@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Markah GKKO1062 - Kokurikulum dan Kesihatan Diri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Login Form */
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Student Info Card */
+        .student-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .student-card p {
+            margin: 8px 0;
+        }
+
+        .student-card strong {
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        /* Marks Display */
+        .marks-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .mark-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .mark-item .label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .mark-item .value {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* Rubrik Display */
+        .rubrik-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .rubrik-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .rubrik-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .rubrik-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rubrik-table .tahap-lemah { background: #fed7d7; }
+        .rubrik-table .tahap-lulus { background: #feebc8; }
+        .rubrik-table .tahap-kepujian { background: #c6f6d5; }
+        .rubrik-table .tahap-cemerlang { background: #bee3f8; }
+        .rubrik-table .tahap-amat { background: #d6f5ff; }
+
+        /* Grading Form */
+        .grading-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .grading-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+        }
+
+        .mark-guide {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Student List in Lecturer View */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .student-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .student-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .student-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-grade {
+            background: #48bb78;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-grade:hover {
+            background: #38a169;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border-left: 4px solid #4299e1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 20px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .grading-row {
+                grid-template-columns: 1fr;
+            }
+
+            .student-table {
+                font-size: 12px;
+            }
+
+            .student-table th,
+            .student-table td {
+                padding: 8px;
+            }
+
+            .modal-content {
+                max-width: 95%;
+                padding: 20px;
+            }
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .total-section div {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📊 Portal Markah GKKO1062</h1>
+            <p>Kokurikulum dan Kesihatan Diri | PPISMP 2024</p>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" onclick="showSection('student')">👨‍🎓 Pelajar</button>
+                <button class="btn btn-secondary" onclick="showSection('lecturer')">👨‍🏫 Pensyarah</button>
+                <button class="btn btn-danger" id="logoutBtn" style="display:none;" onclick="logout()">🚪 Keluar</button>
+            </div>
+        </header>
+
+        <!-- Pelajar Section -->
+        <section id="student" class="section active">
+            <h2>📝 Portal Pelajar</h2>
+            
+            <div class="form-group">
+                <label for="studentSelect">Pilih Pelajar:</label>
+                <select id="studentSelect" onchange="loadStudentMarks()">
+                    <option value="">-- Sila Pilih --</option>
+                </select>
+            </div>
+
+            <div id="studentInfo" style="display:none;">
+                <div class="student-card">
+                    <p><strong>Nama Pelajar:</strong> <span id="studentName"></span></p>
+                    <p><strong>No. K/P:</strong> <span id="studentKP"></span></p>
+                    <p><strong>No. Giliran:</strong> <span id="studentNo"></span></p>
+                    <p><strong>Kelas:</strong> <span id="studentClass"></span></p>
+                </div>
+
+                <h3>📌 Markah Pentaksiran Berterusan</h3>
+                <div class="marks-section">
+                    <div class="mark-item">
+                        <div class="label">Ujian (30%)</div>
+                        <div class="value"><span id="markUjian">-</span>/30</div>
+                    </div>
+                    <div class="mark-item">
+                        <div class="label">Persembahan (20%)</div>
+                        <div class="value"><span id="markPersembahan">-</span>/20</div>
+                    </div>
+                    <div class="mark-item">
+                        <div class="label">Penulisan (50%)</div>
+                        <div class="value"><span id="markPenulisan">-</span>/50</div>
+                    </div>
+                </div>
+
+                <div class="total-section">
+                    <div>
+                        <span>JUMLAH MARKAH (100%):</span>
+                        <span id="totalMark">0</span>
+                    </div>
+                    <div>
+                        <span>GRED:</span>
+                        <span id="grade" style="font-size: 24px;">-</span>
+                    </div>
+                </div>
+
+                <h3>📖 Rubrik Pemarkahan</h3>
+                <div style="margin: 20px 0;">
+                    <p style="margin-bottom: 10px;"><strong>TUGASAN 1: UJIAN (30%)</strong></p>
+                    <table class="rubrik-table">
+                        <tr>
+                            <th>Tahap</th>
+                            <th>Markah</th>
+                            <th>Kriteria</th>
+                        </tr>
+                        <tr class="tahap-lemah">
+                            <td>Lemah</td>
+                            <td>&lt;15</td>
+                            <td>Menjawab soalan ujian dengan agak memuaskan namun huraian salah</td>
+                        </tr>
+                        <tr class="tahap-lulus">
+                            <td>Lulus</td>
+                            <td>15-17.9</td>
+                            <td>Menjawab dengan memuaskan serta huraian tepat</td>
+                        </tr>
+                        <tr class="tahap-kepujian">
+                            <td>Kepujian</td>
+                            <td>18-22.4</td>
+                            <td>Menjawab dengan huraian tepat dan contoh agak tepat</td>
+                        </tr>
+                        <tr class="tahap-cemerlang">
+                            <td>Cemerlang</td>
+                            <td>22.5-26.9</td>
+                            <td>Menjawab dengan cemerlang dan huraian sangat tepat</td>
+                        </tr>
+                        <tr class="tahap-amat">
+                            <td>Amat Cemerlang</td>
+                            <td>27-30</td>
+                            <td>Menjawab dengan amat cemerlang dan contoh sangat tepat</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <p style="margin-bottom: 10px;"><strong>TUGASAN 2: PERSEMBAHAN (20%)</strong></p>
+                    <table class="rubrik-table">
+                        <tr>
+                            <th>Tahap</th>
+                            <th>Markah</th>
+                            <th>Kriteria</th>
+                        </tr>
+                        <tr class="tahap-lemah">
+                            <td>Lemah</td>
+                            <td>&lt;10</td>
+                            <td>Menilai dan memberi maklum balas dengan agak memuaskan</td>
+                        </tr>
+                        <tr class="tahap-lulus">
+                            <td>Lulus</td>
+                            <td>10-11.9</td>
+                            <td>Menilai dan memberi maklum balas dengan memuaskan</td>
+                        </tr>
+                        <tr class="tahap-kepujian">
+                            <td>Kepujian</td>
+                            <td>12-14.9</td>
+                            <td>Dapat menilai dan memberi maklum balas dengan baik</td>
+                        </tr>
+                        <tr class="tahap-cemerlang">
+                            <td>Cemerlang</td>
+                            <td>15-17.9</td>
+                            <td>Dapat menilai dan memberi maklum balas dengan tepat</td>
+                        </tr>
+                        <tr class="tahap-amat">
+                            <td>Amat Cemerlang</td>
+                            <td>18-20</td>
+                            <td>Dapat menilai dan memberi maklum balas dengan sangat tepat</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <p style="margin-bottom: 10px;"><strong>TUGASAN 3: PENULISAN (50%)</strong></p>
+                    <table class="rubrik-table">
+                        <tr>
+                            <th>Tahap</th>
+                            <th>Markah</th>
+                            <th>Kriteria</th>
+                        </tr>
+                        <tr class="tahap-lemah">
+                            <td>Lemah</td>
+                            <td>&lt;25</td>
+                            <td>Idea lemah, pengolahan ayat dan bahasa lemah</td>
+                        </tr>
+                        <tr class="tahap-lulus">
+                            <td>Lulus</td>
+                            <td>25-29.9</td>
+                            <td>Idea sederhana, pengolahan ayat dan bahasa baik</td>
+                        </tr>
+                        <tr class="tahap-kepujian">
+                            <td>Kepujian</td>
+                            <td>30-37.4</td>
+                            <td>Idea baik, pengolahan ayat dan bahasa baik</td>
+                        </tr>
+                        <tr class="tahap-cemerlang">
+                            <td>Cemerlang</td>
+                            <td>37.5-44.9</td>
+                            <td>Idea relevan, pengolahan ayat dan bahasa menarik</td>
+                        </tr>
+                        <tr class="tahap-amat">
+                            <td>Amat Cemerlang</td>
+                            <td>45-50</td>
+                            <td>Idea sangat relevan, pengolahan ayat dan bahasa menarik</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pensyarah Section -->
+        <section id="lecturer" class="section">
+            <h2>👨‍🏫 Portal Pensyarah</h2>
+
+            <div id="lecturerLogin">
+                <h3>🔐 Log Masuk Pensyarah</h3>
+                <div class="login-form">
+                    <div class="alert alert-info">
+                        Demo: Username: <strong>pensyarah</strong> | Password: <strong>123456</strong>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" placeholder="Masukkan username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" placeholder="Masukkan password">
+                    </div>
+                    <button class="btn btn-secondary" onclick="lecturerLogin()" style="width: 100%;">Log Masuk</button>
+                </div>
+            </div>
+
+            <div id="lecturerDashboard" style="display:none;">
+                <h3>📋 Senarai Pelajar - Pemarkahan</h3>
+                <div id="alert" class="alert"></div>
+                <div id="lectureMarksList"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal untuk Pemarkahan -->
+    <div id="markingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 Masukkan Markah</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="markingForm"></div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL"; // Ganti dengan URL Apps Script anda
+
+        // Data global
+        let students = [];
+        let marks = [];
+        let currentStudent = null;
+        let lecturerLoggedIn = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudents();
+            loadAllMarks();
+        });
+
+        // =====================================================
+        // UTILITY FUNCTIONS
+        // =====================================================
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.getElementById('alert') || createAlert();
+            alertDiv.textContent = message;
+            alertDiv.className = `alert show alert-${type}`;
+            setTimeout(() => alertDiv.classList.remove('show'), 5000);
+        }
+
+        function createAlert() {
+            const alert = document.createElement('div');
+            alert.id = 'alert';
+            alert.className = 'alert';
+            document.querySelector('#lecturerDashboard').insertBefore(alert, document.querySelector('#lectureMarksList'));
+            return alert;
+        }
+
+        // =====================================================
+        // PELAJAR FUNCTIONS
+        // =====================================================
+
+        async function loadStudents() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?student-data`);
+                const data = await response.json();
+                if (data.success) {
+                    students = data.data;
+                    populateStudentSelect();
+                }
+            } catch (e) {
+                console.log('Demo mode: Using sample data');
+                students = [
+                    {
+                        ID_SISTEM: '001',
+                        Nama_Pelajar: 'Ahmad Bin Ali',
+                        JANTINA: 'L',
+                        No_KP: '010112-01-1234',
+                        No_Giliran: 'BM001',
+                        Kelas: 'Bahasa Melayu',
+                        Penilai: 'Pn. Fatimah'
+                    },
+                    {
+                        ID_SISTEM: '002',
+                        Nama_Pelajar: 'Siti Nurhaliza',
+                        JANTINA: 'P',
+                        No_KP: '020315-02-5678',
+                        No_Giliran: 'BM002',
+                        Kelas: 'Bahasa Melayu',
+                        Penilai: 'Pn. Fatimah'
+                    }
+                ];
+                populateStudentSelect();
+            }
+        }
+
+        function populateStudentSelect() {
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = '<option value="">-- Sila Pilih --</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.ID_SISTEM;
+                option.textContent = `${student.Nama_Pelajar} (${student.No_Giliran})`;
+                select.appendChild(option);
+            });
+        }
+
+        function loadStudentMarks() {
+            const studentId = document.getElementById('studentSelect').value;
+            if (!studentId) {
+                document.getElementById('studentInfo').style.display = 'none';
+                return;
+            }
+
+            const student = students.find(s => s.ID_SISTEM === studentId);
+            if (!student) return;
+
+            // Display student info
+            document.getElementById('studentName').textContent = student.Nama_Pelajar;
+            document.getElementById('studentKP').textContent = student.No_KP;
+            document.getElementById('studentNo').textContent = student.No_Giliran;
+            document.getElementById('studentClass').textContent = student.Kelas;
+
+            // Load marks
+            const mark = marks.find(m => m.ID_SISTEM === studentId) || {
+                Ujian_30: 0,
+                Persembahan_20: 0,
+                Penulisan_50: 0,
+                Total_100: 0,
+                Gred: '-'
+            };
+
+            document.getElementById('markUjian').textContent = mark.Ujian_30 || 0;
+            document.getElementById('markPersembahan').textContent = mark.Persembahan_20 || 0;
+            document.getElementById('markPenulisan').textContent = mark.Penulisan_50 || 0;
+            document.getElementById('totalMark').textContent = mark.Total_100 || 0;
+            document.getElementById('grade').textContent = mark.Gred || '-';
+
+            document.getElementById('studentInfo').style.display = 'block';
+        }
+
+        // =====================================================
+        // PENSYARAH FUNCTIONS
+        // =====================================================
+
+        async function lecturerLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showAlert('Sila masukkan username dan password', 'error');
+                return;
+            }
+
+            // Demo login
+            if (username === 'pensyarah' && password === '123456') {
+                lecturerLoggedIn = true;
+                document.getElementById('lecturerLogin').style.display = 'none';
+                document.getElementById('lecturerDashboard').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                displayStudentMarksList();
+                showAlert('Log masuk berjaya!', 'success');
+            } else {
+                showAlert('Username atau password tidak tepat', 'error');
+            }
+        }
+
+        async function loadAllMarks() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?get-all-marks`);
+                const data = await response.json();
+                if (data.success) {
+                    marks = data.data;
+                }
+            } catch (e) {
+                console.log('Demo mode: marks data');
+                marks = [
+                    {
+                        ID_SISTEM: '001',
+                        Nama_Pelajar: 'Ahmad Bin Ali',
+                        No_Giliran: 'BM001',
+                        Ujian_30: 25,
+                        Persembahan_20: 18,
+                        Penulisan_50: 42,
+                        Total_100: 85,
+                        Gred: 'A'
+                    },
+                    {
+                        ID_SISTEM: '002',
+                        Nama_Pelajar: 'Siti Nurhaliza',
+                        No_Giliran: 'BM002',
+                        Ujian_30: 0,
+                        Persembahan_20: 0,
+                        Penulisan_50: 0,
+                        Total_100: 0,
+                        Gred: '-'
+                    }
+                ];
+            }
+        }
+
+        function displayStudentMarksList() {
+            const container = document.getElementById('lectureMarksList');
+            container.innerHTML = `
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Nama Pelajar</th>
+                            <th>No. Giliran</th>
+                            <th>Ujian (30)</th>
+                            <th>Persembahan (20)</th>
+                            <th>Penulisan (50)</th>
+                            <th>Total (100)</th>
+                            <th>Gred</th>
+                            <th>Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            marks.forEach((mark, index) => {
+                container.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${mark.Nama_Pelajar || '-'}</td>
+                        <td>${mark.No_Giliran || '-'}</td>
+                        <td>${mark.Ujian_30 || 0}</td>
+                        <td>${mark.Persembahan_20 || 0}</td>
+                        <td>${mark.Penulisan_50 || 0}</td>
+                        <td><strong>${mark.Total_100 || 0}</strong></td>
+                        <td>${mark.Gred || '-'}</td>
+                        <td><button class="btn-grade" onclick="openMarkingModal('${mark.ID_SISTEM}')">Pemarkahan</button></td>
+                    </tr>
+                `;
+            });
+
+            container.innerHTML += `
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function openMarkingModal(studentId) {
+            const student = students.find(s => s.ID_SISTEM === studentId);
+            const mark = marks.find(m => m.ID_SISTEM === studentId) || {};
+
+            const form = document.getElementById('markingForm');
+            form.innerHTML = `
+                <p><strong>Pelajar:</strong> ${student.Nama_Pelajar} (${student.No_Giliran})</p>
+                
+                <h4 style="margin-top: 20px;">Markah Pentaksiran Berterusan</h4>
+                
+                <div class="grading-form">
+                    <div class="form-group">
+                        <label>1. UJIAN (30%)</label>
+                        <input type="number" id="markUjianInput" value="${mark.Ujian_30 || 0}" min="0" max="30" step="0.1">
+                        <div class="mark-guide">Markah minimum: 0 | Markah maksimum: 30</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. PERSEMBAHAN (20%)</label>
+                        <input type="number" id="markPersembahanInput" value="${mark.Persembahan_20 || 0}" min="0" max="20" step="0.1">
+                        <div class="mark-guide">Markah minimum: 0 | Markah maksimum: 20</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3. PENULISAN (50%)</label>
+                        <input type="number" id="markPenulisanInput" value="${mark.Penulisan_50 || 0}" min="0" max="50" step="0.1">
+                        <div class="mark-guide">Markah minimum: 0 | Markah maksimum: 50</div>
+                    </div>
+                </div>
+
+                <div style="background: #f0f0f0; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <strong>Jumlah Markah (100%):</strong> <span id="previewTotal">0</span><br>
+                    <strong>Anggaran Gred:</strong> <span id="previewGrade">-</span>
+                </div>
+
+                <button class="btn btn-secondary" onclick="submitMarks('${studentId}')" style="width: 100%; margin-top: 15px;">💾 Simpan Markah</button>
+            `;
+
+            // Add event listeners for real-time calculation
+            document.getElementById('markUjianInput').addEventListener('input', calculateTotal);
+            document.getElementById('markPersembahanInput').addEventListener('input', calculateTotal);
+            document.getElementById('markPenulisanInput').addEventListener('input', calculateTotal);
+
+            calculateTotal();
+
+            document.getElementById('markingModal').classList.add('show');
+        }
+
+        function calculateTotal() {
+            const ujian = parseFloat(document.getElementById('markUjianInput').value) || 0;
+            const persembahan = parseFloat(document.getElementById('markPersembahanInput').value) || 0;
+            const penulisan = parseFloat(document.getElementById('markPenulisanInput').value) || 0;
+
+            const total = ujian + persembahan + penulisan;
+            document.getElementById('previewTotal').textContent = total.toFixed(1);
+
+            // Calculate grade
+            let grade = 'F';
+            if (total >= 90) grade = 'A+';
+            else if (total >= 85) grade = 'A';
+            else if (total >= 80) grade = 'A-';
+            else if (total >= 75) grade = 'B+';
+            else if (total >= 70) grade = 'B';
+            else if (total >= 65) grade = 'B-';
+            else if (total >= 60) grade = 'C+';
+            else if (total >= 55) grade = 'C';
+            else if (total >= 50) grade = 'C-';
+            else if (total >= 40) grade = 'D';
+
+            document.getElementById('previewGrade').textContent = grade;
+        }
+
+        async function submitMarks(studentId) {
+            const ujian = parseFloat(document.getElementById('markUjianInput').value) || 0;
+            const persembahan = parseFloat(document.getElementById('markPersembahanInput').value) || 0;
+            const penulisan = parseFloat(document.getElementById('markPenulisanInput').value) || 0;
+
+            // Validate
+            if (ujian < 0 || ujian > 30) {
+                showAlert('Markah Ujian mesti antara 0-30', 'error');
+                return;
+            }
+            if (persembahan < 0 || persembahan > 20) {
+                showAlert('Markah Persembahan mesti antara 0-20', 'error');
+                return;
+            }
+            if (penulisan < 0 || penulisan > 50) {
+                showAlert('Markah Penulisan mesti antara 0-50', 'error');
+                return;
+            }
+
+            // Demo save
+            const mark = marks.find(m => m.ID_SISTEM === studentId);
+            if (mark) {
+                mark.Ujian_30 = ujian;
+                mark.Persembahan_20 = persembahan;
+                mark.Penulisan_50 = penulisan;
+                mark.Total_100 = ujian + persembahan + penulisan;
+
+                let grade = 'F';
+                if (mark.Total_100 >= 90) grade = 'A+';
+                else if (mark.Total_100 >= 85) grade = 'A';
+                else if (mark.Total_100 >= 80) grade = 'A-';
+                else if (mark.Total_100 >= 75) grade = 'B+';
+                else if (mark.Total_100 >= 70) grade = 'B';
+                else if (mark.Total_100 >= 65) grade = 'B-';
+                else if (mark.Total_100 >= 60) grade = 'C+';
+                else if (mark.Total_100 >= 55) grade = 'C';
+                else if (mark.Total_100 >= 50) grade = 'C-';
+                else if (mark.Total_100 >= 40) grade = 'D';
+
+                mark.Gred = grade;
+            }
+
+            showAlert('Markah disimpan berjaya!', 'success');
+            closeModal();
+            displayStudentMarksList();
+        }
+
+        function closeModal() {
+            document.getElementById('markingModal').classList.remove('show');
+        }
+
+        function logout() {
+            lecturerLoggedIn = false;
+            document.getElementById('lecturerLogin').style.display = 'block';
+            document.getElementById('lecturerDashboard').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            showAlert('Anda telah log keluar', 'info');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('markingModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
