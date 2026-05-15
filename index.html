@@ -10,7 +10,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e3a8a); min-height: 100vh; color: white; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
-        .input-glass { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 8px; outline: none; width: 100%; }
+        .input-glass { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 8px; outline: none; width: 100%; transition: border-color 0.3s;}
+        .input-glass:focus { border-color: #06b6d4; }
         .hidden-view { display: none !important; }
     </style>
 </head>
@@ -31,10 +32,10 @@
             </div>
         </div>
 
-        <div id="viewStudentLogin" class="hidden-view glass max-w-md mx-auto p-10">
-            <h2 class="text-xl font-bold mb-6 text-center text-cyan-400">Login No. KP</h2>
+        <div id="viewStudentLogin" class="hidden-view glass max-w-md mx-auto p-10 text-center">
+            <h2 class="text-xl font-bold mb-6 text-cyan-400">Log Masuk Pelajar (No. KP)</h2>
             <input type="text" id="kpLogin" placeholder="Guna No KP tanpa -" class="input-glass text-center font-bold mb-6">
-            <button id="btnLoginStu" class="w-full bg-cyan-600 py-4 rounded-xl font-bold">Masuk Dashboard</button>
+            <button id="btnLoginStu" class="w-full bg-cyan-600 py-4 rounded-xl font-bold hover:bg-cyan-500 transition">Masuk Dashboard</button>
         </div>
 
         <div id="viewStudentDash" class="hidden-view glass p-8">
@@ -44,19 +45,28 @@
                         <i id="imgIcon" class="fa-solid fa-user text-6xl text-white/20"></i>
                         <img id="stuImg" class="hidden absolute inset-0 w-full h-full object-cover z-10">
                     </div>
-                    <input type="file" id="fileImg" class="hidden" accept="image/*">
-                    <button onclick="document.getElementById('fileImg').click()" class="bg-cyan-600 px-6 py-2 rounded-xl font-bold w-full">Pilih Foto Profil Baru</button>
+                    <input type="file" id="fileImg" class="hidden" accept="image/jpeg, image/png">
+                    <button onclick="document.getElementById('fileImg').click()" class="bg-cyan-600 hover:bg-cyan-500 transition px-6 py-2 rounded-xl font-bold w-full">Pilih Foto Profil Baru</button>
                     <p id="fileStatus" class="text-xs text-emerald-400 font-bold mt-2"></p>
                 </div>
                 <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">NAMA PENUH</label><input type="text" id="b_nama" class="input-glass uppercase"></div>
-                    <div><label class="text-[10px] text-cyan-400 font-bold">NO. KP</label><input type="text" id="b_kp" class="input-glass bg-white/5" readonly></div>
+                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">NAMA PENUH</label><input type="text" id="b_nama" class="input-glass uppercase font-bold"></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">NO. KP</label><input type="text" id="b_kp" class="input-glass bg-white/5 text-white/50" readonly></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">ID SISTEM</label><input type="text" id="b_id" class="input-glass bg-white/5 text-white/50" readonly></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">JANTINA</label><select id="b_jantina" class="input-glass"><option value="LELAKI">LELAKI</option><option value="PEREMPUAN">PEREMPUAN</option></select></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">NO. GILIRAN</label><input type="text" id="b_giliran" class="input-glass"></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">KELAS</label><input type="text" id="b_kelas" class="input-glass"></div>
-                    <div><label class="text-[10px] text-cyan-400 font-bold">ID SISTEM</label><input type="text" id="b_id" class="input-glass bg-white/5" readonly></div>
+                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">PENSYARAH PENILAI</label><input type="text" id="b_penilai" class="input-glass"></div>
                 </div>
             </div>
-            <button id="btnUpdateStu" class="w-full bg-cyan-600 mt-10 py-5 rounded-xl font-bold text-lg shadow-lg">SIMPAN & MUATNAIK</button>
+            <button id="btnUpdateStu" class="w-full bg-cyan-600 hover:bg-cyan-500 transition mt-10 py-5 rounded-xl font-bold text-lg shadow-lg shadow-cyan-500/30">SIMPAN SEMUA PERUBAHAN</button>
+        </div>
+
+        <div id="viewLecturerLogin" class="hidden-view glass max-w-md mx-auto p-10 text-center">
+            <h2 class="text-xl font-bold mb-6 text-emerald-400">Log Masuk Pensyarah</h2>
+            <input type="text" id="lUser" placeholder="ID Pengguna" class="input-glass mb-4">
+            <input type="password" id="lPass" placeholder="Kata Laluan" class="input-glass mb-6">
+            <button id="btnLoginLect" class="w-full bg-emerald-600 hover:bg-emerald-500 transition py-4 rounded-xl font-bold">Log Masuk</button>
         </div>
 
         <div id="viewLecturerDash" class="hidden-view space-y-6">
@@ -70,7 +80,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summaryStats"></div>
                 <div class="glass overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-left">
                     <thead class="bg-white/5 text-[10px] text-white/50">
-                        <tr><th>Pelajar</th><th class="text-center">Markah (30/20/50)</th><th class="text-center w-20">Total</th><th class="text-center w-20">Gred</th><th class="text-center w-20">Simpan</th></tr>
+                        <tr><th class="p-4">Pelajar</th><th class="text-center p-4">Markah (30/20/50)</th><th class="text-center w-20 p-4">Total</th><th class="text-center w-20 p-4">Gred</th><th class="text-center w-20 p-4">Simpan</th></tr>
                     </thead>
                     <tbody id="studentTableBody"></tbody>
                 </table></div></div>
@@ -84,10 +94,10 @@
     </div>
 
     <script>
-        // MASUKKAN URL WEB APP ANDA DI SINI
-        const API = 'GANTIKAN_URL_WEB_APP_ANDA_DISINI';
+        // URL API ANDA YANG BAHARU
+        const API = 'https://script.google.com/macros/s/AKfycbwMBTWvGlSLiRbt08szbvacoJiDpRTRoGgJTAgfrysJJXqteLEs_d3QVHi5t2Fqtyi3/exec';
 
-        // FIX 1 & 2: Pengurusan Gambar Google Drive
+        // Fix 1 & 2: Pengurusan Gambar Google Drive
         function fixDriveUrl(url) {
             if (!url) return "";
             const match = url.match(/[-\w]{25,}/);
@@ -104,80 +114,168 @@
             img.src = finalUrl;
         }
 
+        function setLoader(show, text="Memproses...") {
+            const loaderText = document.getElementById('loaderText');
+            const loader = document.getElementById('loader');
+            if (loaderText) loaderText.innerText = text;
+            if (loader) {
+                if(show) loader.classList.remove('hidden-view');
+                else loader.classList.add('hidden-view');
+            }
+        }
+
         async function call(payload) {
             try {
-                const res = await fetch(API, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+                const res = await fetch(API, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain' }, 
+                    body: JSON.stringify(payload) 
+                });
                 const txt = await res.text();
-                try { return JSON.parse(txt); } catch(e) { alert("Ralat Server: Sila pastikan deployment 'Anyone'."); return {success:false}; }
-            } catch(e) { alert("Ralat Rangkaian."); return {success:false}; }
+                try { 
+                    return JSON.parse(txt); 
+                } catch(e) { 
+                    alert("Ralat Server. Pastikan deployment Who has access adalah 'Anyone'."); 
+                    console.error(txt);
+                    return {success:false}; 
+                }
+            } catch(e) { 
+                alert("Ralat Rangkaian / Internet."); 
+                return {success:false}; 
+            }
         }
 
         // NAVIGATION
         document.getElementById('btnHome').onclick = () => location.reload();
         document.getElementById('goStudent').onclick = () => showView('viewStudentLogin');
-        document.getElementById('goLecturer').onclick = async () => {
-            document.getElementById('loader').classList.remove('hidden-view');
-            const res = await call({ action: "getClasses" });
-            document.getElementById('loader').classList.add('hidden-view');
-            if(res.success) {
-                const sel = document.getElementById('selectClass');
-                sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-                res.classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
-                showView('viewLecturerDash');
-            }
-        };
+        document.getElementById('goLecturer').onclick = () => showView('viewLecturerLogin');
 
         function showView(v) {
-            ['viewHome','viewStudentLogin','viewStudentDash','viewLecturerDash'].forEach(i => document.getElementById(i).classList.add('hidden-view'));
+            ['viewHome','viewStudentLogin','viewStudentDash','viewLecturerDash','viewLecturerLogin'].forEach(i => {
+                const el = document.getElementById(i);
+                if(el) el.classList.add('hidden-view');
+            });
             document.getElementById(v).classList.remove('hidden-view');
+            window.scrollTo(0, 0);
         }
 
-        // LOGIK PELAJAR
+        // ==========================================
+        // PORTAL PELAJAR
+        // ==========================================
+        document.getElementById('fileImg').addEventListener('change', function(e) {
+            const st = document.getElementById('fileStatus');
+            if(this.files[0] && st) st.innerText = "✓ Gambar sedia dimuat naik. Klik SIMPAN.";
+            else if(st) st.innerText = "";
+        });
+
         document.getElementById('btnLoginStu').onclick = async () => {
             const kp = document.getElementById('kpLogin').value.trim();
             if(!kp) return alert("Sila masukkan No KP.");
-            document.getElementById('loader').classList.remove('hidden-view');
+            
+            setLoader(true, "MENCARI DATA...");
             const res = await call({ action: "getStudentByKP", noKP: kp });
-            document.getElementById('loader').classList.add('hidden-view');
+            setLoader(false);
+
             if(res.success) {
                 const s = res.student;
-                document.getElementById('b_kp').value = s.nokp;
-                document.getElementById('b_nama').value = s.nama;
-                document.getElementById('b_kelas').value = s.kelas;
-                document.getElementById('b_id').value = s.id;
+                document.getElementById('b_kp').value = s.nokp || "";
+                document.getElementById('b_id').value = s.id || "";
+                document.getElementById('b_nama').value = s.nama || "";
+                document.getElementById('b_jantina').value = s.jantina || "LELAKI";
+                document.getElementById('b_giliran').value = s.nogiliran || "";
+                document.getElementById('b_kelas').value = s.kelas || "";
+                document.getElementById('b_penilai').value = s.penilai || "";
+                
+                document.getElementById('fileImg').value = "";
+                const fs = document.getElementById('fileStatus');
+                if(fs) fs.innerText = "";
+                
                 loadImage('stuImg', 'imgIcon', s.gambar);
                 showView('viewStudentDash');
-            } else alert(res.message);
+            } else {
+                alert(res.message || "Rekod tidak ditemui!");
+            }
         };
 
-        // FIX 3: Upload Tanpa Reload
+        // Fix 3: Upload tanpa Reload
         document.getElementById('btnUpdateStu').onclick = async () => {
             const kp = document.getElementById('b_kp').value;
             const file = document.getElementById('fileImg').files[0];
-            document.getElementById('loaderText').innerText = "Menyimpan Data...";
-            document.getElementById('loader').classList.remove('hidden-view');
-
+            
             if(file) {
-                const base64 = await new Promise(r => { const reader = new FileReader(); reader.onload = (e) => r(e.target.result); reader.readAsDataURL(file); });
+                setLoader(true, "MEMUAT NAIK GAMBAR...");
+                const base64 = await new Promise(r => { 
+                    const reader = new FileReader(); 
+                    reader.onload = (e) => r(e.target.result); 
+                    reader.readAsDataURL(file); 
+                });
+                
                 const resUp = await call({ action: "uploadFoto", noKP: kp, imageBlob: base64 });
-                if(resUp.success) await new Promise(r => setTimeout(r, 2000)); // Drive processing delay
+                if(resUp.success) {
+                    setLoader(true, "MEMPROSES PAUTAN...");
+                    await new Promise(r => setTimeout(r, 2000)); // Drive API delay
+                } else {
+                    setLoader(false);
+                    return alert("Ralat Gambar: " + (resUp.message || "Gagal muat naik"));
+                }
             }
 
-            const resBio = await call({ action: "updateBiodata", formData: { No_KP: kp, Nama_Pelajar: document.getElementById('b_nama').value, JANTINA: document.getElementById('b_jantina').value, No_Giliran: "", Kelas: document.getElementById('b_kelas').value, Penilai: "" }});
+            setLoader(true, "MENYIMPAN BIODATA...");
+            const resBio = await call({ 
+                action: "updateBiodata", 
+                formData: { 
+                    No_KP: kp, 
+                    Nama_Pelajar: document.getElementById('b_nama').value, 
+                    JANTINA: document.getElementById('b_jantina').value, 
+                    No_Giliran: document.getElementById('b_giliran').value, 
+                    Kelas: document.getElementById('b_kelas').value, 
+                    Penilai: document.getElementById('b_penilai').value 
+                }
+            });
+
+            setLoader(false);
+
             if(resBio.success) {
-                const resFresh = await call({ action: "getStudentByKP", noKP: kp });
-                if(resFresh.success) loadImage('stuImg', 'imgIcon', resFresh.student.gambar);
-                alert("Berjaya Disimpan!");
+                if(file) {
+                    setLoader(true, "MENYEGARKAN GAMBAR...");
+                    const resFresh = await call({ action: "getStudentByKP", noKP: kp });
+                    setLoader(false);
+                    if(resFresh.success) loadImage('stuImg', 'imgIcon', resFresh.student.gambar);
+                }
+                const fs = document.getElementById('fileStatus');
+                if(fs) fs.innerText = "";
+                alert("Berjaya Disimpan ke Pangkalan Data!");
+            } else {
+                alert("Ralat menyalin biodata: " + resBio.message);
             }
-            document.getElementById('loader').classList.add('hidden-view');
         };
 
-        // LECTURER DASHBOARD
+        // ==========================================
+        // DASHBOARD PENSYARAH
+        // ==========================================
+        document.getElementById('btnLoginLect').onclick = async () => {
+            setLoader(true, "MENGESAHKAN...");
+            const res = await call({ action: "login", username: document.getElementById('lUser').value, password: document.getElementById('lPass').value });
+            if(res.success) {
+                const resClass = await call({ action: "getClasses" });
+                setLoader(false);
+                if(resClass.success) {
+                    const sel = document.getElementById('selectClass');
+                    sel.innerHTML = '<option value="">-- Senarai Kelas --</option>';
+                    resClass.classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+                    showView('viewLecturerDash');
+                }
+            } else {
+                setLoader(false);
+                alert(res.message || "Log masuk gagal.");
+            }
+        };
+
         document.getElementById('selectClass').onchange = async (e) => {
             if(!e.target.value) return;
-            document.getElementById('loader').classList.remove('hidden-view');
+            setLoader(true, "MENARIK SENARAI KELAS...");
             const res = await call({ action: "getStudentsByClass", kelas: e.target.value });
-            document.getElementById('loader').classList.add('hidden-view');
+            setLoader(false);
             if(res.success) renderTable(res.students);
         };
 
@@ -186,22 +284,26 @@
             tbody.innerHTML = '';
             students.forEach((s, i) => {
                 const imgId = 'tImg'+i;
+                const iconId = 'tIcn'+i;
                 tbody.innerHTML += `
-                    <tr class="border-b border-white/5">
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition">
                         <td class="p-4 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gray-800 overflow-hidden"><img id="${imgId}" class="hidden w-full h-full object-cover"></div>
-                            <span class="text-[10px] font-bold uppercase truncate w-24">${s.nama}</span>
+                            <div class="relative w-10 h-10 rounded-full border border-white/20 bg-gray-800 flex items-center justify-center overflow-hidden">
+                                <i id="${iconId}" class="fa-solid fa-user text-white/30 text-xs"></i>
+                                <img id="${imgId}" class="hidden absolute inset-0 w-full h-full object-cover z-10">
+                            </div>
+                            <span class="text-[11px] font-bold uppercase truncate w-32 md:w-full">${s.nama}</span>
                         </td>
-                        <td class="text-center">
-                            <input type="number" value="${s.u}" oninput="calc(${i})" class="input-glass w-12 text-center u-in text-[10px] p-1">
-                            <input type="number" value="${s.p}" oninput="calc(${i})" class="input-glass w-12 text-center p-in text-[10px] p-1">
-                            <input type="number" value="${s.pen}" oninput="calc(${i})" class="input-glass w-12 text-center pen-in text-[10px] p-1">
+                        <td class="text-center p-2">
+                            <input type="number" value="${s.u}" oninput="calc(${i})" class="input-glass w-12 text-center u-in text-[10px] p-2">
+                            <input type="number" value="${s.p}" oninput="calc(${i})" class="input-glass w-12 text-center p-in text-[10px] p-2">
+                            <input type="number" value="${s.pen}" oninput="calc(${i})" class="input-glass w-12 text-center pen-in text-[10px] p-2">
                         </td>
-                        <td class="text-center font-bold text-cyan-400 t-out">${s.total}</td>
-                        <td class="text-center font-bold g-out">${s.gred}</td>
-                        <td class="text-center"><button onclick="saveMark('${s.id}', ${i})" class="bg-emerald-600 p-2 rounded text-[10px]"><i class="fa-solid fa-save"></i></button></td>
+                        <td class="text-center font-bold text-cyan-400 t-out p-2">${s.total}</td>
+                        <td class="text-center font-bold g-out p-2">${s.gred}</td>
+                        <td class="text-center p-2"><button onclick="saveMark('${s.id}', ${i})" class="bg-emerald-600 hover:bg-emerald-500 transition p-2 rounded-lg text-[10px] text-white w-full"><i class="fa-solid fa-save"></i></button></td>
                     </tr>`;
-                setTimeout(() => loadImage(imgId, null, s.gambar), 100);
+                setTimeout(() => loadImage(imgId, iconId, s.gambar), 50);
             });
             updateStats();
             document.getElementById('classContent').classList.remove('hidden-view');
@@ -211,23 +313,23 @@
             const u = parseFloat(document.querySelectorAll('.u-in')[idx].value) || 0;
             const p = parseFloat(document.querySelectorAll('.p-in')[idx].value) || 0;
             const pen = parseFloat(document.querySelectorAll('.pen-in')[idx].value) || 0;
-            const t = (u + p + pen).toFixed(1);
-            document.querySelectorAll('.t-out')[idx].innerText = t;
-            document.querySelectorAll('.g-out')[idx].innerText = getGred(t);
+            const t = u + p + pen;
+            document.querySelectorAll('.t-out')[idx].innerText = t.toFixed(1);
+            document.querySelectorAll('.g-out')[idx].innerText = t>=90?"A+":t>=80?"A":t>=75?"A-":t>=70?"B+":t>=65?"B":t>=60?"B-":t>=55?"C+":t>=50?"C":t>=40?"D":"F";
             updateStats();
-        }
-
-        function getGred(m) {
-            if(m>=90) return "A+"; if(m>=80) return "A"; if(m>=75) return "A-"; if(m>=70) return "B+"; if(m>=65) return "B"; if(m>=60) return "B-"; if(m>=55) return "C+"; if(m>=50) return "C"; if(m>=40) return "D"; return "F";
         }
 
         function updateStats() {
             const totals = Array.from(document.querySelectorAll('.t-out')).map(e => parseFloat(e.innerText));
+            const greds = Array.from(document.querySelectorAll('.g-out')).map(e => e.innerText);
             const avg = totals.length ? (totals.reduce((a,b)=>a+b,0)/totals.length).toFixed(1) : 0;
-            const lulus = Array.from(document.querySelectorAll('.g-out')).filter(e => e.innerText !== 'F').length;
+            const a = greds.filter(g => g.startsWith('A')).length;
+            const lulus = greds.filter(g => g !== 'F' && g !== '').length;
             document.getElementById('summaryStats').innerHTML = `
                 <div class="glass p-4 text-center"><p class="text-[10px] opacity-50">PURATA KELAS</p><p class="text-2xl font-bold">${avg}</p></div>
-                <div class="glass p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] opacity-50">LULUS</p><p class="text-2xl font-bold">${lulus}</p></div>
+                <div class="glass p-4 text-center border-b-4 border-emerald-500"><p class="text-[10px] opacity-50 text-emerald-400">BIL. A</p><p class="text-2xl font-bold">${a}</p></div>
+                <div class="glass p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] opacity-50 text-cyan-400">LULUS</p><p class="text-2xl font-bold">${lulus}</p></div>
+                <div class="glass p-4 text-center border-b-4 border-red-500"><p class="text-[10px] opacity-50 text-red-400">GAGAL</p><p class="text-2xl font-bold">${totals.length - lulus}</p></div>
             `;
         }
 
@@ -235,8 +337,11 @@
             const u = document.querySelectorAll('.u-in')[idx].value;
             const p = document.querySelectorAll('.p-in')[idx].value;
             const pen = document.querySelectorAll('.pen-in')[idx].value;
+            setLoader(true, "MENYIMPAN MARKAH...");
             const res = await call({ action:"saveMarks", idSistem:id, u, p, pen });
-            if(res.success) alert("Disimpan!");
+            setLoader(false);
+            if(res.success) alert("Markah Berjaya Disimpan!");
+            else alert(res.message || "Gagal menyimpan markah.");
         }
     </script>
 </body>
