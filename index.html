@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GKKO1062 Portal | Glassmorphism</title>
+    <title>GKKO1062 PORTAL | KEMASKINI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e3a8a); min-height: 100vh; color: white; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
-        .input-glass { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 10px; outline: none; transition: 0.3s; width: 100%; }
+        .input-glass { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 10px; border-radius: 8px; outline: none; width: 100%; }
         .hidden-view { display: none !important; }
     </style>
 </head>
@@ -24,15 +24,15 @@
     <main class="max-w-6xl mx-auto">
         <div id="viewHome" class="grid md:grid-cols-2 gap-8 py-20">
             <div id="goStudent" class="glass p-12 text-center cursor-pointer hover:scale-105 transition border-t-4 border-cyan-500">
-                <i class="fa-solid fa-user-edit text-6xl mb-4 text-cyan-400"></i><h2 class="text-3xl font-bold">Portal Pelajar</h2><p class="text-white/50">Kemaskini Biodata & Foto</p>
+                <i class="fa-solid fa-user-edit text-6xl mb-4 text-cyan-400"></i><h2 class="text-2xl font-bold">Portal Pelajar</h2><p class="text-white/50">Biodata & Foto</p>
             </div>
             <div id="goLecturer" class="glass p-12 text-center cursor-pointer hover:scale-105 transition border-t-4 border-emerald-500">
-                <i class="fa-solid fa-users-cog text-6xl mb-4 text-emerald-400"></i><h2 class="text-3xl font-bold">Portal Pensyarah</h2><p class="text-white/50">Pemarkahan & Rumusan Kelas</p>
+                <i class="fa-solid fa-users-cog text-6xl mb-4 text-emerald-400"></i><h2 class="text-2xl font-bold">Dashboard Pensyarah</h2><p class="text-white/50">Pemarkahan & Rumusan Kelas</p>
             </div>
         </div>
 
-        <div id="viewStudentLogin" class="hidden-view glass max-w-md mx-auto p-10 text-center">
-            <h2 class="text-xl font-bold mb-6 text-cyan-400">Log Masuk Pelajar (No. KP)</h2>
+        <div id="viewStudentLogin" class="hidden-view glass max-w-md mx-auto p-10">
+            <h2 class="text-xl font-bold mb-6 text-center text-cyan-400">Login No. KP</h2>
             <input type="text" id="kpLogin" placeholder="Guna No KP tanpa -" class="input-glass text-center font-bold mb-6">
             <button id="btnLoginStu" class="w-full bg-cyan-600 py-4 rounded-xl font-bold">Masuk Dashboard</button>
         </div>
@@ -44,19 +44,19 @@
                         <i id="imgIcon" class="fa-solid fa-user text-6xl text-white/20"></i>
                         <img id="stuImg" class="hidden absolute inset-0 w-full h-full object-cover z-10">
                     </div>
-                    <input type="file" id="fileImg" class="hidden" accept="image/jpeg, image/png">
-                    <button onclick="document.getElementById('fileImg').click()" class="bg-cyan-600 px-6 py-2 rounded-xl font-bold w-full">Pilih Foto Profil</button>
+                    <input type="file" id="fileImg" class="hidden" accept="image/*">
+                    <button onclick="document.getElementById('fileImg').click()" class="bg-cyan-600 px-6 py-2 rounded-xl font-bold w-full">Pilih Foto Profil Baru</button>
                     <p id="fileStatus" class="text-xs text-emerald-400 font-bold mt-2"></p>
                 </div>
                 <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">NAMA PENUH</label><input type="text" id="b_nama" class="input-glass uppercase font-bold"></div>
+                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">NAMA PENUH</label><input type="text" id="b_nama" class="input-glass uppercase"></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">NO. KP</label><input type="text" id="b_kp" class="input-glass bg-white/5" readonly></div>
-                    <div><label class="text-[10px] text-cyan-400 font-bold">ID SISTEM</label><input type="text" id="b_id" class="input-glass bg-white/5" readonly></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">JANTINA</label><select id="b_jantina" class="input-glass"><option value="LELAKI">LELAKI</option><option value="PEREMPUAN">PEREMPUAN</option></select></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">KELAS</label><input type="text" id="b_kelas" class="input-glass"></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">ID SISTEM</label><input type="text" id="b_id" class="input-glass bg-white/5" readonly></div>
                 </div>
             </div>
-            <button id="btnUpdateStu" class="w-full bg-cyan-600 mt-10 py-5 rounded-xl font-bold text-lg">SIMPAN & MUATNAIK</button>
+            <button id="btnUpdateStu" class="w-full bg-cyan-600 mt-10 py-5 rounded-xl font-bold text-lg shadow-lg">SIMPAN & MUATNAIK</button>
         </div>
 
         <div id="viewLecturerDash" class="hidden-view space-y-6">
@@ -80,20 +80,20 @@
 
     <div id="loader" class="hidden-view fixed inset-0 bg-black/80 flex items-center justify-center z-50 flex-col">
         <div class="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p id="loaderText" class="font-bold uppercase tracking-widest text-sm">Sedang Memproses...</p>
+        <p id="loaderText" class="font-bold uppercase tracking-widest text-sm text-cyan-300">Memproses...</p>
     </div>
 
     <script>
+        // MASUKKAN URL WEB APP ANDA DI SINI
         const API = 'GANTIKAN_URL_WEB_APP_ANDA_DISINI';
 
-        // Fix 1: Regex ID Drive
+        // FIX 1 & 2: Pengurusan Gambar Google Drive
         function fixDriveUrl(url) {
             if (!url) return "";
             const match = url.match(/[-\w]{25,}/);
             return match ? `https://drive.google.com/thumbnail?id=${match[0]}&sz=w800` : url;
         }
 
-        // Fix 2: Image Loader + Fallback
         function loadImage(imgId, iconId, rawUrl) {
             const img = document.getElementById(imgId);
             const icon = document.getElementById(iconId);
@@ -104,27 +104,21 @@
             img.src = finalUrl;
         }
 
-        function setLoader(show, text="Memproses...") {
-            document.getElementById('loaderText').innerText = text;
-            if(show) document.getElementById('loader').classList.remove('hidden-view');
-            else document.getElementById('loader').classList.add('hidden-view');
-        }
-
         async function call(payload) {
             try {
                 const res = await fetch(API, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
                 const txt = await res.text();
-                try { return JSON.parse(txt); } catch(e) { alert("Ralat Server. Pastikan deployment 'Anyone'."); return {success:false}; }
+                try { return JSON.parse(txt); } catch(e) { alert("Ralat Server: Sila pastikan deployment 'Anyone'."); return {success:false}; }
             } catch(e) { alert("Ralat Rangkaian."); return {success:false}; }
         }
 
-        // NAV
+        // NAVIGATION
         document.getElementById('btnHome').onclick = () => location.reload();
         document.getElementById('goStudent').onclick = () => showView('viewStudentLogin');
         document.getElementById('goLecturer').onclick = async () => {
-            setLoader(true);
+            document.getElementById('loader').classList.remove('hidden-view');
             const res = await call({ action: "getClasses" });
-            setLoader(false);
+            document.getElementById('loader').classList.add('hidden-view');
             if(res.success) {
                 const sel = document.getElementById('selectClass');
                 sel.innerHTML = '<option value="">-- Pilih Kelas --</option>';
@@ -142,30 +136,31 @@
         document.getElementById('btnLoginStu').onclick = async () => {
             const kp = document.getElementById('kpLogin').value.trim();
             if(!kp) return alert("Sila masukkan No KP.");
-            setLoader(true);
+            document.getElementById('loader').classList.remove('hidden-view');
             const res = await call({ action: "getStudentByKP", noKP: kp });
-            setLoader(false);
+            document.getElementById('loader').classList.add('hidden-view');
             if(res.success) {
                 const s = res.student;
                 document.getElementById('b_kp').value = s.nokp;
-                document.getElementById('b_id').value = s.id;
                 document.getElementById('b_nama').value = s.nama;
                 document.getElementById('b_kelas').value = s.kelas;
+                document.getElementById('b_id').value = s.id;
                 loadImage('stuImg', 'imgIcon', s.gambar);
                 showView('viewStudentDash');
             } else alert(res.message);
         };
 
-        // Fix 3: Upload tanpa Reload
+        // FIX 3: Upload Tanpa Reload
         document.getElementById('btnUpdateStu').onclick = async () => {
             const kp = document.getElementById('b_kp').value;
             const file = document.getElementById('fileImg').files[0];
-            setLoader(true, "Menyimpan Data...");
+            document.getElementById('loaderText').innerText = "Menyimpan Data...";
+            document.getElementById('loader').classList.remove('hidden-view');
 
             if(file) {
                 const base64 = await new Promise(r => { const reader = new FileReader(); reader.onload = (e) => r(e.target.result); reader.readAsDataURL(file); });
-                await call({ action: "uploadFoto", noKP: kp, imageBlob: base64 });
-                await new Promise(r => setTimeout(r, 2000)); // Drive sync delay
+                const resUp = await call({ action: "uploadFoto", noKP: kp, imageBlob: base64 });
+                if(resUp.success) await new Promise(r => setTimeout(r, 2000)); // Drive processing delay
             }
 
             const resBio = await call({ action: "updateBiodata", formData: { No_KP: kp, Nama_Pelajar: document.getElementById('b_nama').value, JANTINA: document.getElementById('b_jantina').value, No_Giliran: "", Kelas: document.getElementById('b_kelas').value, Penilai: "" }});
@@ -174,15 +169,15 @@
                 if(resFresh.success) loadImage('stuImg', 'imgIcon', resFresh.student.gambar);
                 alert("Berjaya Disimpan!");
             }
-            setLoader(false);
+            document.getElementById('loader').classList.add('hidden-view');
         };
 
-        // DASHBOARD PENSYARAH
+        // LECTURER DASHBOARD
         document.getElementById('selectClass').onchange = async (e) => {
             if(!e.target.value) return;
-            setLoader(true);
+            document.getElementById('loader').classList.remove('hidden-view');
             const res = await call({ action: "getStudentsByClass", kelas: e.target.value });
-            setLoader(false);
+            document.getElementById('loader').classList.add('hidden-view');
             if(res.success) renderTable(res.students);
         };
 
@@ -194,19 +189,19 @@
                 tbody.innerHTML += `
                     <tr class="border-b border-white/5">
                         <td class="p-4 flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden"><img id="${imgId}" class="hidden w-full h-full object-cover"></div>
-                            <span class="text-[10px] font-bold">${s.nama}</span>
+                            <div class="w-10 h-10 rounded-full bg-gray-800 overflow-hidden"><img id="${imgId}" class="hidden w-full h-full object-cover"></div>
+                            <span class="text-[10px] font-bold uppercase truncate w-24">${s.nama}</span>
                         </td>
                         <td class="text-center">
-                            <input type="number" value="${s.u}" oninput="calc(${i})" class="input-glass w-12 text-center u-in text-xs">
-                            <input type="number" value="${s.p}" oninput="calc(${i})" class="input-glass w-12 text-center p-in text-xs">
-                            <input type="number" value="${s.pen}" oninput="calc(${i})" class="input-glass w-12 text-center pen-in text-xs">
+                            <input type="number" value="${s.u}" oninput="calc(${i})" class="input-glass w-12 text-center u-in text-[10px] p-1">
+                            <input type="number" value="${s.p}" oninput="calc(${i})" class="input-glass w-12 text-center p-in text-[10px] p-1">
+                            <input type="number" value="${s.pen}" oninput="calc(${i})" class="input-glass w-12 text-center pen-in text-[10px] p-1">
                         </td>
                         <td class="text-center font-bold text-cyan-400 t-out">${s.total}</td>
                         <td class="text-center font-bold g-out">${s.gred}</td>
                         <td class="text-center"><button onclick="saveMark('${s.id}', ${i})" class="bg-emerald-600 p-2 rounded text-[10px]"><i class="fa-solid fa-save"></i></button></td>
                     </tr>`;
-                setTimeout(() => loadImage(imgId, null, s.gambar), 50);
+                setTimeout(() => loadImage(imgId, null, s.gambar), 100);
             });
             updateStats();
             document.getElementById('classContent').classList.remove('hidden-view');
@@ -216,16 +211,24 @@
             const u = parseFloat(document.querySelectorAll('.u-in')[idx].value) || 0;
             const p = parseFloat(document.querySelectorAll('.p-in')[idx].value) || 0;
             const pen = parseFloat(document.querySelectorAll('.pen-in')[idx].value) || 0;
-            const t = u + p + pen;
-            document.querySelectorAll('.t-out')[idx].innerText = t.toFixed(1);
-            document.querySelectorAll('.g-out')[idx].innerText = t>=90?"A+":t>=80?"A":t>=75?"A-":t>=70?"B+":t>=65?"B":t>=60?"B-":t>=55?"C+":t>=50?"C":t>=40?"D":"F";
+            const t = (u + p + pen).toFixed(1);
+            document.querySelectorAll('.t-out')[idx].innerText = t;
+            document.querySelectorAll('.g-out')[idx].innerText = getGred(t);
             updateStats();
+        }
+
+        function getGred(m) {
+            if(m>=90) return "A+"; if(m>=80) return "A"; if(m>=75) return "A-"; if(m>=70) return "B+"; if(m>=65) return "B"; if(m>=60) return "B-"; if(m>=55) return "C+"; if(m>=50) return "C"; if(m>=40) return "D"; return "F";
         }
 
         function updateStats() {
             const totals = Array.from(document.querySelectorAll('.t-out')).map(e => parseFloat(e.innerText));
             const avg = totals.length ? (totals.reduce((a,b)=>a+b,0)/totals.length).toFixed(1) : 0;
-            document.getElementById('summaryStats').innerHTML = `<div class="glass p-4 text-center"><p class="text-[10px] opacity-50">PURATA KELAS</p><p class="text-2xl font-bold">${avg}</p></div>`;
+            const lulus = Array.from(document.querySelectorAll('.g-out')).filter(e => e.innerText !== 'F').length;
+            document.getElementById('summaryStats').innerHTML = `
+                <div class="glass p-4 text-center"><p class="text-[10px] opacity-50">PURATA KELAS</p><p class="text-2xl font-bold">${avg}</p></div>
+                <div class="glass p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] opacity-50">LULUS</p><p class="text-2xl font-bold">${lulus}</p></div>
+            `;
         }
 
         async function saveMark(id, idx) {
