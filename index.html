@@ -64,10 +64,11 @@
                 <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">NAMA PENUH</label><input type="text" id="b_nama" class="input-glass uppercase font-bold"></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">NO. KP</label><input type="text" id="b_kp" class="input-glass bg-white/5 text-white/50" readonly></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">ID SISTEM</label><input type="text" id="b_id" class="input-glass bg-white/5 text-white/50" readonly></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">JANTINA</label><select id="b_jantina" class="input-glass"><option value="LELAKI">LELAKI</option><option value="PEREMPUAN">PEREMPUAN</option></select></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">NO. GILIRAN</label><input type="text" id="b_giliran" class="input-glass"></div>
                     <div><label class="text-[10px] text-cyan-400 font-bold">KELAS</label><input type="text" id="b_kelas" class="input-glass"></div>
-                    <div class="md:col-span-2"><label class="text-[10px] text-cyan-400 font-bold">PENSYARAH PENILAI</label><input type="text" id="b_penilai" class="input-glass"></div>
+                    <div><label class="text-[10px] text-cyan-400 font-bold">PENSYARAH PENILAI</label><input type="text" id="b_penilai" class="input-glass"></div>
                 </div>
             </div>
             <button id="btnUpdateStu" class="w-full bg-cyan-600 hover:bg-cyan-500 mt-10 py-5 rounded-xl font-bold text-lg transition shadow-lg shadow-cyan-500/30">SIMPAN SEMUA PERUBAHAN</button>
@@ -114,9 +115,13 @@
     <script>
         const API = 'https://script.google.com/macros/s/AKfycbz5UpIYcxsswWo7H3P3EWdpLrsIqTEJ7zMJiu0H70F0ecvOQ7h7MBSB6g0xWrguiyJk/exec';
 
-        // ==========================================
-        // SISTEM PENGURUSAN URL GAMBAR (FIX 1 & 2)
-        // ==========================================
+        // --- FUNGSI KALIS RALAT UNTUK ELEMENT HTML ---
+        function setVal(id, val) {
+            let el = document.getElementById(id);
+            if (el) el.value = val;
+        }
+
+        // --- PENGURUSAN IMEJ ---
         function fixDriveUrl(url) {
             if (!url) return "";
             const match = url.match(/[-\w]{25,}/);
@@ -150,20 +155,21 @@
                     if(icon) icon.classList.remove('hidden');
                 }
             };
-
             img.dataset.tried = "";
             img.src = finalUrl;
         }
 
         function setLoader(show, text="Sedang Memproses...") {
-            document.getElementById('loaderText').innerText = text;
-            if(show) document.getElementById('loader').classList.remove('hidden-view');
-            else document.getElementById('loader').classList.add('hidden-view');
+            const loaderText = document.getElementById('loaderText');
+            const loader = document.getElementById('loader');
+            if (loaderText) loaderText.innerText = text;
+            if (loader) {
+                if(show) loader.classList.remove('hidden-view');
+                else loader.classList.add('hidden-view');
+            }
         }
 
-        // ==========================================
-        // SISTEM PENGESAN RALAT API PINTAR (FIX CORS)
-        // ==========================================
+        // --- PENGURUSAN API FETCH ---
         async function call(payload) {
             try {
                 const res = await fetch(API, { 
@@ -173,39 +179,37 @@
                 });
                 
                 const rawText = await res.text();
-                
                 try {
                     return JSON.parse(rawText);
                 } catch (parseErr) {
-                    console.error("Respon bukan JSON (Kemungkinan disekat):", rawText);
-                    alert("Ralat Server: Pastikan 'Who has access' diset kepada 'Anyone' semasa Deploy Apps Script.");
+                    alert("Ralat Server: Sila pastikan Apps Script dideploy dengan akses 'Anyone'.");
                     return { success: false, message: "Akses API Disekat" };
                 }
             } catch(e) {
-                alert("Ralat Rangkaian / CORS: Sila semak sambungan Internet atau URL Deployment.");
+                alert("Ralat Rangkaian / CORS.");
                 return { success: false, message: e.toString() };
             }
         }
 
-        // ==========================================
-        // NAVIGASI
-        // ==========================================
+        // --- NAVIGASI ---
         document.getElementById('btnHome').onclick = () => location.reload();
         document.getElementById('goStudent').onclick = () => showView('viewStudentLogin');
         document.getElementById('goLecturer').onclick = () => showView('viewLecturerLogin');
 
         function showView(v) {
-            ['viewHome','viewStudentLogin','viewStudentDash','viewLecturerDash','viewLecturerLogin'].forEach(i => document.getElementById(i).classList.add('hidden-view'));
-            document.getElementById(v).classList.remove('hidden-view');
+            ['viewHome','viewStudentLogin','viewStudentDash','viewLecturerDash','viewLecturerLogin'].forEach(i => {
+                let el = document.getElementById(i);
+                if(el) el.classList.add('hidden-view');
+            });
+            let target = document.getElementById(v);
+            if(target) target.classList.remove('hidden-view');
             window.scrollTo(0, 0);
         }
 
-        // ==========================================
-        // PORTAL PELAJAR (LOGIN & FIX 3 UPLOAD)
-        // ==========================================
+        // --- PORTAL PELAJAR ---
         document.getElementById('fileImg').addEventListener('change', function(e) {
-            if(this.files[0]) document.getElementById('fileStatus').innerText = "✓ Gambar siap dipilih. Klik butang SIMPAN untuk hantar.";
-            else document.getElementById('fileStatus').innerText = "";
+            let st = document.getElementById('fileStatus');
+            if(this.files[0] && st) st.innerText = "✓ Gambar sedia. Klik SIMPAN.";
         });
 
         document.getElementById('btnLoginStu').onclick = async () => {
@@ -218,48 +222,52 @@
 
             if(res.success) {
                 const s = res.student;
-                document.getElementById('b_kp').value = s.nokp;
-                document.getElementById('b_id').value = s.id;
-                document.getElementById('b_nama').value = s.nama;
-                document.getElementById('b_jantina').value = s.jantina || "LELAKI";
-                document.getElementById('b_giliran').value = s.nogiliran;
-                document.getElementById('b_kelas').value = s.kelas;
-                document.getElementById('b_penilai').value = s.penilai;
+                // Gunakan setVal untuk mengelakkan ralat null
+                setVal('b_kp', s.nokp);
+                setVal('b_id', s.id);
+                setVal('b_nama', s.nama);
+                setVal('b_jantina', s.jantina || "LELAKI");
+                setVal('b_giliran', s.nogiliran);
+                setVal('b_kelas', s.kelas);
+                setVal('b_penilai', s.penilai);
                 
-                document.getElementById('fileImg').value = "";
-                document.getElementById('fileStatus').innerText = "";
+                setVal('fileImg', "");
+                let fs = document.getElementById('fileStatus');
+                if(fs) fs.innerText = "";
                 
                 loadImage('stuImg', 'imgIcon', s.gambar);
                 showView('viewStudentDash');
-            } else alert(res.message);
+            } else {
+                alert("Ralat: " + (res.message || "Rekod tidak ditemui!"));
+            }
         };
 
-        // FIX 3: Upload with Await & Timeout delay
+        // --- UPLOAD & UPDATE PELAJAR ---
         document.getElementById('btnUpdateStu').onclick = async () => {
             const kp = document.getElementById('b_kp').value;
             const file = document.getElementById('fileImg').files[0];
             
-            // 1. TUNGGU UPLOAD GAMBAR SELESAI
+            // 1. UPLOAD IMAGE
             if(file) {
-                setLoader(true, "MEMUAT NAIK GAMBAR KE GOOGLE DRIVE...");
+                setLoader(true, "MEMUAT NAIK GAMBAR KE DRIVE...");
                 const base64 = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
                     reader.readAsDataURL(file);
                 });
 
-                const resUp = await call({ action: "uploadFoto", noKP: kp, imageBlob: base64 });
+                const resUp = await call({ action: "uploadFoto", noKP: kp, imageBlob: base64, fileName: file.name });
                 
                 if(resUp.success) {
-                    setLoader(true, "MEMPROSES PAUTAN GAMBAR...");
-                    await new Promise(r => setTimeout(r, 2500)); // Delay for Drive API stabil
+                    setLoader(true, "MEMPROSES PAUTAN...");
+                    await new Promise(r => setTimeout(r, 2000));
                 } else {
                     setLoader(false);
-                    return alert("Ralat Muat Naik Gambar: " + resUp.message);
+                    return alert("Ralat Muat Naik: " + (resUp.message || "Gagal"));
                 }
             }
 
-            // 2. KEMASKINI BIODATA TEKS
+            // 2. UPDATE TEXT
             setLoader(true, "MENYIMPAN BIODATA...");
             const resBio = await call({ 
                 action: "updateBiodata", 
@@ -277,22 +285,20 @@
 
             if(resBio.success) {
                 if(file) {
-                    // Update paparan gambar terus secara LIVE
-                    setLoader(true, "MENYEGARKAN PAPARAN...");
+                    setLoader(true, "MENYEGARKAN GAMBAR...");
                     const resFetch = await call({ action: "getStudentByKP", noKP: kp });
                     setLoader(false);
                     if(resFetch.success) loadImage('stuImg', 'imgIcon', resFetch.student.gambar);
                 }
-                document.getElementById('fileStatus').innerText = "";
+                let fs = document.getElementById('fileStatus');
+                if(fs) fs.innerText = "";
                 alert("Data Profil dan Gambar Berjaya Disimpan di Google Sheets!");
             } else {
                 alert("Ralat menyimpan biodata: " + resBio.message);
             }
         };
 
-        // ==========================================
-        // PORTAL PENSYARAH
-        // ==========================================
+        // --- PORTAL PENSYARAH ---
         document.getElementById('btnLoginLect').onclick = async () => {
             setLoader(true, "MENGESAHKAN...");
             const res = await call({ action: "login", username: document.getElementById('lUser').value, password: document.getElementById('lPass').value });
@@ -301,13 +307,15 @@
                 setLoader(false);
                 if(resClass.success) {
                     const sel = document.getElementById('selectClass');
-                    sel.innerHTML = '<option value="">-- Senarai Kelas --</option>';
-                    resClass.classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+                    if(sel) {
+                        sel.innerHTML = '<option value="">-- Senarai Kelas --</option>';
+                        resClass.classes.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+                    }
                     showView('viewLecturerDash');
                 }
             } else {
                 setLoader(false);
-                alert(res.message);
+                alert(res.message || "ID / Katalaluan Salah!");
             }
         };
 
@@ -321,6 +329,7 @@
 
         function renderTable(students) {
             const tbody = document.getElementById('studentTableBody');
+            if(!tbody) return;
             tbody.innerHTML = '';
             students.forEach((s, i) => {
                 const imgId = 'tblImg_' + i;
@@ -342,7 +351,6 @@
                         <td class="text-center"><button onclick="saveMark('${s.id}', ${i})" class="bg-emerald-600/80 hover:bg-emerald-500 p-2 rounded-lg text-[10px] font-bold w-full"><i class="fa-solid fa-save"></i></button></td>
                     </tr>
                 `;
-                // Asynchronous loading untuk mengelakkan hang
                 setTimeout(() => loadImage(imgId, iconId, s.gambar), 50);
             });
             updateStats();
@@ -369,12 +377,16 @@
             const avg = totals.length > 0 ? (totals.reduce((a,b)=>a+b,0)/totals.length).toFixed(1) : 0;
             const a = greds.filter(g => g.startsWith('A')).length;
             const lulus = greds.filter(g => g !== 'F' && g !== '').length;
-            document.getElementById('summaryStats').innerHTML = `
-                <div class="glass p-4 text-center"><p class="text-[10px] opacity-50">PURATA KELAS</p><p class="text-2xl font-bold">${avg}</p></div>
-                <div class="glass p-4 text-center border-b-4 border-emerald-500"><p class="text-[10px] opacity-50 text-emerald-400">BIL. GRED A</p><p class="text-2xl font-bold">${a}</p></div>
-                <div class="glass p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] opacity-50 text-cyan-400">LULUS</p><p class="text-2xl font-bold">${lulus}</p></div>
-                <div class="glass p-4 text-center border-b-4 border-red-500"><p class="text-[10px] opacity-50 text-red-400">GAGAL</p><p class="text-2xl font-bold">${totals.length - lulus}</p></div>
-            `;
+            
+            let st = document.getElementById('summaryStats');
+            if(st) {
+                st.innerHTML = `
+                    <div class="glass p-4 text-center"><p class="text-[10px] opacity-50">PURATA KELAS</p><p class="text-2xl font-bold">${avg}</p></div>
+                    <div class="glass p-4 text-center border-b-4 border-emerald-500"><p class="text-[10px] opacity-50 text-emerald-400">BIL. GRED A</p><p class="text-2xl font-bold">${a}</p></div>
+                    <div class="glass p-4 text-center border-b-4 border-cyan-500"><p class="text-[10px] opacity-50 text-cyan-400">LULUS</p><p class="text-2xl font-bold">${lulus}</p></div>
+                    <div class="glass p-4 text-center border-b-4 border-red-500"><p class="text-[10px] opacity-50 text-red-400">GAGAL</p><p class="text-2xl font-bold">${totals.length - lulus}</p></div>
+                `;
+            }
         }
 
         async function saveMark(id, idx) {
@@ -385,7 +397,7 @@
             const res = await call({ action:"saveMarks", idSistem:id, u, p, pen });
             setLoader(false);
             if(res.success) alert("Markah Berjaya Disimpan!");
-            else alert(res.message);
+            else alert(res.message || "Gagal Simpan.");
         }
     </script>
 </body>
