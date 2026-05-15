@@ -52,7 +52,7 @@
             <h2 class="text-2xl font-bold mb-6 text-center text-cyan-400"><i class="fa-solid fa-right-to-bracket mr-2"></i>Akses Pelajar</h2>
             <div class="mb-6">
                 <label class="block text-sm text-white/60 mb-2 ml-1">Masukkan ID Sistem</label>
-                <input type="text" id="stuIdLogin" placeholder="Contoh: S123" class="input-glass font-bold text-lg">
+                <input type="text" id="stuIdLogin" placeholder="Contoh: MPU2082_002" class="input-glass font-bold text-lg">
             </div>
             <button id="btnLoginStu" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 py-4 rounded-xl font-bold text-lg btn-hover shadow-lg">Log Masuk</button>
         </div>
@@ -140,13 +140,12 @@
     </div>
 
     <script>
-        // URL API ANDA TELAH DISERTAKAN. JANGAN UBAH!
+        // API URL TETAP
         const API = 'https://script.google.com/macros/s/AKfycbz5UpIYcxsswWo7H3P3EWdpLrsIqTEJ7zMJiu0H70F0ecvOQ7h7MBSB6g0xWrguiyJk/exec';
 
         window.onload = function() {
             console.log("Sistem Sedia.");
 
-            // Fungsi Tukar Skrin
             function showView(viewId) {
                 const views = ['viewHome', 'viewStudentLogin', 'viewLecturerLogin', 'viewStudentDash', 'viewLecturerDash'];
                 views.forEach(v => {
@@ -157,7 +156,6 @@
                 window.scrollTo(0, 0);
             }
 
-            // Fungsi Loading
             function toggleLoader(show, text="MEMPROSES...") {
                 let el = document.getElementById('loader');
                 if(show) {
@@ -168,29 +166,25 @@
                 }
             }
 
-            // Fungsi Panggilan API ke Google Apps Script (Dengan bypass CORS)
             async function call(payload) {
                 try {
                     const res = await fetch(API, { 
                         method: 'POST', 
-                        // Ini memastikan pelayar web tidak menyekat penghantaran (CORS)
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payload) 
                     });
                     return await res.json();
                 } catch(e) { 
-                    alert("Gagal menghubungi pangkalan data. Pastikan internet anda stabil.");
-                    console.error("Fetch Error: ", e);
+                    alert("Gagal menghubungi pangkalan data. Pastikan internet stabil.");
                     return { success: false };
                 }
             }
 
-            // NAVIGASI MENU UTAMA
             document.getElementById('btnHome').addEventListener('click', () => showView('viewHome'));
             document.getElementById('goStudent').addEventListener('click', () => showView('viewStudentLogin'));
             document.getElementById('goLecturer').addEventListener('click', () => showView('viewLecturerLogin'));
 
-            // LOGIN PELAJAR
+            // === LOGIN PELAJAR ===
             document.getElementById('btnLoginStu').addEventListener('click', async () => {
                 const id = document.getElementById('stuIdLogin').value.trim();
                 if(!id) return alert("Sila masukkan ID Sistem anda.");
@@ -208,20 +202,20 @@
                     document.getElementById('b_giliran').value = s.nogiliran || "";
                     document.getElementById('b_kelas').value = s.kelas || "";
                     document.getElementById('b_penilai').value = s.penilai || "";
-                    document.getElementById('stuImg').src = s.gambar || "https://ui-avatars.com/api/?name=User&background=random&color=fff";
+                    document.getElementById('stuImg').src = (s.gambar && s.gambar !== "") ? s.gambar : "https://ui-avatars.com/api/?name=User&background=random&color=fff";
                     
                     showView('viewStudentDash');
                 } else {
-                    alert("Maaf, ID Sistem tidak dijumpai dalam pangkalan data.");
+                    alert(res.message);
                 }
             });
 
-            // UPLOAD GAMBAR FUNGSI
+            // === UPLOAD GAMBAR ===
             document.getElementById('btnTriggerUpload').addEventListener('click', () => {
                 document.getElementById('fileImg').click();
             });
 
-            // UPDATE BIODATA PELAJAR
+            // === UPDATE BIODATA PELAJAR ===
             document.getElementById('btnUpdateStu').addEventListener('click', async () => {
                 const id = document.getElementById('b_id').value;
                 if(!id) return;
@@ -238,7 +232,6 @@
                 
                 toggleLoader(true, "MENYIMPAN PROFIL...");
 
-                // Upload Foto Dahulu (Jika Ada)
                 const fileInput = document.getElementById('fileImg');
                 const file = fileInput.files[0];
                 if(file) {
@@ -250,12 +243,10 @@
                             imageBlob: e.target.result, 
                             fileName: file.name 
                         });
-                        // Simpan Data Teks Selepas Gambar
                         saveTextData(formData);
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    // Terus Simpan Data Teks Jika Tiada Gambar Baru
                     saveTextData(formData);
                 }
             });
@@ -267,7 +258,7 @@
                 else alert("Gagal mengemaskini profil.");
             }
 
-            // LOGIN PENSYARAH
+            // === LOGIN PENSYARAH ===
             document.getElementById('btnLoginLect').addEventListener('click', async () => {
                 const u = document.getElementById('lectUsername').value.trim();
                 const p = document.getElementById('lectPassword').value.trim();
@@ -281,11 +272,11 @@
                     document.getElementById('displayLectName').innerText = res.lecturerName;
                     showView('viewLecturerDash');
                 } else {
-                    alert("Log masuk gagal. Sila semak ID dan Kata Laluan.");
+                    alert(res.message);
                 }
             });
 
-            // PENSYARAH: CARI PELAJAR UNTUK MARKAH
+            // === PENSYARAH: CARI PELAJAR ===
             document.getElementById('btnSearch').addEventListener('click', async () => {
                 const id = document.getElementById('searchId').value.trim();
                 if(!id) return alert("Sila isikan ID Pelajar.");
@@ -296,18 +287,17 @@
 
                 if(res.success && res.student) {
                     document.getElementById('displayStudentTarget').innerText = res.student.nama + " (" + res.student.id + ")";
-                    // Kosongkan form sedia ada
                     document.getElementById('m_ujian').value = "";
                     document.getElementById('m_per').value = "";
                     document.getElementById('m_pen').value = "";
                     document.getElementById('markForm').classList.remove('hidden-view');
                 } else {
-                    alert("ID Pelajar tidak dijumpai.");
+                    alert(res.message);
                     document.getElementById('markForm').classList.add('hidden-view');
                 }
             });
 
-            // PENSYARAH: SIMPAN MARKAH
+            // === PENSYARAH: SIMPAN MARKAH ===
             document.getElementById('btnSaveMark').addEventListener('click', async () => {
                 const id = document.getElementById('searchId').value.trim();
                 const u = document.getElementById('m_ujian').value;
@@ -327,7 +317,7 @@
                     document.getElementById('markForm').classList.add('hidden-view');
                     document.getElementById('searchId').value = "";
                 } else {
-                    alert("Ralat sewaktu menyimpan markah.");
+                    alert("Ralat sewaktu menyimpan markah: " + res.message);
                 }
             });
         };
