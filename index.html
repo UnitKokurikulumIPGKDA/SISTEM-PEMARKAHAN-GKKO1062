@@ -4,259 +4,1319 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GKKO1062 - Sistem Markah Tugasan</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --success: #10b981;
-            --danger: #ef4444;
             --warning: #f59e0b;
-            --dark: #1f2937;
+            --danger: #ef4444;
+            --dark: #0f172a;
             --light: #f8fafc;
+            --border: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
             position: relative;
             overflow-x: hidden;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 1200px;
+            width: 100%;
             position: relative;
             z-index: 1;
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-        }
-
         header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
-            font-size: 42px;
-            font-weight: 700;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Toast Notification */
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark);
             color: white;
-            padding: 14px 24px;
-            border-radius: 50px;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .view-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
             display: none;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        /* Student View */
-        .search-box {
-            display: flex;
-            gap: 12px;
-            align-items: end;
+        .view-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
         }
 
-        .search-box input {
-            flex: 1;
-            padding: 16px 20px;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== LOGIN VIEW ===== */
+        #loginView {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .login-form {
+            padding: 50px 40px;
+        }
+
+        .login-form h2 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .login-form p {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 14px 24px;
             border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.9);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #86efac;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== STUDENT VIEW ===== */
+        .student-header, .lecturer-header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .student-header h2, .lecturer-header h2 {
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .student-section {
+            margin-bottom: 40px;
+        }
+
+        .student-section h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
         }
 
         .biodata-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .biodata-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .biodata-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .biodata-item label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .biodata-item span {
+            display: block;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .image-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .image-upload-area:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .image-upload-area.dragover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+        }
+
+        .image-upload-area input[type="file"] {
+            display: none;
+        }
+
+        .image-upload-area p {
+            color: white;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .image-upload-area small {
+            color: rgba(255, 255, 255, 0.6);
+            display: block;
+            font-size: 13px;
+        }
+
+        .image-preview {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .image-preview img {
+            max-width: 300px;
+            max-height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== LECTURER VIEW ===== */
+        .student-selector {
+            margin-bottom: 30px;
+        }
+
+        .student-selector label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .student-selector select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .student-selector select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .student-selector select option {
+            background: var(--dark);
+            color: white;
+        }
+
+        .selected-student-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .selected-student-info h4 {
+            color: white;
+            margin-bottom: 16px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .student-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }
 
-        .biodata-card {
-            background: rgba(255,255,255,0.9);
-            padding: 24px;
+        .student-info-item {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .student-info-item strong {
+            color: white;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .student-image-display {
+            margin-top: 16px;
+            grid-column: 1/-1;
+        }
+
+        .student-image-display img {
+            max-width: 200px;
+            border-radius: 8px;
+        }
+
+        .assignment-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 3px solid var(--primary);
+            padding: 28px;
+            margin-bottom: 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .assignment-card h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .assignment-badge {
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
             border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .rubric-checklist {
+            margin-bottom: 24px;
+        }
+
+        .rubric-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .rubric-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-left-color: var(--primary);
+        }
+
+        .rubric-item input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 4px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .rubric-item label {
+            flex: 1;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .mark-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .mark-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mark-input label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .mark-input input {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .mark-input input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .suggested-grade {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .marks-summary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .marks-summary h3 {
+            color: white;
+            margin-bottom: 24px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .marks-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .mark-summary-item {
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        .biodata-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        .mark-summary-item p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
 
-        /* Loading */
+        .mark-summary-item span {
+            display: block;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .total-mark {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .total-mark p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .total-mark span {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--success);
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .actions .btn {
+            flex: 1;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .student-input-section {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .student-input-section .form-group {
+            margin-bottom: 16px;
+        }
+
+        /* ===== LOADING STATE ===== */
         .loading {
             display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #e5e7eb;
-            border-top-color: var(--primary);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .student-header, .lecturer-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .student-header h2, .lecturer-header h2 {
+                width: 100%;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .login-form {
+                padding: 30px 20px;
+            }
+
+            .biodata-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mark-input-group {
+                grid-template-columns: 1fr;
+            }
+
+            .marks-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .assignment-card {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1><i class="fas fa-graduation-cap"></i> GKKO1062</h1>
-            <p>Sistem Penilaian Tugasan Kokurikulum dan Kesihatan Diri</p>
+            <p>Sistem Markah Tugasan Kokurikulum dan Kesihatan Diri</p>
         </header>
 
         <!-- LOGIN VIEW -->
-        <div id="loginView" class="view-container active glass" style="max-width: 420px; margin: 60px auto; padding: 50px 40px;">
-            <div style="text-align:center; margin-bottom:30px;">
-                <i class="fas fa-lock fa-4x" style="color:var(--primary); opacity:0.8;"></i>
+        <div id="loginView" class="view-container active">
+            <div class="login-form">
+                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <p>Masukkan kredensial anda untuk melanjutkan</p>
+                <div id="loginAlert"></div>
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Username" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                <button class="btn btn-primary" onclick="loginLecturer()">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
+                </button>
+                <button class="btn btn-secondary" onclick="switchToStudent()">
+                    <i class="fas fa-eye"></i> Pelajar - Lihat Markah
+                </button>
             </div>
-            <h2 style="text-align:center; color:var(--dark);">Login Pensyarah</h2>
-            <div id="loginAlert"></div>
-            <input type="text" id="username" class="glass" style="width:100%; padding:16px; margin:12px 0; border-radius:16px; border:none;" placeholder="Username">
-            <input type="password" id="password" class="glass" style="width:100%; padding:16px; margin:12px 0; border-radius:16px; border:none;" placeholder="Password">
-            <button class="btn btn-primary" onclick="loginLecturer()" style="width:100%; padding:16px; font-size:16px;">
-                <i class="fas fa-sign-in-alt"></i> MASUK
-            </button>
         </div>
 
         <!-- STUDENT VIEW -->
-        <div id="studentView" class="view-container glass" style="display:none;">
-            <div class="glass" style="padding:20px 30px; display:flex; justify-content:space-between; align-items:center; border-radius:24px 24px 0 0;">
-                <h2><i class="fas fa-user-graduate"></i> Dashboard Pelajar</h2>
-                <button class="btn btn-danger" onclick="logout()">Keluar</button>
+        <div id="studentView" class="view-container">
+            <div class="student-header">
+                <h2><i class="fas fa-user-circle"></i> Dashboard Pelajar</h2>
+                <button class="btn btn-logout" onclick="logout()" style="width: auto;">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </button>
             </div>
-
-            <div style="padding:40px;">
-                <div class="section">
-                    <h3 style="margin-bottom:15px;"><i class="fas fa-search"></i> Cari Maklumat Pelajar</h3>
-                    <div class="search-box">
-                        <input type="text" id="studentSearch" placeholder="Masukkan No. Kad Pengenalan (No. KP)" maxlength="12">
-                        <button class="btn btn-primary" onclick="loadStudentData()" style="padding:0 32px;">
-                            <i class="fas fa-search"></i>
+            <div class="content">
+                <!-- Student Input -->
+                <div id="studentInputSection" class="student-input-section">
+                    <div class="student-section">
+                        <h3><i class="fas fa-search"></i> Cari Maklumat Anda</h3>
+                        <div class="form-group">
+                            <label for="studentIdInput"><i class="fas fa-id-card"></i> ID Sistem</label>
+                            <input type="text" id="studentIdInput" placeholder="Cth: STU001" autocomplete="off">
+                        </div>
+                        <button class="btn btn-primary" onclick="loadStudentData()" style="width: 100%;">
+                            <i class="fas fa-search"></i> Cari
                         </button>
                     </div>
                 </div>
 
-                <div id="biodataSection" style="display:none;">
-                    <div class="biodata-grid" id="biodataGrid"></div>
+                <!-- Student Data Section -->
+                <div id="biodataSection" class="hidden">
+                    <div class="student-section">
+                        <h3><i class="fas fa-id-badge"></i> Maklumat Peribadi</h3>
+                        <div class="biodata-grid" id="biodataGrid"></div>
+                    </div>
 
-                    <!-- Image Upload -->
-                    <div style="margin-top:40px;">
-                        <h3><i class="fas fa-camera"></i> Muat Naik Gambar Pelajar</h3>
-                        <div id="uploadArea" style="border:2px dashed var(--primary); border-radius:20px; padding:50px; text-align:center; cursor:pointer;">
-                            <i class="fas fa-cloud-upload-alt fa-4x" style="color:var(--primary); margin-bottom:15px;"></i>
+                    <div class="student-section">
+                        <h3><i class="fas fa-image"></i> Gambar Profil</h3>
+                        <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+                            <input type="file" id="fileInput" accept="image/*">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: rgba(255,255,255,0.6); display: block; margin-bottom: 10px;"></i>
                             <p>Klik atau seret gambar ke sini</p>
-                            <small>JPG / PNG • Maks 5MB</small>
-                            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+                            <small>JPG, PNG | Maksimum 5MB</small>
                         </div>
-                        <div id="uploadStatus" style="margin-top:15px;"></div>
-                        <div id="imagePreview" style="margin-top:20px; text-align:center;"></div>
+                        <div id="uploadStatus"></div>
+                        <div class="image-preview" id="imagePreview"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- LECTURER VIEW (sama seperti sebelumnya, saya ringkaskan) -->
-        <!-- ... (Lecturer View kekal sama seperti versi sebelum ini) ... -->
-    </div>
+        <!-- LECTURER VIEW -->
+        <div id="lecturerView" class="view-container">
+            <div class="lecturer-header">
+                <h2><i class="fas fa-chalkboard-user"></i> Dashboard Pensyarah</h2>
+                <button class="btn btn-logout" onclick="logout()" style="width: auto;">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
+            </div>
+            <div class="content">
+                <!-- Student Selector -->
+                <div class="student-selector">
+                    <label for="studentSelect"><i class="fas fa-list"></i> Pilih Pelajar</label>
+                    <select id="studentSelect" onchange="loadSelectedStudent()">
+                        <option value="">-- Pilih Pelajar --</option>
+                    </select>
+                </div>
 
-    <!-- TOAST -->
-    <div id="toast"><i class="fas fa-check-circle"></i> <span id="toastText"></span></div>
+                <!-- Student Info -->
+                <div id="selectedStudentInfo" class="hidden selected-student-info">
+                    <h4><i class="fas fa-info-circle"></i> Maklumat Pelajar</h4>
+                    <div class="student-info-grid">
+                        <div class="student-info-item">
+                            <strong>Nama</strong>
+                            <span id="selStudentName">-</span>
+                        </div>
+                        <div class="student-info-item">
+                            <strong>No. Giliran</strong>
+                            <span id="selStudentNo">-</span>
+                        </div>
+                        <div class="student-info-item">
+                            <strong>ID Sistem</strong>
+                            <span id="selStudentId">-</span>
+                        </div>
+                        <div class="student-info-item">
+                            <strong>Kelas</strong>
+                            <span id="selStudentClass">-</span>
+                        </div>
+                        <div class="student-image-display" id="selStudentImage"></div>
+                    </div>
+                </div>
+
+                <!-- Assignment 1: Ujian -->
+                <div class="assignment-card">
+                    <h3>
+                        <span><i class="fas fa-file-alt"></i> Ujian</span>
+                        <span class="assignment-badge">30%</span>
+                    </h3>
+                    <div class="rubric-checklist">
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Pengetahuan Isi Kandungan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Kefahaman Konsep</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>KBAT (Kemahiran Berfikir Aras Tinggi)</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Ketepatan Jawapan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Organisasi Idea</label>
+                        </div>
+                    </div>
+                    <div class="mark-input-group">
+                        <div class="mark-input">
+                            <label for="ujianMark"><i class="fas fa-calculator"></i> Markah (0-30)</label>
+                            <input type="number" id="ujianMark" min="0" max="30" value="0" oninput="calculateMarks()">
+                            <div class="suggested-grade">
+                                <i class="fas fa-star"></i> <span id="ujianGradeSuggestion">-</span>
+                            </div>
+                        </div>
+                        <div class="mark-input">
+                            <label><i class="fas fa-medal"></i> Gred</label>
+                            <input type="text" id="ujianGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment 2: Persembahan -->
+                <div class="assignment-card">
+                    <h3>
+                        <span><i class="fas fa-presentation"></i> Persembahan</span>
+                        <span class="assignment-badge">20%</span>
+                    </h3>
+                    <div class="rubric-checklist">
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Organisasi & Struktur Persembahan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Kemahiran Komunikasi Lisan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Penggunaan Alat Bantu Mengajar</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Keyakinan & Penguasaan Isi</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Keterlibatan Audiens</label>
+                        </div>
+                    </div>
+                    <div class="mark-input-group">
+                        <div class="mark-input">
+                            <label for="persembMark"><i class="fas fa-calculator"></i> Markah (0-20)</label>
+                            <input type="number" id="persembMark" min="0" max="20" value="0" oninput="calculateMarks()">
+                            <div class="suggested-grade">
+                                <i class="fas fa-star"></i> <span id="persembGradeSuggestion">-</span>
+                            </div>
+                        </div>
+                        <div class="mark-input">
+                            <label><i class="fas fa-medal"></i> Gred</label>
+                            <input type="text" id="persembGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment 3: Penulisan -->
+                <div class="assignment-card">
+                    <h3>
+                        <span><i class="fas fa-pen-fancy"></i> Penulisan</span>
+                        <span class="assignment-badge">50%</span>
+                    </h3>
+                    <div class="rubric-checklist">
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Penguasaan Kandungan Isu/Topik</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Organisasi & Struktur Penulisan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Kemahiran Berbahasa & Ejaan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Kemahiran Membuat Rujukan</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Pemikiran Kritis & Analisis</label>
+                        </div>
+                        <div class="rubric-item">
+                            <input type="checkbox"> 
+                            <label>Keaslian & Integriti Akademik</label>
+                        </div>
+                    </div>
+                    <div class="mark-input-group">
+                        <div class="mark-input">
+                            <label for="penulMark"><i class="fas fa-calculator"></i> Markah (0-50)</label>
+                            <input type="number" id="penulMark" min="0" max="50" value="0" oninput="calculateMarks()">
+                            <div class="suggested-grade">
+                                <i class="fas fa-star"></i> <span id="penulGradeSuggestion">-</span>
+                            </div>
+                        </div>
+                        <div class="mark-input">
+                            <label><i class="fas fa-medal"></i> Gred</label>
+                            <input type="text" id="penulGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marks Summary -->
+                <div class="marks-summary">
+                    <h3><i class="fas fa-chart-bar"></i> Ringkasan Markah</h3>
+                    <div class="marks-summary-grid">
+                        <div class="mark-summary-item">
+                            <p>Ujian</p>
+                            <span id="summaryUjian">0</span>
+                        </div>
+                        <div class="mark-summary-item">
+                            <p>Persembahan</p>
+                            <span id="summaryPersemb">0</span>
+                        </div>
+                        <div class="mark-summary-item">
+                            <p>Penulisan</p>
+                            <span id="summaryPenul">0</span>
+                        </div>
+                    </div>
+                    <div class="total-mark">
+                        <p>Jumlah Markah (100)</p>
+                        <span id="totalMark">0</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button class="btn btn-success" onclick="submitMarks()">
+                        <i class="fas fa-save"></i> Simpan Markah
+                    </button>
+                    <button class="btn btn-clear" onclick="clearMarks()">
+                        <i class="fas fa-redo"></i> Padam
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwMBTWvGlSLiRbt08szbvacoJiDpRTRoGgJTAgfrysJJXqteLEs_d3QVHi5t2Fqtyi3/exec';
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const text = document.getElementById('toastText');
-            text.innerHTML = message;
-            toast.style.display = 'flex';
-            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
-            setTimeout(() => toast.style.display = 'none', 3000);
+        // ===== VIEW MANAGEMENT =====
+        function showView(viewName) {
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewName).classList.add('active');
         }
 
-        // Student Search menggunakan No. KP
-        function loadStudentData() {
-            const noKP = document.getElementById('studentSearch').value.trim();
-            if (!noKP) return showToast('Sila masukkan No. Kad Pengenalan', 'error');
+        function logout() {
+            showView('loginView');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginAlert').innerHTML = '';
+        }
 
-            fetch(`${API_URL}?action=getStudent&noKP=${noKP}`)
+        function switchToStudent() {
+            showView('studentView');
+            document.getElementById('studentInputSection').classList.remove('hidden');
+            document.getElementById('biodataSection').classList.add('hidden');
+        }
+
+        // ===== IMAGE UPLOAD =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    handleImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+        });
+
+        function handleImageUpload(file) {
+            const uploadStatus = document.getElementById('uploadStatus');
+            const imagePreview = document.getElementById('imagePreview');
+            
+            if (file.size > 5 * 1024 * 1024) {
+                uploadStatus.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Saiz gambar terlalu besar (maksimum 5MB)</div>';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Data = e.target.result;
+                const idSistem = document.getElementById('studentIdInput').value;
+                
+                uploadStatus.innerHTML = '<div class="alert alert-success"><i class="fas fa-spinner loading"></i> Sedang memuat naik...</div>';
+
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'uploadImage',
+                        imageData: base64Data,
+                        fileName: `${idSistem}_${Date.now()}.jpg`,
+                        idSistem: idSistem
+                    })
+                })
                 .then(r => r.json())
-                .then(student => {
-                    if (student && student.No_KP) {
-                        displayStudentBiodata(student);
-                        document.getElementById('biodataSection').style.display = 'block';
-                        showToast('Maklumat pelajar berjaya dimuat!');
+                .then(data => {
+                    if (data.success) {
+                        uploadStatus.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Gambar berjaya dimuat naik!</div>';
+                        imagePreview.innerHTML = `<img src="${data.fileUrl}" alt="Preview">`;
                     } else {
-                        showToast('Pelajar tidak dijumpai', 'error');
+                        uploadStatus.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${data.message}</div>`;
                     }
                 })
-                .catch(() => showToast('Ralat sambungan', 'error'));
+                .catch(err => {
+                    uploadStatus.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Ralat: ${err.message}</div>`;
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ===== STUDENT MODE =====
+        function loadStudentData() {
+            const idSistem = document.getElementById('studentIdInput').value.trim();
+            if (!idSistem) {
+                alert('Sila masukkan ID Sistem');
+                return;
+            }
+
+            fetch(`${API_URL}?action=getStudent&id=${encodeURIComponent(idSistem)}`)
+                .then(r => r.json())
+                .then(student => {
+                    if (student.ID_SISTEM) {
+                        displayStudentBiodata(student);
+                        document.getElementById('studentInputSection').classList.add('hidden');
+                        document.getElementById('biodataSection').classList.remove('hidden');
+                    } else {
+                        alert('Pelajar tidak ditemukan');
+                    }
+                })
+                .catch(err => alert('Ralat: ' + err.message));
         }
 
         function displayStudentBiodata(student) {
             const grid = document.getElementById('biodataGrid');
-            grid.innerHTML = '';
-
-            const data = [
-                {icon: 'fa-barcode', label: 'ID Sistem', value: student.ID_SISTEM},
-                {icon: 'fa-user', label: 'Nama Pelajar', value: student.Nama_Pelajar},
-                {icon: 'fa-id-card', label: 'No. Kad Pengenalan', value: student.No_KP},
-                {icon: 'fa-hashtag', label: 'No. Giliran', value: student.No_Giliran},
-                {icon: 'fa-venus-mars', label: 'Jantina', value: student.JANTINA},
-                {icon: 'fa-chalkboard', label: 'Kelas', value: student.Kelas},
-                {icon: 'fa-chalkboard-user', label: 'Penilai', value: student.Penilai}
+            const fields = [
+                { key: 'ID_SISTEM', label: 'ID Sistem', icon: 'id-card' },
+                { key: 'Nama_Pelajar', label: 'Nama', icon: 'user' },
+                { key: 'JANTINA', label: 'Jantina', icon: 'mars-venus' },
+                { key: 'No_KP', label: 'No. KP', icon: 'credit-card' },
+                { key: 'No_Giliran', label: 'No. Giliran', icon: 'list-ol' },
+                { key: 'Kelas', label: 'Kelas', icon: 'building' },
+                { key: 'Penilai', label: 'Penilai', icon: 'chalkboard-user' }
             ];
 
-            data.forEach(item => {
-                grid.innerHTML += `
-                    <div class="biodata-card glass">
-                        <i class="fas ${item.icon}" style="font-size:32px; color:var(--primary); margin-bottom:12px;"></i>
-                        <div style="color:#64748b; font-size:13px;">${item.label}</div>
-                        <div style="font-weight:600; font-size:17px; margin-top:4px;">${item.value || '-'}</div>
-                    </div>
-                `;
-            });
+            grid.innerHTML = fields.map(f => `
+                <div class="biodata-item">
+                    <label><i class="fas fa-${f.icon}"></i> ${f.label}</label>
+                    <span>${student[f.key] || '-'}</span>
+                </div>
+            `).join('');
 
             if (student.Link_Gambar) {
-                document.getElementById('imagePreview').innerHTML = `<img src="${student.Link_Gambar}" style="max-width:320px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">`;
+                document.getElementById('imagePreview').innerHTML = `<img src="${student.Link_Gambar}" alt="Student Photo">`;
             }
         }
 
-        // Image Upload (kekal sama)
-        document.getElementById('uploadArea').addEventListener('click', () => document.getElementById('fileInput').click());
-        // ... (kod handleImageUpload kekal seperti sebelum ini)
+        // ===== LECTURER MODE =====
+        function loginLecturer() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const alert = document.getElementById('loginAlert');
 
-        function logout() {
-            location.reload();
+            if (!username || !password) {
+                alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Sila masukkan username dan password</div>';
+                return;
+            }
+
+            fetch(`${API_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById('username').value = '';
+                        document.getElementById('password').value = '';
+                        alert.innerHTML = '';
+                        showView('lecturerView');
+                        loadAllStudents();
+                    } else {
+                        alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Username atau password salah</div>';
+                    }
+                })
+                .catch(err => {
+                    alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Ralat: ' + err.message + '</div>';
+                });
         }
 
-        // Lecturer functions (sama seperti versi lama)
-        // Anda boleh copy dari versi sebelum ini
+        function loadAllStudents() {
+            fetch(`${API_URL}?action=getAllMarks`)
+                .then(r => r.json())
+                .then(marks => {
+                    const select = document.getElementById('studentSelect');
+                    select.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
+                    marks.forEach(m => {
+                        select.innerHTML += `<option value="${m.ID_SISTEM}">${m.Nama_Pelajar} (${m.No_Giliran})</option>`;
+                    });
+                })
+                .catch(err => console.error('Ralat:', err));
+        }
+
+        function loadSelectedStudent() {
+            const idSistem = document.getElementById('studentSelect').value;
+            if (!idSistem) {
+                document.getElementById('selectedStudentInfo').classList.add('hidden');
+                clearMarks();
+                return;
+            }
+
+            fetch(`${API_URL}?action=getStudent&id=${encodeURIComponent(idSistem)}`)
+                .then(r => r.json())
+                .then(student => {
+                    if (student.ID_SISTEM) {
+                        document.getElementById('selStudentName').textContent = student.Nama_Pelajar || '-';
+                        document.getElementById('selStudentNo').textContent = student.No_Giliran || '-';
+                        document.getElementById('selStudentId').textContent = student.ID_SISTEM || '-';
+                        document.getElementById('selStudentClass').textContent = student.Kelas || '-';
+
+                        const imgDiv = document.getElementById('selStudentImage');
+                        if (student.Link_Gambar) {
+                            imgDiv.innerHTML = `<img src="${student.Link_Gambar}" alt="Gambar Pelajar" style="max-width: 150px; border-radius: 8px;">`;
+                        } else {
+                            imgDiv.innerHTML = '<span style="color: rgba(255,255,255,0.5);"><i class="fas fa-image"></i> Tiada gambar</span>';
+                        }
+
+                        document.getElementById('selectedStudentInfo').classList.remove('hidden');
+                        clearMarks();
+                    }
+                })
+                .catch(err => console.error('Ralat:', err));
+        }
+
+        function calculateMarks() {
+            const ujian = parseInt(document.getElementById('ujianMark').value) || 0;
+            const persemb = parseInt(document.getElementById('persembMark').value) || 0;
+            const penul = parseInt(document.getElementById('penulMark').value) || 0;
+
+            // Update suggestions
+            document.getElementById('ujianGradeSuggestion').textContent = getSuggestion(ujian, 30);
+            document.getElementById('persembGradeSuggestion').textContent = getSuggestion(persemb, 20);
+            document.getElementById('penulGradeSuggestion').textContent = getSuggestion(penul, 50);
+
+            // Update grades
+            document.getElementById('ujianGrade').value = getGrade(ujian, 30);
+            document.getElementById('persembGrade').value = getGrade(persemb, 20);
+            document.getElementById('penulGrade').value = getGrade(penul, 50);
+
+            // Update summary
+            document.getElementById('summaryUjian').textContent = ujian;
+            document.getElementById('summaryPersemb').textContent = persemb;
+            document.getElementById('summaryPenul').textContent = penul;
+
+            const total = ujian + persemb + penul;
+            document.getElementById('totalMark').textContent = total;
+        }
+
+        function getSuggestion(mark, max) {
+            const percent = (mark / max) * 100;
+            if (percent < 50) return 'Lemah';
+            if (percent < 65) return 'Lulus';
+            if (percent < 75) return 'Kepujian';
+            if (percent < 90) return 'Cemerlang';
+            return 'Amat Cemerlang';
+        }
+
+        function getGrade(mark, max) {
+            const percent = (mark / max) * 100;
+            if (percent >= 90) return 'A+';
+            if (percent >= 85) return 'A';
+            if (percent >= 80) return 'A-';
+            if (percent >= 75) return 'B+';
+            if (percent >= 70) return 'B';
+            if (percent >= 65) return 'B-';
+            if (percent >= 60) return 'C+';
+            if (percent >= 55) return 'C';
+            if (percent >= 50) return 'C-';
+            if (percent >= 40) return 'D';
+            return 'F';
+        }
+
+        function submitMarks() {
+            const idSistem = document.getElementById('studentSelect').value;
+            if (!idSistem) {
+                alert('Sila pilih pelajar');
+                return;
+            }
+
+            const ujian = parseInt(document.getElementById('ujianMark').value) || 0;
+            const persemb = parseInt(document.getElementById('persembMark').value) || 0;
+            const penul = parseInt(document.getElementById('penulMark').value) || 0;
+
+            const btn = event.target;
+            btn.innerHTML = '<i class="fas fa-spinner loading"></i> Menyimpan...';
+            btn.disabled = true;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'submitMarks',
+                    ID_SISTEM: idSistem,
+                    Ujian_30: ujian,
+                    Persembahan_20: persemb,
+                    Penulisan_50: penul
+                })
+            })
+            .then(r => r.json())
+            .then(result => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Markah';
+                btn.disabled = false;
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    loadAllStudents();
+                } else {
+                    alert('❌ ' + result.message);
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Markah';
+                btn.disabled = false;
+                alert('❌ Ralat: ' + err.message);
+            });
+        }
+
+        function clearMarks() {
+            document.getElementById('ujianMark').value = '0';
+            document.getElementById('persembMark').value = '0';
+            document.getElementById('penulMark').value = '0';
+            calculateMarks();
+        }
     </script>
 </body>
 </html>
