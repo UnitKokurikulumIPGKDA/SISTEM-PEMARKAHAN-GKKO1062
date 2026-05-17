@@ -3,1320 +3,1605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GKKO1062 - Sistem Markah Tugasan</title>
+    <title>Portal GKKO1062 | Sistem Penilaian Kokurikulum IPGKDA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --border: #e2e8f0;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --indigo: #6366f1; --purple: #a855f7; --pink: #ec4899;
+            --cyan: #06b6d4; --emerald: #10b981; --amber: #f59e0b;
+            --bg: #080b14; --surface: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); min-height: 100vh; color: white; }
+        .shell { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+        .glass { background: var(--surface); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 2rem; }
+        .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; }
+        .btn-grad { background: linear-gradient(135deg, var(--indigo), var(--purple)); border: none; cursor: pointer; transition: all 0.3s; color: white; font-family: inherit; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+        .btn-grad:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-grad:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+        .btn-outline:hover { border-color: var(--indigo); color: white; }
+        .tab-bar { display: flex; gap: 4px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 1rem; }
+        .tab { flex: 1; padding: 10px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: all 0.25s; background: transparent; border: none; color: rgba(255,255,255,0.4); font-family: inherit; }
+        .tab.active { background: var(--indigo); color: white; }
+        .screen { display: none; }
+        .screen.active { display: flex; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
+        /* Likert Scale */
+        .likert-group { display: flex; gap: 6px; }
+        .likert-btn { flex: 1; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); font-family: inherit; transition: all 0.2s; text-align: center; }
+        .likert-btn:hover { border-color: var(--indigo); color: white; }
+        .likert-btn.sel-1 { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #ef4444; }
+        .likert-btn.sel-2 { background: rgba(245,158,11,0.2); border-color: var(--amber); color: var(--amber); }
+        .likert-btn.sel-3 { background: rgba(234,179,8,0.2); border-color: #eab308; color: #eab308; }
+        .likert-btn.sel-4 { background: rgba(16,185,129,0.2); border-color: var(--emerald); color: var(--emerald); }
+        .likert-btn.sel-5 { background: rgba(99,102,241,0.2); border-color: var(--indigo); color: var(--indigo); }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
+        /* Checklist rating buttons (1-4 tahap) */
+        .rating-group { display: flex; gap: 5px; }
+        .rating-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); font-family: inherit; transition: all 0.2s; text-align: center; line-height: 1.3; }
+        .rating-btn:hover { border-color: var(--indigo); color: white; }
+        .rating-btn.r-1 { background: rgba(239,68,68,0.15); border-color: #ef4444; color: #ef4444; }
+        .rating-btn.r-2 { background: rgba(245,158,11,0.15); border-color: var(--amber); color: var(--amber); }
+        .rating-btn.r-3 { background: rgba(16,185,129,0.15); border-color: var(--emerald); color: var(--emerald); }
+        .rating-btn.r-4 { background: rgba(99,102,241,0.15); border-color: var(--indigo); color: #a5b4fc; }
 
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            padding: 40px 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            color: white;
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-        }
-
-        .view-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: none;
-        }
-
-        .view-container.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== LOGIN VIEW ===== */
-        #loginView {
-            max-width: 450px;
-            margin: 0 auto;
-        }
-
-        .login-form {
-            padding: 50px 40px;
-        }
-
-        .login-form h2 {
-            color: white;
-            margin-bottom: 10px;
-            font-size: 28px;
-            text-align: center;
-        }
-
-        .login-form p {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .s-card { padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+        .s-card:hover { background: rgba(99,102,241,0.08); border-left-color: var(--indigo); }
+        .s-card.selected { background: rgba(99,102,241,0.12); border-left-color: var(--indigo); border-color: rgba(99,102,241,0.3); }
+        .s-card.done { border-left-color: var(--emerald); }
+        .scroll-thin::-webkit-scrollbar { width: 4px; }
+        .scroll-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        input[type=number], input[type=text], input[type=password], textarea {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            color: white; font-family: inherit; outline: none; transition: border-color 0.2s;
             border-radius: 12px;
-            font-size: 14px;
-            color: white;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
         }
+        input:focus, textarea:focus { border-color: var(--indigo); }
+        .alert-info { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); color: #a5b4fc; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
+        .alert-warn { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
+        .alert-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
+
+        /* HPK badges */
+        .hpk-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700; font-family:'Space Mono',monospace; }
+        .hpk1 { background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3); color:#a5b4fc; }
+        .hpk2 { background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3); color:#67e8f9; }
+        .hpk3 { background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#d8b4fe; }
+
+        /* Cadangan markah highlight box */
+        .cad-box { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 14px; padding: 14px 16px; }
+        .cad-val { font-size: 28px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--amber); }
+
+        #toast { position: fixed; top: 20px; right: 20px; z-index: 9999; transform: translateX(120%); transition: transform 0.3s; }
+        #toast.show { transform: translateX(0); }
+        .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .eval-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .eval-dot.done { background: var(--emerald); }
+        .eval-dot.pending { background: rgba(255,255,255,0.2); }
+        .q-block { padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); margin-bottom: 10px; }
+        .dim-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+        .disclaimer-bar { background: rgba(99,102,241,0.07); border-bottom: 1px solid rgba(99,102,241,0.15); padding: 9px 20px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 10.5px; color: rgba(255,255,255,0.45); letter-spacing: 0.02em; text-align: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); }
+        .disclaimer-bar strong { color: rgba(255,255,255,0.7); font-weight: 700; }
+        .disclaimer-bar .sep { opacity: 0.25; margin: 0 4px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease forwards; }
+        .disclaimer-footer { background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); padding: 18px 24px; text-align: center; font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.8; }
+
+        /* Progress bar */
+        .prog-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+        .prog-bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .btn-logout {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-logout:hover {
-            background: #dc2626;
-        }
-
-        .alert {
-            padding: 14px 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid;
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.15);
-            color: #86efac;
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-
-        /* ===== STUDENT VIEW ===== */
-        .student-header, .lecturer-header {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
-            border-bottom: 1px solid var(--glass-border);
-            padding: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .student-header h2, .lecturer-header h2 {
-            color: white;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .student-section {
-            margin-bottom: 40px;
-        }
-
-        .student-section h3 {
-            color: white;
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-        }
-
-        .biodata-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .biodata-item {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 18px;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .biodata-item:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .biodata-item label {
-            display: block;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .biodata-item span {
-            display: block;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .image-upload-area {
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-
-        .image-upload-area:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .image-upload-area.dragover {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: var(--primary);
-        }
-
-        .image-upload-area input[type="file"] {
-            display: none;
-        }
-
-        .image-upload-area p {
-            color: white;
-            font-weight: 500;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .image-upload-area small {
-            color: rgba(255, 255, 255, 0.6);
-            display: block;
-            font-size: 13px;
-        }
-
-        .image-preview {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .image-preview img {
-            max-width: 300px;
-            max-height: 400px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        /* ===== LECTURER VIEW ===== */
-        .student-selector {
-            margin-bottom: 30px;
-        }
-
-        .student-selector label {
-            display: block;
-            color: white;
-            font-weight: 600;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-
-        .student-selector select {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            font-size: 14px;
-            color: white;
-            backdrop-filter: blur(10px);
-        }
-
-        .student-selector select:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .student-selector select option {
-            background: var(--dark);
-            color: white;
-        }
-
-        .selected-student-info {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-
-        .selected-student-info h4 {
-            color: white;
-            margin-bottom: 16px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .student-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .student-info-item {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 13px;
-        }
-
-        .student-info-item strong {
-            color: white;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .student-image-display {
-            margin-top: 16px;
-            grid-column: 1/-1;
-        }
-
-        .student-image-display img {
-            max-width: 200px;
-            border-radius: 8px;
-        }
-
-        .assignment-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-left: 3px solid var(--primary);
-            padding: 28px;
-            margin-bottom: 24px;
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-        }
-
-        .assignment-card h3 {
-            color: white;
-            font-size: 18px;
-            margin-bottom: 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-
-        .assignment-badge {
-            background: var(--primary);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .rubric-checklist {
-            margin-bottom: 24px;
-        }
-
-        .rubric-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 14px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            border-left: 3px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s;
-        }
-
-        .rubric-item:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-left-color: var(--primary);
-        }
-
-        .rubric-item input[type="checkbox"] {
-            margin-right: 12px;
-            margin-top: 4px;
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-        }
-
-        .rubric-item label {
-            flex: 1;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-        }
-
-        .mark-input-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .mark-input {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .mark-input label {
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .mark-input input {
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            backdrop-filter: blur(10px);
-        }
-
-        .mark-input input:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .suggested-grade {
-            background: rgba(99, 102, 241, 0.2);
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        .marks-summary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 16px;
-            padding: 28px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .marks-summary h3 {
-            color: white;
-            margin-bottom: 24px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .marks-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .mark-summary-item {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .mark-summary-item p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 11px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .mark-summary-item span {
-            display: block;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .total-mark {
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-        }
-
-        .total-mark p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .total-mark span {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--success);
-            display: block;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .actions .btn {
-            flex: 1;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
-
-        .btn-clear {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-clear:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .student-input-section {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .student-input-section .form-group {
-            margin-bottom: 16px;
-        }
-
-        /* ===== LOADING STATE ===== */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 24px;
-            }
-
-            .student-header, .lecturer-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .student-header h2, .lecturer-header h2 {
-                width: 100%;
-            }
-
-            .content {
-                padding: 24px;
-            }
-
-            .login-form {
-                padding: 30px 20px;
-            }
-
-            .biodata-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .mark-input-group {
-                grid-template-columns: 1fr;
-            }
-
-            .marks-summary-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .assignment-card {
-                padding: 20px;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
+            .disclaimer-bar { font-size: 9px !important; padding: 8px 12px !important; }
+            .glass { border-radius: 1.2rem !important; }
+            .tab { padding: 8px 4px !important; font-size: 9px !important; }
+            .likert-group, .rating-group { flex-wrap: wrap !important; }
+            .likert-btn, .rating-btn { min-width: calc(33% - 4px) !important; }
+            #toast { left: 12px; right: 12px; top: 12px; transform: translateY(-120%) !important; }
+            #toast.show { transform: translateY(0) !important; }
+        }
+        @media (max-width: 900px) {
+            #lecturerDash > div:last-child { grid-template-columns: 1fr !important; }
+            #sList { display: flex !important; flex-direction: row !important; overflow-x: auto !important; overflow-y: hidden !important; max-height: none !important; gap: 8px !important; }
+            #sList .s-card { min-width: 160px !important; flex-shrink: 0 !important; margin-bottom: 0 !important; }
+        }
+        @media (max-width: 480px) {
+            .shell { align-items: flex-start !important; padding: 0 !important; }
+            .shell > .glass { border-radius: 0 !important; min-height: 100vh !important; border: none !important; justify-content: center !important; display: flex !important; flex-direction: column !important; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            .btn-grad, .btn-outline, .tab, .s-card, .likert-btn, .rating-btn { min-height: 44px; }
+            .tab { min-height: 36px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-graduation-cap"></i> GKKO1062</h1>
-            <p>Sistem Markah Tugasan Kokurikulum dan Kesihatan Diri</p>
-        </header>
 
-        <!-- LOGIN VIEW -->
-        <div id="loginView" class="view-container active">
-            <div class="login-form">
-                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
-                <p>Masukkan kredensial anda untuk melanjutkan</p>
-                <div id="loginAlert"></div>
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Username</label>
-                    <input type="text" id="username" placeholder="Username" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="password" placeholder="Password">
-                </div>
-                <button class="btn btn-primary" onclick="loginLecturer()">
-                    <i class="fas fa-sign-in-alt"></i> Masuk
-                </button>
-                <button class="btn btn-secondary" onclick="switchToStudent()">
-                    <i class="fas fa-eye"></i> Pelajar - Lihat Markah
-                </button>
+<!-- DISCLAIMER BAR -->
+<div class="disclaimer-bar" id="globalDisclaimer">
+    <i class="fas fa-shield-halved" style="color:#6366f1; font-size:13px; flex-shrink:0;"></i>
+    <span style="flex:1;">
+        <strong>🔒 SULIT &amp; TERHAD</strong>
+        <span class="sep">|</span>
+        Sistem ini adalah <strong>SULIT</strong> dan hanya untuk kegunaan
+        <strong>Unit Kokurikulum IPG Kampus Darulaman</strong>
+        <span class="sep">|</span>
+        <strong>GKKO1062</strong>
+        <span class="sep">| Kokurikulum dan Kesihatan Diri |</span>
+        Dibangunkan oleh <strong>Unit Kokurikulum IPGKDA</strong>
+    </span>
+    <button onclick="document.getElementById('globalDisclaimer').style.display='none'"
+            style="background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer; font-size:14px; padding:0 4px; flex-shrink:0;">✕</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+    <div class="glass px-5 py-3 flex items-center gap-3 text-sm font-bold" id="toastMsg">
+        <i class="fas fa-check-circle text-emerald-400"></i>
+        <span>Berjaya</span>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- LOGIN SCREEN -->
+<!-- ============================================================ -->
+<div class="shell" id="loginScreen">
+    <div class="glass w-full shadow-2xl" style="max-width:420px; padding: clamp(1.4rem, 5vw, 2.5rem);">
+        <div class="text-center" style="margin-bottom:20px;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:18px; background:linear-gradient(135deg,#6366f1,#a855f7); margin-bottom:14px; box-shadow:0 8px 28px rgba(99,102,241,0.4);">
+                <i class="fas fa-graduation-cap" style="font-size:1.6rem; color:white;"></i>
+            </div>
+            <div style="font-size:9px; font-weight:800; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase; margin-bottom:6px;">IPG Kampus Darulaman · Unit Kokurikulum</div>
+            <h1 style="font-size:clamp(1.5rem,6vw,2rem); font-weight:800; color:white; line-height:1.2; margin-bottom:3px;">Portal Pemarkahan</h1>
+            <p style="font-size:11px; color:rgba(99,102,241,0.8); font-weight:600;">GKKO1062 — Kokurikulum dan Kesihatan Diri</p>
+        </div>
+
+        <div style="background:rgba(99,102,241,0.07); border:1px solid rgba(99,102,241,0.18); border-radius:14px; padding:14px 16px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <i class="fas fa-shield-halved" style="color:#818cf8; font-size:13px;"></i>
+                <span style="font-size:10px; font-weight:800; color:#a5b4fc; text-transform:uppercase; letter-spacing:0.1em;">Penafian Rasmi</span>
+            </div>
+            <p style="font-size:10.5px; color:rgba(255,255,255,0.45); line-height:1.75;">
+                Sistem ini adalah <strong style="color:rgba(255,255,255,0.7);">SULIT</strong> untuk kegunaan
+                <strong style="color:rgba(255,255,255,0.7);">Unit Kokurikulum IPGKDA</strong> bagi kod kursus
+                <strong style="color:#a5b4fc;">GKKO1062</strong>.
+                Sebarang penyalahgunaan adalah <strong style="color:rgba(255,255,255,0.7);">dilarang keras</strong>.
+            </p>
+        </div>
+
+        <!-- HPK Structure Info -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:18px;">
+            <div style="text-align:center; padding:10px 6px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:12px;">
+                <div style="font-size:9px; font-weight:800; color:#a5b4fc; text-transform:uppercase; margin-bottom:4px;">HPK1</div>
+                <div style="font-size:11px; font-weight:700; color:white;">Ujian</div>
+                <div style="font-size:18px; font-weight:800; color:#6366f1; font-family:'Space Mono',monospace;">30%</div>
+            </div>
+            <div style="text-align:center; padding:10px 6px; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:12px;">
+                <div style="font-size:9px; font-weight:800; color:#67e8f9; text-transform:uppercase; margin-bottom:4px;">HPK2</div>
+                <div style="font-size:11px; font-weight:700; color:white;">Persembahan</div>
+                <div style="font-size:18px; font-weight:800; color:#06b6d4; font-family:'Space Mono',monospace;">20%</div>
+            </div>
+            <div style="text-align:center; padding:10px 6px; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:12px;">
+                <div style="font-size:9px; font-weight:800; color:#d8b4fe; text-transform:uppercase; margin-bottom:4px;">HPK3</div>
+                <div style="font-size:11px; font-weight:700; color:white;">Penulisan</div>
+                <div style="font-size:18px; font-weight:800; color:#a855f7; font-family:'Space Mono',monospace;">50%</div>
             </div>
         </div>
 
-        <!-- STUDENT VIEW -->
-        <div id="studentView" class="view-container">
-            <div class="student-header">
-                <h2><i class="fas fa-user-circle"></i> Dashboard Pelajar</h2>
-                <button class="btn btn-logout" onclick="logout()" style="width: auto;">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </button>
+        <div class="tab-bar" style="margin-bottom:16px;">
+            <button class="tab active" id="ts" onclick="setType('student')">
+                <i class="fas fa-user-graduate" style="margin-right:4px;"></i> PELAJAR
+            </button>
+            <button class="tab" id="tl" onclick="setType('lecturer')">
+                <i class="fas fa-chalkboard-teacher" style="margin-right:4px;"></i> PENSYARAH
+            </button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+            <input type="text" id="idIn" placeholder="No. Kad Pengenalan / Emel"
+                style="padding:14px 16px; font-family:'Space Mono',monospace; font-size:13px; text-align:center; border-radius:14px; width:100%;"
+                autocomplete="username" inputmode="text">
+            <input type="password" id="pwIn" placeholder="Password"
+                style="padding:14px 16px; text-align:center; border-radius:14px; font-size:14px; width:100%; display:none;"
+                autocomplete="current-password">
+        </div>
+
+        <button onclick="handleAuth()" id="loginBtn" class="btn-grad w-full rounded-2xl" style="padding:15px; font-size:13px; width:100%;">
+            <i class="fas fa-right-to-bracket" style="margin-right:8px;"></i> MASUK SISTEM
+        </button>
+
+        <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;">
+            <p style="font-size:9px; color:rgba(255,255,255,0.18); line-height:1.9;">
+                © 2025–2026 Unit Kokurikulum IPG Kampus Darulaman<br>
+                <span style="color:rgba(99,102,241,0.45); font-size:8px; letter-spacing:0.05em;">v3.0 · GKKO1062</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STUDENT DASHBOARD -->
+<!-- ============================================================ -->
+<div id="studentDash" style="display:none; min-height:100vh; flex-direction:column;">
+    <div style="background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; backdrop-filter:blur(20px);">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:32px; height:32px; background:linear-gradient(135deg,var(--indigo),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px;"><i class="fas fa-graduation-cap"></i></div>
+            <div>
+                <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:var(--indigo);">STUDENT PORTAL</div>
+                <div id="hdrName" style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.8);">--</div>
             </div>
-            <div class="content">
-                <!-- Student Input -->
-                <div id="studentInputSection" class="student-input-section">
-                    <div class="student-section">
-                        <h3><i class="fas fa-search"></i> Cari Maklumat Anda</h3>
-                        <div class="form-group">
-                            <label for="studentIdInput"><i class="fas fa-id-card"></i> ID Sistem</label>
-                            <input type="text" id="studentIdInput" placeholder="Cth: STU001" autocomplete="off">
-                        </div>
-                        <button class="btn btn-primary" onclick="loadStudentData()" style="width: 100%;">
-                            <i class="fas fa-search"></i> Cari
-                        </button>
-                    </div>
+        </div>
+        <button onclick="logout()" class="btn-outline px-4 py-2 rounded-full">LOGOUT</button>
+    </div>
+
+    <div style="padding:20px 24px 0;">
+        <div class="tab-bar" style="max-width:500px;">
+            <button class="tab active" onclick="showStudentTab('profile')"><i class="fas fa-user me-1"></i> Profil</button>
+            <button class="tab" onclick="showStudentTab('peer')"><i class="fas fa-users me-1"></i> Peer Eval</button>
+        </div>
+    </div>
+
+    <!-- TAB: PROFIL -->
+    <div id="stab-profile" style="padding:20px 24px; flex:1; display:flex; flex-wrap:wrap; gap:20px;">
+        <div class="glass" style="flex:1; min-width:280px; padding:28px;">
+            <div style="font-size:9px; font-weight:800; letter-spacing:0.15em; color:var(--indigo); text-transform:uppercase; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:12px;">PROFIL DIGITAL</div>
+            <div style="display:flex; flex-direction:column; gap:18px;">
+                <div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Nama Penuh</div>
+                    <div id="sN" style="font-size:18px; font-weight:700;">--</div>
                 </div>
+                <div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">No. Kad Pengenalan</div>
+                    <div id="sK" style="font-family:'Space Mono',monospace; color:#a5b4fc; font-size:14px;">--</div>
+                </div>
+                <div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Kelas</div>
+                    <div id="sC" style="font-size:18px; font-weight:700;">--</div>
+                </div>
+                <div>
+                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Status Gambar</div>
+                    <div id="sS" style="font-weight:700; color:rgb(251,146,60); text-transform:uppercase; font-size:12px;">PENDING</div>
+                </div>
+            </div>
 
-                <!-- Student Data Section -->
-                <div id="biodataSection" class="hidden">
-                    <div class="student-section">
-                        <h3><i class="fas fa-id-badge"></i> Maklumat Peribadi</h3>
-                        <div class="biodata-grid" id="biodataGrid"></div>
+            <!-- Struktur Pentaksiran -->
+            <div style="margin-top:24px; padding-top:16px; border-top:1px solid var(--border);">
+                <div style="font-size:9px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">Struktur Pentaksiran Berterusan</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="hpk-badge hpk1">HPK1</span>
+                        <span style="flex:1; font-size:12px;">Ujian</span>
+                        <span style="font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:#6366f1;">30%</span>
                     </div>
-
-                    <div class="student-section">
-                        <h3><i class="fas fa-image"></i> Gambar Profil</h3>
-                        <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
-                            <input type="file" id="fileInput" accept="image/*">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: rgba(255,255,255,0.6); display: block; margin-bottom: 10px;"></i>
-                            <p>Klik atau seret gambar ke sini</p>
-                            <small>JPG, PNG | Maksimum 5MB</small>
-                        </div>
-                        <div id="uploadStatus"></div>
-                        <div class="image-preview" id="imagePreview"></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="hpk-badge hpk2">HPK2</span>
+                        <span style="flex:1; font-size:12px;">Persembahan</span>
+                        <span style="font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:#06b6d4;">20%</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="hpk-badge hpk3">HPK3</span>
+                        <span style="flex:1; font-size:12px;">Penulisan (1000 patah perkataan)</span>
+                        <span style="font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:#a855f7;">50%</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- LECTURER VIEW -->
-        <div id="lecturerView" class="view-container">
-            <div class="lecturer-header">
-                <h2><i class="fas fa-chalkboard-user"></i> Dashboard Pensyarah</h2>
-                <button class="btn btn-logout" onclick="logout()" style="width: auto;">
-                    <i class="fas fa-sign-out-alt"></i> Keluar
-                </button>
-            </div>
-            <div class="content">
-                <!-- Student Selector -->
-                <div class="student-selector">
-                    <label for="studentSelect"><i class="fas fa-list"></i> Pilih Pelajar</label>
-                    <select id="studentSelect" onchange="loadSelectedStudent()">
-                        <option value="">-- Pilih Pelajar --</option>
-                    </select>
-                </div>
-
-                <!-- Student Info -->
-                <div id="selectedStudentInfo" class="hidden selected-student-info">
-                    <h4><i class="fas fa-info-circle"></i> Maklumat Pelajar</h4>
-                    <div class="student-info-grid">
-                        <div class="student-info-item">
-                            <strong>Nama</strong>
-                            <span id="selStudentName">-</span>
-                        </div>
-                        <div class="student-info-item">
-                            <strong>No. Giliran</strong>
-                            <span id="selStudentNo">-</span>
-                        </div>
-                        <div class="student-info-item">
-                            <strong>ID Sistem</strong>
-                            <span id="selStudentId">-</span>
-                        </div>
-                        <div class="student-info-item">
-                            <strong>Kelas</strong>
-                            <span id="selStudentClass">-</span>
-                        </div>
-                        <div class="student-image-display" id="selStudentImage"></div>
+        <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:16px;">
+            <div class="glass" style="padding:20px;">
+                <div style="font-size:9px; font-weight:800; letter-spacing:0.15em; color:var(--indigo); text-transform:uppercase; margin-bottom:14px;">GAMBAR PROFIL</div>
+                <div id="imgBox" style="width:100%; aspect-ratio:16/9; border-radius:16px; overflow:hidden; background:rgba(0,0,0,0.3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; position:relative;">
+                    <img id="sImg" style="width:100%; height:100%; object-fit:cover; display:none;" alt="Gambar Pelajar">
+                    <div id="sPl" style="display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0.25;">
+                        <i class="fas fa-image" style="font-size:2rem;"></i>
+                        <span style="font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;">Tiada Fail</span>
                     </div>
                 </div>
-
-                <!-- Assignment 1: Ujian -->
-                <div class="assignment-card">
-                    <h3>
-                        <span><i class="fas fa-file-alt"></i> Ujian</span>
-                        <span class="assignment-badge">30%</span>
-                    </h3>
-                    <div class="rubric-checklist">
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Pengetahuan Isi Kandungan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Kefahaman Konsep</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>KBAT (Kemahiran Berfikir Aras Tinggi)</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Ketepatan Jawapan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Organisasi Idea</label>
-                        </div>
-                    </div>
-                    <div class="mark-input-group">
-                        <div class="mark-input">
-                            <label for="ujianMark"><i class="fas fa-calculator"></i> Markah (0-30)</label>
-                            <input type="number" id="ujianMark" min="0" max="30" value="0" oninput="calculateMarks()">
-                            <div class="suggested-grade">
-                                <i class="fas fa-star"></i> <span id="ujianGradeSuggestion">-</span>
-                            </div>
-                        </div>
-                        <div class="mark-input">
-                            <label><i class="fas fa-medal"></i> Gred</label>
-                            <input type="text" id="ujianGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assignment 2: Persembahan -->
-                <div class="assignment-card">
-                    <h3>
-                        <span><i class="fas fa-presentation"></i> Persembahan</span>
-                        <span class="assignment-badge">20%</span>
-                    </h3>
-                    <div class="rubric-checklist">
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Organisasi & Struktur Persembahan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Kemahiran Komunikasi Lisan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Penggunaan Alat Bantu Mengajar</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Keyakinan & Penguasaan Isi</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Keterlibatan Audiens</label>
-                        </div>
-                    </div>
-                    <div class="mark-input-group">
-                        <div class="mark-input">
-                            <label for="persembMark"><i class="fas fa-calculator"></i> Markah (0-20)</label>
-                            <input type="number" id="persembMark" min="0" max="20" value="0" oninput="calculateMarks()">
-                            <div class="suggested-grade">
-                                <i class="fas fa-star"></i> <span id="persembGradeSuggestion">-</span>
-                            </div>
-                        </div>
-                        <div class="mark-input">
-                            <label><i class="fas fa-medal"></i> Gred</label>
-                            <input type="text" id="persembGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assignment 3: Penulisan -->
-                <div class="assignment-card">
-                    <h3>
-                        <span><i class="fas fa-pen-fancy"></i> Penulisan</span>
-                        <span class="assignment-badge">50%</span>
-                    </h3>
-                    <div class="rubric-checklist">
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Penguasaan Kandungan Isu/Topik</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Organisasi & Struktur Penulisan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Kemahiran Berbahasa & Ejaan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Kemahiran Membuat Rujukan</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Pemikiran Kritis & Analisis</label>
-                        </div>
-                        <div class="rubric-item">
-                            <input type="checkbox"> 
-                            <label>Keaslian & Integriti Akademik</label>
-                        </div>
-                    </div>
-                    <div class="mark-input-group">
-                        <div class="mark-input">
-                            <label for="penulMark"><i class="fas fa-calculator"></i> Markah (0-50)</label>
-                            <input type="number" id="penulMark" min="0" max="50" value="0" oninput="calculateMarks()">
-                            <div class="suggested-grade">
-                                <i class="fas fa-star"></i> <span id="penulGradeSuggestion">-</span>
-                            </div>
-                        </div>
-                        <div class="mark-input">
-                            <label><i class="fas fa-medal"></i> Gred</label>
-                            <input type="text" id="penulGrade" readonly style="background: rgba(255,255,255,0.08); cursor: not-allowed;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Marks Summary -->
-                <div class="marks-summary">
-                    <h3><i class="fas fa-chart-bar"></i> Ringkasan Markah</h3>
-                    <div class="marks-summary-grid">
-                        <div class="mark-summary-item">
-                            <p>Ujian</p>
-                            <span id="summaryUjian">0</span>
-                        </div>
-                        <div class="mark-summary-item">
-                            <p>Persembahan</p>
-                            <span id="summaryPersemb">0</span>
-                        </div>
-                        <div class="mark-summary-item">
-                            <p>Penulisan</p>
-                            <span id="summaryPenul">0</span>
-                        </div>
-                    </div>
-                    <div class="total-mark">
-                        <p>Jumlah Markah (100)</p>
-                        <span id="totalMark">0</span>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="actions">
-                    <button class="btn btn-success" onclick="submitMarks()">
-                        <i class="fas fa-save"></i> Simpan Markah
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+                    <button onclick="document.getElementById('fIn').click()" class="btn-outline p-3 rounded-xl text-xs" style="padding:12px;">
+                        <i class="fas fa-folder-open me-1"></i> PILIH FAIL
                     </button>
-                    <button class="btn btn-clear" onclick="clearMarks()">
-                        <i class="fas fa-redo"></i> Padam
+                    <button onclick="hUp()" id="uploadBtn" class="btn-grad p-3 rounded-xl text-xs" style="padding:12px;">
+                        <i class="fas fa-upload me-1"></i> UPLOAD
                     </button>
                 </div>
+                <input type="file" id="fIn" hidden accept="image/*" onchange="pImg(this)">
+                <div id="uploadStatus" style="margin-top:8px; font-size:10px; color:rgba(255,255,255,0.35); text-align:center; display:none;"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyXbNtY-Oc5TDrUCNYyuxPKSMg5wMAr5ww4F9T650eqZfzzF3xYTWgHzMwHFQNJRpnO/exec';
+    <!-- TAB: PEER EVALUATION -->
+    <div id="stab-peer" style="padding:20px 24px; flex:1; display:none;">
+        <div class="alert-info" style="margin-bottom:16px;">
+            <i class="fas fa-info-circle"></i>
+            <span>Anda perlu menilai <strong>semua ahli kelas</strong> anda. Penilaian adalah sulit dan hanya pensyarah yang akan melihat keputusan agregat.</span>
+        </div>
 
-        // ===== VIEW MANAGEMENT =====
-        function showView(viewName) {
-            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-            document.getElementById(viewName).classList.add('active');
-        }
-
-        function logout() {
-            showView('loginView');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('loginAlert').innerHTML = '';
-        }
-
-        function switchToStudent() {
-            showView('studentView');
-            document.getElementById('studentInputSection').classList.remove('hidden');
-            document.getElementById('biodataSection').classList.add('hidden');
-        }
-
-        // ===== IMAGE UPLOAD =====
-        document.addEventListener('DOMContentLoaded', function() {
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                if (e.dataTransfer.files.length) {
-                    handleImageUpload(e.dataTransfer.files[0]);
-                }
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handleImageUpload(e.target.files[0]);
-                }
-            });
-        });
-
-        function handleImageUpload(file) {
-            const uploadStatus = document.getElementById('uploadStatus');
-            const imagePreview = document.getElementById('imagePreview');
-            
-            if (file.size > 5 * 1024 * 1024) {
-                uploadStatus.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Saiz gambar terlalu besar (maksimum 5MB)</div>';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const base64Data = e.target.result;
-                const idSistem = document.getElementById('studentIdInput').value;
-                
-                uploadStatus.innerHTML = '<div class="alert alert-success"><i class="fas fa-spinner loading"></i> Sedang memuat naik...</div>';
-
-                fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'uploadImage',
-                        imageData: base64Data,
-                        fileName: `${idSistem}_${Date.now()}.jpg`,
-                        idSistem: idSistem
-                    })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        uploadStatus.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Gambar berjaya dimuat naik!</div>';
-                        imagePreview.innerHTML = `<img src="${data.fileUrl}" alt="Preview">`;
-                    } else {
-                        uploadStatus.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> ${data.message}</div>`;
-                    }
-                })
-                .catch(err => {
-                    uploadStatus.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Ralat: ${err.message}</div>`;
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // ===== STUDENT MODE =====
-        function loadStudentData() {
-            const idSistem = document.getElementById('studentIdInput').value.trim();
-            if (!idSistem) {
-                alert('Sila masukkan ID Sistem');
-                return;
-            }
-
-            fetch(`${API_URL}?action=getStudent&id=${encodeURIComponent(idSistem)}`)
-                .then(r => r.json())
-                .then(student => {
-                    if (student.ID_SISTEM) {
-                        displayStudentBiodata(student);
-                        document.getElementById('studentInputSection').classList.add('hidden');
-                        document.getElementById('biodataSection').classList.remove('hidden');
-                    } else {
-                        alert('Pelajar tidak ditemukan');
-                    }
-                })
-                .catch(err => alert('Ralat: ' + err.message));
-        }
-
-        function displayStudentBiodata(student) {
-            const grid = document.getElementById('biodataGrid');
-            const fields = [
-                { key: 'ID_SISTEM', label: 'ID Sistem', icon: 'id-card' },
-                { key: 'Nama_Pelajar', label: 'Nama', icon: 'user' },
-                { key: 'JANTINA', label: 'Jantina', icon: 'mars-venus' },
-                { key: 'No_KP', label: 'No. KP', icon: 'credit-card' },
-                { key: 'No_Giliran', label: 'No. Giliran', icon: 'list-ol' },
-                { key: 'Kelas', label: 'Kelas', icon: 'building' },
-                { key: 'Penilai', label: 'Penilai', icon: 'chalkboard-user' }
-            ];
-
-            grid.innerHTML = fields.map(f => `
-                <div class="biodata-item">
-                    <label><i class="fas fa-${f.icon}"></i> ${f.label}</label>
-                    <span>${student[f.key] || '-'}</span>
+        <div style="display:grid; grid-template-columns:280px 1fr; gap:20px;">
+            <div>
+                <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">
+                    Senarai Rakan <span id="evalProgress" style="color:var(--emerald); margin-left:6px;">0/0</span>
                 </div>
-            `).join('');
+                <div id="peerList" class="scroll-thin" style="max-height:500px; overflow-y:auto; padding-right:4px;">
+                    <div style="text-align:center; padding:40px; color:rgba(255,255,255,0.2); font-size:12px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</div>
+                </div>
+            </div>
 
-            if (student.Link_Gambar) {
-                document.getElementById('imagePreview').innerHTML = `<img src="${student.Link_Gambar}" alt="Student Photo">`;
-            }
+            <div id="peerPanel" style="display:none;" class="fade-in">
+                <div class="glass p-6" style="padding:24px;">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+                        <img id="peerImg" style="width:48px; height:60px; object-fit:cover; border-radius:10px; border:1px solid var(--border); display:none;" alt="">
+                        <div id="peerImgPh" style="width:48px; height:60px; border-radius:10px; border:1px solid var(--border); background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-user" style="color:rgba(255,255,255,0.2);"></i>
+                        </div>
+                        <div>
+                            <div id="peerName" style="font-size:16px; font-weight:700;">--</div>
+                            <div id="peerKlass" style="font-size:10px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.35);">--</div>
+                        </div>
+                        <div id="peerDoneTag" style="margin-left:auto; display:none;">
+                            <span style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; font-size:10px; font-weight:700; padding:4px 12px; border-radius:20px;">
+                                <i class="fas fa-check me-1"></i> Sudah Dinilai
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="peerQuestions">
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-crown me-1" style="color:var(--amber);"></i>D1 — Kepimpinan</div>
+                            <p style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.5;">Rakan ini menunjukkan kepimpinan yang jelas dalam menyelaraskan tugasan pasukan.</p>
+                            <div class="likert-group" id="q1">
+                                <button class="likert-btn" onclick="setLikert('q1',1,this)">1<br><span style="font-size:9px;">Sangat<br>Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q1',2,this)">2<br><span style="font-size:9px;">Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q1',3,this)">3<br><span style="font-size:9px;">Memuas</span></button>
+                                <button class="likert-btn" onclick="setLikert('q1',4,this)">4<br><span style="font-size:9px;">Baik</span></button>
+                                <button class="likert-btn" onclick="setLikert('q1',5,this)">5<br><span style="font-size:9px;">Cemerlang</span></button>
+                            </div>
+                        </div>
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-bolt me-1" style="color:var(--cyan);"></i>D2 — Autonomi & Inisiatif</div>
+                            <p style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.5;">Rakan ini bertindak secara proaktif dan mengambil inisiatif sendiri tanpa perlu diarahkan.</p>
+                            <div class="likert-group" id="q2">
+                                <button class="likert-btn" onclick="setLikert('q2',1,this)">1<br><span style="font-size:9px;">Sangat<br>Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q2',2,this)">2<br><span style="font-size:9px;">Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q2',3,this)">3<br><span style="font-size:9px;">Memuas</span></button>
+                                <button class="likert-btn" onclick="setLikert('q2',4,this)">4<br><span style="font-size:9px;">Baik</span></button>
+                                <button class="likert-btn" onclick="setLikert('q2',5,this)">5<br><span style="font-size:9px;">Cemerlang</span></button>
+                            </div>
+                        </div>
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-shield-halved me-1" style="color:var(--emerald);"></i>D3 — Tanggungjawab Sosial</div>
+                            <p style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.5;">Rakan ini menjalankan tanggungjawab dengan penuh akauntabiliti terhadap tugas yang diamanahkan.</p>
+                            <div class="likert-group" id="q3">
+                                <button class="likert-btn" onclick="setLikert('q3',1,this)">1<br><span style="font-size:9px;">Sangat<br>Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q3',2,this)">2<br><span style="font-size:9px;">Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q3',3,this)">3<br><span style="font-size:9px;">Memuas</span></button>
+                                <button class="likert-btn" onclick="setLikert('q3',4,this)">4<br><span style="font-size:9px;">Baik</span></button>
+                                <button class="likert-btn" onclick="setLikert('q3',5,this)">5<br><span style="font-size:9px;">Cemerlang</span></button>
+                            </div>
+                        </div>
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-calendar-check me-1" style="color:var(--purple);"></i>D4 — Penganjuran & Organisasi</div>
+                            <p style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.5;">Rakan ini membantu merancang dan membuat persembahan secara sistematik dan bersungguh-sungguh.</p>
+                            <div class="likert-group" id="q4">
+                                <button class="likert-btn" onclick="setLikert('q4',1,this)">1<br><span style="font-size:9px;">Sangat<br>Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q4',2,this)">2<br><span style="font-size:9px;">Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q4',3,this)">3<br><span style="font-size:9px;">Memuas</span></button>
+                                <button class="likert-btn" onclick="setLikert('q4',4,this)">4<br><span style="font-size:9px;">Baik</span></button>
+                                <button class="likert-btn" onclick="setLikert('q4',5,this)">5<br><span style="font-size:9px;">Cemerlang</span></button>
+                            </div>
+                        </div>
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-handshake me-1" style="color:var(--pink);"></i>D5 — Kerjasama Pasukan</div>
+                            <p style="font-size:13px; font-weight:600; margin-bottom:12px; line-height:1.5;">Rakan ini bekerjasama dengan baik bersama ahli pasukan dan menyumbang secara aktif.</p>
+                            <div class="likert-group" id="q5">
+                                <button class="likert-btn" onclick="setLikert('q5',1,this)">1<br><span style="font-size:9px;">Sangat<br>Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q5',2,this)">2<br><span style="font-size:9px;">Lemah</span></button>
+                                <button class="likert-btn" onclick="setLikert('q5',3,this)">3<br><span style="font-size:9px;">Memuas</span></button>
+                                <button class="likert-btn" onclick="setLikert('q5',4,this)">4<br><span style="font-size:9px;">Baik</span></button>
+                                <button class="likert-btn" onclick="setLikert('q5',5,this)">5<br><span style="font-size:9px;">Cemerlang</span></button>
+                            </div>
+                        </div>
+                        <div class="q-block">
+                            <div class="dim-label"><i class="fas fa-comment-dots me-1"></i>Catatan (Pilihan)</div>
+                            <textarea id="peerNote" rows="2" placeholder="Catatan ringkas..." style="width:100%; padding:12px; font-size:13px; resize:none;"></textarea>
+                        </div>
+                    </div>
+                    <button id="submitPeerBtn" onclick="submitPeerEval()" class="btn-grad w-full rounded-2xl" style="padding:16px; margin-top:16px; font-size:13px; width:100%;">
+                        <i class="fas fa-paper-plane me-2"></i> HANTAR PENILAIAN
+                    </button>
+                </div>
+            </div>
+
+            <div id="peerPanelEmpty" style="display:flex; align-items:center; justify-content:center;">
+                <div style="text-align:center; color:rgba(255,255,255,0.2);">
+                    <i class="fas fa-users" style="font-size:3rem; margin-bottom:12px;"></i>
+                    <p style="font-size:13px;">Pilih rakan dari senarai untuk mula menilai</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- LECTURER DASHBOARD -->
+<!-- ============================================================ -->
+<div id="lecturerDash" style="display:none; min-height:100vh; flex-direction:column;">
+    <div style="background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; backdrop-filter:blur(20px);">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:32px; height:32px; background:linear-gradient(135deg,#a855f7,#ec4899); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px;"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div>
+                <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#a855f7;">LECTURER PORTAL</div>
+                <div id="lecName" style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.8);">--</div>
+            </div>
+        </div>
+        <button onclick="logout()" class="btn-outline px-4 py-2 rounded-full">LOGOUT</button>
+    </div>
+
+    <div style="padding:20px 24px 0;">
+        <div class="tab-bar" style="max-width:700px;">
+            <button class="tab active" onclick="showLecTab('marking')"><i class="fas fa-pen-to-square me-1"></i> Pemarkahan</button>
+            <button class="tab" onclick="showLecTab('checklist')"><i class="fas fa-list-check me-1"></i> Checklist</button>
+            <button class="tab" onclick="showLecTab('peer')"><i class="fas fa-spider me-1"></i> Peer Radar</button>
+            <button class="tab" onclick="showLecTab('summary')"><i class="fas fa-table me-1"></i> Ringkasan</button>
+        </div>
+    </div>
+
+    <div style="padding:20px 24px; display:grid; grid-template-columns:300px 1fr; gap:20px; flex:1;">
+        <!-- Student List -->
+        <div>
+            <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>SENARAI PELAJAR</span>
+                <span id="classInfo" style="color:var(--indigo);"></span>
+            </div>
+            <div id="sList" class="scroll-thin" style="max-height:calc(100vh - 200px); overflow-y:auto; padding-right:4px;">
+                <div style="text-align:center; padding:40px; color:rgba(255,255,255,0.2); font-size:12px;"><i class="fas fa-spinner fa-spin"></i></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div>
+
+            <!-- TAB: PEMARKAHAN AKHIR -->
+            <div id="ltab-marking">
+                <div id="gradingPanel" style="display:none;" class="glass fade-in" style="padding:24px;">
+                    <div style="padding:24px;">
+                        <!-- Student info bar -->
+                        <div style="display:flex; align-items:center; gap:16px; padding:16px; background:rgba(255,255,255,0.03); border-radius:16px; margin-bottom:20px; border:1px solid var(--border);">
+                            <div id="liContainer" style="width:56px; height:72px; border-radius:12px; overflow:hidden; background:rgba(255,255,255,0.05); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <img id="li" style="width:100%; height:100%; object-fit:cover; display:none;" alt="">
+                                <i id="liPh" class="fas fa-user" style="color:rgba(255,255,255,0.2); font-size:1.4rem;"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div id="ln" style="font-size:18px; font-weight:700; margin-bottom:4px;">--</div>
+                                <div id="lk" style="font-size:10px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.35);">--</div>
+                            </div>
+                            <!-- Cadangan markah dari checklist -->
+                            <div id="cadanganBadge" style="display:none; text-align:right;">
+                                <div style="font-size:9px; color:rgba(245,158,11,0.7); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Cadangan Checklist</div>
+                                <div style="display:flex; gap:8px;">
+                                    <div style="text-align:center;">
+                                        <div style="font-size:9px; color:rgba(255,255,255,0.35);">HP1</div>
+                                        <div id="cadHP1disp" style="font-size:16px; font-weight:800; font-family:'Space Mono',monospace; color:var(--amber);">--</div>
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:9px; color:rgba(255,255,255,0.35);">HP2</div>
+                                        <div id="cadHP2disp" style="font-size:16px; font-weight:800; font-family:'Space Mono',monospace; color:var(--cyan);">--</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notis cadangan dari checklist -->
+                        <div id="checklistCadNote" style="display:none; margin-bottom:16px;">
+                            <div class="alert-warn">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="checklistCadText">Checklist mengesyorkan markah HP1 dan HP2. Anda boleh terima atau laraskan.</span>
+                            </div>
+                        </div>
+
+                        <!-- Inputs HPK -->
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px;">
+                            <div style="padding:18px; background:rgba(99,102,241,0.06); border-radius:16px; border:1px solid rgba(99,102,241,0.2);">
+                                <div style="font-size:10px; font-weight:800; color:#a5b4fc; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">
+                                    HPK1 — Ujian
+                                </div>
+                                <label style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:6px;">HP1 — Max 30</label>
+                                <input type="number" id="h1" placeholder="0–30" oninput="calc(); checkLimits();" min="0" max="30" style="width:100%; padding:12px; font-family:'Space Mono',monospace; font-size:16px; font-weight:700; text-align:center;">
+                                <div id="h1CadBtn" style="display:none; margin-top:8px; text-align:center;">
+                                    <button onclick="applyCAD('h1')" style="font-size:10px; color:var(--amber); background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:4px 10px; cursor:pointer; font-family:inherit; font-weight:700;">
+                                        <i class="fas fa-magic me-1"></i> Guna Cadangan: <span id="h1CadVal">--</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="padding:18px; background:rgba(6,182,212,0.06); border-radius:16px; border:1px solid rgba(6,182,212,0.2);">
+                                <div style="font-size:10px; font-weight:800; color:#67e8f9; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">
+                                    HPK2 — Persembahan
+                                </div>
+                                <label style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:6px;">HP2 — Max 20</label>
+                                <input type="number" id="h2" placeholder="0–20" oninput="calc(); checkLimits();" min="0" max="20" style="width:100%; padding:12px; font-family:'Space Mono',monospace; font-size:16px; font-weight:700; text-align:center; border-color:rgba(6,182,212,0.3);">
+                                <div id="h2CadBtn" style="display:none; margin-top:8px; text-align:center;">
+                                    <button onclick="applyCAD('h2')" style="font-size:10px; color:var(--cyan); background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); border-radius:8px; padding:4px 10px; cursor:pointer; font-family:inherit; font-weight:700;">
+                                        <i class="fas fa-magic me-1"></i> Guna Cadangan: <span id="h2CadVal">--</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="padding:18px; background:rgba(168,85,247,0.06); border-radius:16px; border:1px solid rgba(168,85,247,0.2);">
+                                <div style="font-size:10px; font-weight:800; color:#d8b4fe; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">
+                                    HPK3 — Penulisan
+                                </div>
+                                <label style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:6px;">HP3 — Max 50</label>
+                                <input type="number" id="h3" placeholder="0–50" oninput="calc(); checkLimits();" min="0" max="50" style="width:100%; padding:12px; font-family:'Space Mono',monospace; font-size:16px; font-weight:700; text-align:center; border-color:rgba(168,85,247,0.3);">
+                            </div>
+                        </div>
+
+                        <!-- Total Display -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(99,102,241,0.08); padding:20px 24px; border-radius:16px; border:1px solid rgba(99,102,241,0.2); margin-bottom:16px;">
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Jumlah Markah</div>
+                                <div id="tm" style="font-size:48px; font-weight:800; font-family:'Space Mono',monospace; color:var(--indigo); line-height:1;">0</div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.3); margin-top:4px;">/ 100</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:10px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">Gred</div>
+                                <div id="gd" style="font-size:56px; font-weight:800; color:var(--indigo); line-height:1;">F</div>
+                            </div>
+                        </div>
+
+                        <div id="limitWarn" class="alert-warn" style="display:none; margin-bottom:12px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Markah melebihi had maksimum — telah ditetapkan semula secara automatik.</span>
+                        </div>
+
+                        <div id="justArea" style="display:none; margin-bottom:16px;">
+                            <div class="alert-warn" style="margin-bottom:8px;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Justifikasi A+ adalah MANDATORI</span>
+                            </div>
+                            <textarea id="justTxt" oninput="validate()" rows="3" placeholder="Nyatakan justifikasi untuk gred A+..." style="width:100%; padding:12px; font-size:13px; resize:none;"></textarea>
+                        </div>
+
+                        <button onclick="save()" id="saveBtn" class="btn-grad w-full rounded-2xl" style="padding:16px; font-size:13px; width:100%;">
+                            <i class="fas fa-save me-2"></i> SIMPAN MARKAH
+                        </button>
+                    </div>
+                </div>
+                <div id="gradingEmpty" style="display:flex; align-items:center; justify-content:center; height:400px; color:rgba(255,255,255,0.2);">
+                    <div style="text-align:center;">
+                        <i class="fas fa-hand-pointer" style="font-size:3rem; margin-bottom:12px;"></i>
+                        <p style="font-size:13px;">Pilih pelajar dari senarai untuk memberi markah</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: CHECKLIST RUBRIK (HP1 Ujian & HP2 Persembahan) -->
+            <div id="ltab-checklist" style="display:none;">
+                <div id="checklistEmpty" style="display:flex; align-items:center; justify-content:center; height:400px; color:rgba(255,255,255,0.2);">
+                    <div style="text-align:center;">
+                        <i class="fas fa-list-check" style="font-size:3rem; margin-bottom:12px;"></i>
+                        <p style="font-size:13px;">Pilih pelajar untuk isi checklist rubrik</p>
+                    </div>
+                </div>
+                <div id="checklistPanel" style="display:none;" class="fade-in">
+                    <!-- Student header -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">CHECKLIST RUBRIK PENTAKSIRAN</div>
+                            <div id="clStudentName" style="font-size:20px; font-weight:700;">--</div>
+                            <div id="clStudentKP" style="font-size:10px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.35);">--</div>
+                        </div>
+                        <div id="clExistBadge" style="display:none; padding:8px 16px; border-radius:20px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); font-size:11px; font-weight:700; color:#6ee7b7;">
+                            <i class="fas fa-check-circle me-1"></i> Sudah dinilai sebelum ini
+                        </div>
+                    </div>
+
+                    <!-- Tab dalam checklist: HP1 vs HP2 -->
+                    <div class="tab-bar" style="max-width:400px; margin-bottom:16px;">
+                        <button class="tab active" onclick="showChecklistTab('ujian')" id="clTab1"><i class="fas fa-pen me-1"></i> HPK1 — Ujian (30%)</button>
+                        <button class="tab" onclick="showChecklistTab('pres')" id="clTab2"><i class="fas fa-presentation me-1"></i> HPK2 — Persembahan (20%)</button>
+                    </div>
+
+                    <!-- UJIAN Checklist -->
+                    <div id="clUjian">
+                        <div class="glass" style="padding:20px; margin-bottom:16px;">
+                            <div style="font-size:10px; font-weight:800; color:#a5b4fc; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px;">
+                                <i class="fas fa-pen me-1"></i> HPK1 — UJIAN (Markah Penuh: 30)
+                            </div>
+                            <div style="margin-bottom:10px; padding:10px 12px; background:rgba(99,102,241,0.06); border-radius:10px; border:1px solid rgba(99,102,241,0.15);">
+                                <div style="display:grid; grid-template-columns:1fr repeat(4,80px); gap:8px; font-size:9px; font-weight:800; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:6px;">
+                                    <span>Kriteria</span>
+                                    <span style="text-align:center; color:#ef4444;">Lemah<br/>&lt;15</span>
+                                    <span style="text-align:center; color:var(--amber);">Lulus<br/>15–17.9</span>
+                                    <span style="text-align:center; color:var(--emerald);">Kepujian<br/>18–22.4</span>
+                                    <span style="text-align:center; color:#a5b4fc;">Cemerlang+<br/>22.5–30</span>
+                                </div>
+                            </div>
+                            <div id="ujianChecklist" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                                <div>
+                                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; margin-bottom:4px;">Jumlah Skor Checklist</div>
+                                    <span id="ujianJumlah" style="font-size:20px; font-weight:800; font-family:'Space Mono',monospace; color:#a5b4fc;">0</span>
+                                    <span style="font-size:11px; color:rgba(255,255,255,0.3);"> / 32</span>
+                                </div>
+                                <div class="cad-box" style="text-align:right;">
+                                    <div style="font-size:9px; color:rgba(245,158,11,0.7); text-transform:uppercase; margin-bottom:4px; font-weight:800;">Cadangan Markah HP1</div>
+                                    <span class="cad-val" id="ujianCad">0</span>
+                                    <span style="font-size:12px; color:rgba(255,255,255,0.3);"> / 30</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PERSEMBAHAN Checklist -->
+                    <div id="clPres" style="display:none;">
+                        <div class="glass" style="padding:20px; margin-bottom:16px;">
+                            <div style="font-size:10px; font-weight:800; color:#67e8f9; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:16px;">
+                                <i class="fas fa-presentation me-1"></i> HPK2 — PERSEMBAHAN (Markah Penuh: 20)
+                            </div>
+                            <div style="margin-bottom:10px; padding:10px 12px; background:rgba(6,182,212,0.06); border-radius:10px; border:1px solid rgba(6,182,212,0.15);">
+                                <div style="display:grid; grid-template-columns:1fr repeat(4,80px); gap:8px; font-size:9px; font-weight:800; text-transform:uppercase; color:rgba(255,255,255,0.35);">
+                                    <span>Kriteria</span>
+                                    <span style="text-align:center; color:#ef4444;">Lemah<br/>&lt;10</span>
+                                    <span style="text-align:center; color:var(--amber);">Lulus<br/>10–11.9</span>
+                                    <span style="text-align:center; color:var(--emerald);">Kepujian<br/>12–14.9</span>
+                                    <span style="text-align:center; color:#67e8f9;">Cemerlang+<br/>15–20</span>
+                                </div>
+                            </div>
+                            <div id="presChecklist" style="display:flex; flex-direction:column; gap:8px;"></div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                                <div>
+                                    <div style="font-size:9px; color:rgba(255,255,255,0.35); text-transform:uppercase; margin-bottom:4px;">Jumlah Skor Checklist</div>
+                                    <span id="presJumlah" style="font-size:20px; font-weight:800; font-family:'Space Mono',monospace; color:#67e8f9;">0</span>
+                                    <span style="font-size:11px; color:rgba(255,255,255,0.3);"> / 32</span>
+                                </div>
+                                <div class="cad-box" style="text-align:right;">
+                                    <div style="font-size:9px; color:rgba(245,158,11,0.7); text-transform:uppercase; margin-bottom:4px; font-weight:800;">Cadangan Markah HP2</div>
+                                    <span class="cad-val" id="presCad">0</span>
+                                    <span style="font-size:12px; color:rgba(255,255,255,0.3);"> / 20</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan cadangan & butang simpan -->
+                    <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.2); border-radius:16px; padding:16px 20px; margin-bottom:16px;">
+                        <div style="font-size:10px; font-weight:800; color:var(--amber); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">
+                            <i class="fas fa-lightbulb me-1"></i> Ringkasan Cadangan Markah
+                        </div>
+                        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                            <div style="text-align:center; flex:1;">
+                                <div style="font-size:9px; color:rgba(255,255,255,0.35); margin-bottom:4px;">HPK1 (Ujian)</div>
+                                <div id="sumCadHP1" style="font-size:24px; font-weight:800; font-family:'Space Mono',monospace; color:#a5b4fc;">0</div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.25);">/ 30</div>
+                            </div>
+                            <div style="text-align:center; flex:1;">
+                                <div style="font-size:9px; color:rgba(255,255,255,0.35); margin-bottom:4px;">HPK2 (Persembahan)</div>
+                                <div id="sumCadHP2" style="font-size:24px; font-weight:800; font-family:'Space Mono',monospace; color:#67e8f9;">0</div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.25);">/ 20</div>
+                            </div>
+                            <div style="display:flex; align-items:center; flex:1;">
+                                <p style="font-size:11px; color:rgba(255,255,255,0.45); line-height:1.6;">Cadangan ini <strong style="color:rgba(255,255,255,0.7);">tidak wajib</strong> diterima. Anda boleh melaraskan markah akhir dalam tab <strong style="color:#a5b4fc;">Pemarkahan</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="saveChecklist()" id="saveChecklistBtn" class="btn-grad w-full rounded-2xl" style="padding:16px; font-size:13px; width:100%;">
+                        <i class="fas fa-save me-2"></i> SIMPAN CHECKLIST & JANA CADANGAN MARKAH
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: PEER RADAR -->
+            <div id="ltab-peer" style="display:none;">
+                <div id="radarEmpty" style="display:flex; align-items:center; justify-content:center; height:400px; color:rgba(255,255,255,0.2);">
+                    <div style="text-align:center;">
+                        <i class="fas fa-spider" style="font-size:3rem; margin-bottom:12px;"></i>
+                        <p style="font-size:13px;">Pilih pelajar untuk lihat Spider Web Radar</p>
+                    </div>
+                </div>
+                <div id="radarContent" style="display:none;" class="glass p-6 fade-in">
+                    <div style="padding:24px;">
+                        <div style="font-size:10px; font-weight:800; color:var(--cyan); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;"><i class="fas fa-chart-radar me-1"></i> SPIDER WEB RADAR — PEER EVALUATION</div>
+                        <div id="radarStudentName" style="font-size:20px; font-weight:700; margin-bottom:4px;">--</div>
+                        <div id="radarMeta" style="font-size:11px; color:rgba(255,255,255,0.35); margin-bottom:20px;">--</div>
+                        <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+                            <div style="position:relative; width:300px; height:300px; flex-shrink:0; margin:0 auto;">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                            <div style="flex:1; min-width:200px;">
+                                <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">SKOR DIMENSI</div>
+                                <div id="dimBreakdown" style="display:flex; flex-direction:column; gap:10px;"></div>
+                                <div style="margin-top:20px; padding:16px; background:rgba(255,255,255,0.02); border-radius:14px; border:1px solid var(--border);">
+                                    <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;">Interpretasi</div>
+                                    <div id="radarInterpret" style="font-size:13px; color:rgba(255,255,255,0.7); line-height:1.7;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:24px;">
+                            <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px;">PECAHAN PENILAIAN (Tanpa Nama)</div>
+                            <div id="evalBreakdown" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: RINGKASAN -->
+            <div id="ltab-summary" style="display:none;">
+                <div class="glass" style="padding:24px;">
+                    <div style="font-size:10px; font-weight:800; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:16px;">
+                        <i class="fas fa-table me-1"></i> RINGKASAN MARKAH
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:12px;" id="summaryTable">
+                            <thead>
+                                <tr style="border-bottom:1px solid var(--border);">
+                                    <th style="padding:10px 12px; text-align:left; color:rgba(255,255,255,0.35); font-weight:700; font-size:9px; text-transform:uppercase; white-space:nowrap;">Nama</th>
+                                    <th style="padding:10px 12px; text-align:center; color:#a5b4fc; font-weight:700; font-size:9px; text-transform:uppercase;">HP1 Ujian<br/><span style="color:rgba(255,255,255,0.2);">/30</span></th>
+                                    <th style="padding:10px 12px; text-align:center; color:#67e8f9; font-weight:700; font-size:9px; text-transform:uppercase;">HP2 Pres<br/><span style="color:rgba(255,255,255,0.2);">/20</span></th>
+                                    <th style="padding:10px 12px; text-align:center; color:#d8b4fe; font-weight:700; font-size:9px; text-transform:uppercase;">HP3 Tulis<br/><span style="color:rgba(255,255,255,0.2);">/50</span></th>
+                                    <th style="padding:10px 12px; text-align:center; color:rgba(255,255,255,0.35); font-weight:700; font-size:9px; text-transform:uppercase;">Jumlah</th>
+                                    <th style="padding:10px 12px; text-align:center; color:rgba(255,255,255,0.35); font-weight:700; font-size:9px; text-transform:uppercase;">Gred</th>
+                                    <th style="padding:10px 12px; text-align:center; color:rgba(245,158,11,0.7); font-weight:700; font-size:9px; text-transform:uppercase;">Cad HP1</th>
+                                    <th style="padding:10px 12px; text-align:center; color:rgba(6,182,212,0.7); font-weight:700; font-size:9px; text-transform:uppercase;">Cad HP2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="disclaimer-footer">
+    <div>Data dalam sistem ini adalah <strong style="color:rgba(255,255,255,0.4);">SULIT</strong> dan tertakluk kepada <strong style="color:rgba(255,255,255,0.4);">Akta Perlindungan Data Peribadi 2010 (PDPA)</strong>.</div>
+    <div style="margin-top:4px;">Sistem Pemarkahan <strong style="color:rgba(255,255,255,0.4);">GKKO1062</strong> · Unit Kokurikulum IPG Kampus Darulaman · © 2026 IPGKDA</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
+<script>
+const API = "https://script.google.com/macros/s/AKfycbxpByTSzO3-9bvM2AY35XWQJeqW76005HmzXMsOiDmU3_l8tSp2vd6slUY2L84m1kIU/exec";
+
+let mode = 'student';
+let sData = [], curS = null, curUser = null, curLecEmail = null;
+let peerScores = {};
+let peerTarget = null;
+let radarChart = null;
+
+// Cadangan markah dari checklist (semasa pelajar dipilih)
+let curCadHP1 = null, curCadHP2 = null;
+
+const DIMS = ['Kepimpinan','Autonomi','Tanggungjawab','Penganjuran','Kerjasama'];
+const DIM_COLORS = ['#6366f1','#06b6d4','#10b981','#a855f7','#ec4899'];
+
+// ==============================================================
+// CHECKLIST DATA — berdasarkan rubrik PDF
+// ==============================================================
+const UJIAN_CHECKLIST = [
+    {id:'u1', nama:'Fahaman Konsep',       huraian:'Memahami dan menghuraikan konsep dengan tepat'},
+    {id:'u2', nama:'Huraian & Contoh',     huraian:'Huraian tepat disertai contoh-contoh yang sesuai'},
+    {id:'u3', nama:'Aplikasi Pengetahuan', huraian:'Mengaplikasikan pengetahuan/kemahiran/konsep semasa menjawab ujian (HP2)'},
+    {id:'u4', nama:'Perkaitan & Analisis', huraian:'Membuat perkaitan dan menganalisis pola, trend atau kesamaan data (KKG2)'},
+    {id:'u5', nama:'Ketepatan Jawapan',    huraian:'Ketepatan dan kelengkapan jawapan secara keseluruhan'},
+    {id:'u6', nama:'Kelebihan Huraian',    huraian:'Huraian melebihi minimum — tambahan fakta, data atau hujah yang relevan'},
+    {id:'u7', nama:'Nilai Kritis',         huraian:'Menunjukkan pemikiran kritis dan analitik dalam jawapan'},
+    {id:'u8', nama:'Keseluruhan Ujian',    huraian:'Penilaian keseluruhan kualiti jawapan ujian (C3)'},
+];
+
+const PRES_CHECKLIST = [
+    {id:'p1', nama:'Penilaian & Maklum Balas',     huraian:'Dapat menilai dan memberi maklum balas tentang kokurikulum dengan tepat (A3)'},
+    {id:'p2', nama:'Komunikasi & Kerjasama',        huraian:'Berkomunikasi dan bekerjasama secara efektif dengan pelbagai pihak (HP5)'},
+    {id:'p3', nama:'Kejelasan & Keyakinan Idea',    huraian:'Menyampaikan idea dengan jelas, koheren, yakin dan meyakinkan (KMK1)'},
+    {id:'p4', nama:'Kelancaran & Sistematik',       huraian:'Persembahan lancar, sistematik dan menepati masa'},
+    {id:'p5', nama:'Penguasaan Isi',                huraian:'Menguasai isi kandungan persembahan dengan baik'},
+    {id:'p6', nama:'Bahasa & Laras',                huraian:'Penggunaan bahasa yang sesuai, tepat dan berkesan'},
+    {id:'p7', nama:'Interaksi Audiens',             huraian:'Interaksi aktif dengan audiens, menjawab soalan dengan yakin'},
+    {id:'p8', nama:'Keseluruhan Persembahan',       huraian:'Penilaian keseluruhan kualiti persembahan'},
+];
+
+const RATING_LABELS = [
+    {val:1, cls:'r-1', lbl:'1<br><span style="font-size:8px;">Lemah</span>'},
+    {val:2, cls:'r-2', lbl:'2<br><span style="font-size:8px;">Lulus</span>'},
+    {val:3, cls:'r-3', lbl:'3<br><span style="font-size:8px;">Kepujian</span>'},
+    {val:4, cls:'r-4', lbl:'4<br><span style="font-size:8px;">Cemerlang</span>'},
+];
+
+// Simpan nilai checklist sementara (sebelum submit)
+let clScores = { ujian: {}, pres: {} };
+
+// ==============================================================
+// HELPER
+// ==============================================================
+function fixDriveUrl(url) {
+    if (!url || url === "") return "";
+    let fileId = "";
+    const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m1) fileId = m1[1];
+    if (!fileId) { const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/); if (m2) fileId = m2[1]; }
+    if (!fileId) return url;
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+}
+
+function loadImage(imgEl, phEl, url) {
+    if (!url || url === "") { imgEl.style.display='none'; if(phEl) phEl.style.display='flex'; return; }
+    const fixed = fixDriveUrl(url);
+    imgEl.onload = () => { imgEl.style.display='block'; if(phEl) phEl.style.display='none'; };
+    imgEl.onerror = () => {
+        const fid = fixed.match(/id=([a-zA-Z0-9_-]+)/)?.[1];
+        if (fid && !imgEl.dataset.retried) {
+            imgEl.dataset.retried = "1";
+            imgEl.src = `https://lh3.googleusercontent.com/d/${fid}`;
+        } else { imgEl.style.display='none'; if(phEl) phEl.style.display='flex'; }
+    };
+    imgEl.src = fixed;
+}
+
+function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    const m = document.getElementById('toastMsg');
+    const icon = type==='success' ? 'fa-check-circle' : type==='warn' ? 'fa-exclamation-triangle' : 'fa-times-circle';
+    const col  = type==='success' ? '#6ee7b7' : type==='warn' ? '#fcd34d' : '#fca5a5';
+    m.innerHTML = `<i class="fas ${icon}" style="color:${col}"></i><span>${msg}</span>`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function calculateGred(m) {
+    if (m >= 90) return "A+"; if (m >= 80) return "A"; if (m >= 75) return "A-";
+    if (m >= 70) return "B+"; if (m >= 65) return "B"; if (m >= 60) return "B-";
+    if (m >= 55) return "C+"; if (m >= 50) return "C"; if (m >= 40) return "C-";
+    if (m >= 30) return "D+"; if (m >= 20) return "D"; return "F";
+}
+
+// ==============================================================
+// AUTH
+// ==============================================================
+function setType(t) {
+    mode = t;
+    document.getElementById('ts').classList.toggle('active', t === 'student');
+    document.getElementById('tl').classList.toggle('active', t === 'lecturer');
+    document.getElementById('pwIn').style.display = t === 'student' ? 'none' : 'block';
+}
+
+async function handleAuth() {
+    const id = document.getElementById('idIn').value.trim();
+    const pw = document.getElementById('pwIn').value;
+    if (!id) return showToast('Sila masukkan maklumat!', 'err');
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENGESAH...';
+    try {
+        if (mode === 'student') {
+            const r = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(id)}`);
+            const o = await r.json();
+            if (o.status === "success") {
+                curUser = o.data;
+                localStorage.setItem('userMPU', JSON.stringify(o.data));
+                renderStudent(o.data);
+            } else { showToast(o.message, 'err'); }
+        } else {
+            const r = await fetch(`${API}?action=lecturerLogin&email=${encodeURIComponent(id)}&pass=${encodeURIComponent(pw)}`);
+            const o = await r.json();
+            if (o.status === "success") {
+                curLecEmail = id;
+                localStorage.setItem('le', id);
+                localStorage.setItem('leName', o.name || id);
+                initLecturer(id, o.name);
+            } else { showToast(o.message || 'Login gagal', 'err'); }
         }
+    } catch (e) { showToast('Ralat sambungan API', 'err'); }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i> MASUK SISTEM';
+}
 
-        // ===== LECTURER MODE =====
-        function loginLecturer() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const alert = document.getElementById('loginAlert');
+// ==============================================================
+// STUDENT
+// ==============================================================
+function renderStudent(d) {
+    curUser = d;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('studentDash').style.display = 'flex';
+    document.getElementById('studentDash').style.flexDirection = 'column';
+    document.getElementById('hdrName').textContent = d.Nama_Pelajar || '--';
+    document.getElementById('sN').textContent = d.Nama_Pelajar || '--';
+    document.getElementById('sK').textContent = d.No_KP || '--';
+    document.getElementById('sC').textContent = d.Kelas || '--';
+    if (d.Status_Upload === "Selesai") {
+        document.getElementById('sS').textContent = "✓ SELESAI";
+        document.getElementById('sS').style.color = '#6ee7b7';
+    }
+    loadImage(document.getElementById('sImg'), document.getElementById('sPl'), d.Link_Gambar);
+    loadPeerList();
+}
 
-            if (!username || !password) {
-                alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Sila masukkan username dan password</div>';
-                return;
-            }
+function showStudentTab(t) {
+    ['profile','peer'].forEach(id => {
+        const el = document.getElementById('stab-'+id);
+        if (el) el.style.display = 'none';
+    });
+    const target = document.getElementById('stab-'+t);
+    if (target) target.style.display = 'flex';
+    document.querySelectorAll('#studentDash .tab-bar .tab').forEach((btn, i) => {
+        btn.classList.toggle('active', ['profile','peer'][i] === t);
+    });
+}
 
-            fetch(`${API_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`)
-                .then(r => r.json())
-                .then(result => {
-                    if (result.success) {
-                        document.getElementById('username').value = '';
-                        document.getElementById('password').value = '';
-                        alert.innerHTML = '';
-                        showView('lecturerView');
-                        loadAllStudents();
-                    } else {
-                        alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Username atau password salah</div>';
-                    }
-                })
-                .catch(err => {
-                    alert.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Ralat: ' + err.message + '</div>';
-                });
+async function loadPeerList() {
+    if (!curUser) return;
+    const kp    = curUser.No_KP.toString().trim();
+    const kelas = curUser.Kelas.toString().trim();
+    try {
+        const r = await fetch(`${API}?action=getClassmates&noKP=${encodeURIComponent(kp)}&kelas=${encodeURIComponent(kelas)}`);
+        const o = await r.json();
+        if (o.status === "success") {
+            renderPeerList(o.data, (o.done || []).map(d => d.toString().trim()));
         }
+    } catch(e) {
+        document.getElementById('peerList').innerHTML = `<div style="color:rgba(255,255,255,0.3); font-size:12px; padding:20px; text-align:center;">Ralat memuatkan senarai rakan</div>`;
+    }
+}
 
-        function loadAllStudents() {
-            fetch(`${API_URL}?action=getAllMarks`)
-                .then(r => r.json())
-                .then(marks => {
-                    const select = document.getElementById('studentSelect');
-                    select.innerHTML = '<option value="">-- Pilih Pelajar --</option>';
-                    marks.forEach(m => {
-                        select.innerHTML += `<option value="${m.ID_SISTEM}">${m.Nama_Pelajar} (${m.No_Giliran})</option>`;
-                    });
-                })
-                .catch(err => console.error('Ralat:', err));
-        }
+function renderPeerList(classmates, doneList) {
+    const total = classmates.length;
+    let doneCount = 0;
+    const html = classmates.map(s => {
+        const isDone = doneList.includes(s.No_KP.toString());
+        if (isDone) doneCount++;
+        return `<div class="s-card ${isDone?'done':''}" onclick="selectPeer('${s.No_KP}')">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div class="eval-dot ${isDone?'done':'pending'}"></div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600;">${s.Nama_Pelajar}</div>
+                    <div style="font-size:9px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.3); margin-top:2px;">${s.No_KP}</div>
+                </div>
+                ${isDone ? '<i class="fas fa-check" style="color:#10b981; font-size:11px;"></i>' : ''}
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('peerList').innerHTML = html || `<div style="color:rgba(255,255,255,0.3); font-size:12px; padding:20px; text-align:center;">Tiada rakan sekelas ditemui</div>`;
+    document.getElementById('evalProgress').textContent = `${doneCount}/${total}`;
+}
 
-        function loadSelectedStudent() {
-            const idSistem = document.getElementById('studentSelect').value;
-            if (!idSistem) {
-                document.getElementById('selectedStudentInfo').classList.add('hidden');
-                clearMarks();
-                return;
-            }
+async function selectPeer(kp) {
+    try {
+        const r = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(kp)}`);
+        const o = await r.json();
+        if (o.status === "success") { peerTarget = o.data; showPeerPanel(peerTarget); }
+    } catch(e) {}
+}
 
-            fetch(`${API_URL}?action=getStudent&id=${encodeURIComponent(idSistem)}`)
-                .then(r => r.json())
-                .then(student => {
-                    if (student.ID_SISTEM) {
-                        document.getElementById('selStudentName').textContent = student.Nama_Pelajar || '-';
-                        document.getElementById('selStudentNo').textContent = student.No_Giliran || '-';
-                        document.getElementById('selStudentId').textContent = student.ID_SISTEM || '-';
-                        document.getElementById('selStudentClass').textContent = student.Kelas || '-';
+function showPeerPanel(peer) {
+    document.getElementById('peerPanel').style.display = 'block';
+    document.getElementById('peerPanelEmpty').style.display = 'none';
+    document.getElementById('peerName').textContent = peer.Nama_Pelajar;
+    document.getElementById('peerKlass').textContent = `KP: ${peer.No_KP} | ${peer.Kelas}`;
+    loadImage(document.getElementById('peerImg'), document.getElementById('peerImgPh'), peer.Link_Gambar);
+    ['q1','q2','q3','q4','q5'].forEach(qid => {
+        document.querySelectorAll(`#${qid} .likert-btn`).forEach(b => b.className = 'likert-btn');
+    });
+    peerScores[peer.No_KP] = null;
+    document.getElementById('peerNote').value = '';
+    document.getElementById('peerDoneTag').style.display = 'none';
+    const btn = document.getElementById('submitPeerBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> HANTAR PENILAIAN';
+    checkPeerDone(peer.No_KP);
+}
 
-                        const imgDiv = document.getElementById('selStudentImage');
-                        if (student.Link_Gambar) {
-                            imgDiv.innerHTML = `<img src="${student.Link_Gambar}" alt="Gambar Pelajar" style="max-width: 150px; border-radius: 8px;">`;
-                        } else {
-                            imgDiv.innerHTML = '<span style="color: rgba(255,255,255,0.5);"><i class="fas fa-image"></i> Tiada gambar</span>';
-                        }
-
-                        document.getElementById('selectedStudentInfo').classList.remove('hidden');
-                        clearMarks();
-                    }
-                })
-                .catch(err => console.error('Ralat:', err));
-        }
-
-        function calculateMarks() {
-            const ujian = parseInt(document.getElementById('ujianMark').value) || 0;
-            const persemb = parseInt(document.getElementById('persembMark').value) || 0;
-            const penul = parseInt(document.getElementById('penulMark').value) || 0;
-
-            // Update suggestions
-            document.getElementById('ujianGradeSuggestion').textContent = getSuggestion(ujian, 30);
-            document.getElementById('persembGradeSuggestion').textContent = getSuggestion(persemb, 20);
-            document.getElementById('penulGradeSuggestion').textContent = getSuggestion(penul, 50);
-
-            // Update grades
-            document.getElementById('ujianGrade').value = getGrade(ujian, 30);
-            document.getElementById('persembGrade').value = getGrade(persemb, 20);
-            document.getElementById('penulGrade').value = getGrade(penul, 50);
-
-            // Update summary
-            document.getElementById('summaryUjian').textContent = ujian;
-            document.getElementById('summaryPersemb').textContent = persemb;
-            document.getElementById('summaryPenul').textContent = penul;
-
-            const total = ujian + persemb + penul;
-            document.getElementById('totalMark').textContent = total;
-        }
-
-        function getSuggestion(mark, max) {
-            const percent = (mark / max) * 100;
-            if (percent < 50) return 'Lemah';
-            if (percent < 65) return 'Lulus';
-            if (percent < 75) return 'Kepujian';
-            if (percent < 90) return 'Cemerlang';
-            return 'Amat Cemerlang';
-        }
-
-        function getGrade(mark, max) {
-            const percent = (mark / max) * 100;
-            if (percent >= 90) return 'A+';
-            if (percent >= 85) return 'A';
-            if (percent >= 80) return 'A-';
-            if (percent >= 75) return 'B+';
-            if (percent >= 70) return 'B';
-            if (percent >= 65) return 'B-';
-            if (percent >= 60) return 'C+';
-            if (percent >= 55) return 'C';
-            if (percent >= 50) return 'C-';
-            if (percent >= 40) return 'D';
-            return 'F';
-        }
-
-        function submitMarks() {
-            const idSistem = document.getElementById('studentSelect').value;
-            if (!idSistem) {
-                alert('Sila pilih pelajar');
-                return;
-            }
-
-            const ujian = parseInt(document.getElementById('ujianMark').value) || 0;
-            const persemb = parseInt(document.getElementById('persembMark').value) || 0;
-            const penul = parseInt(document.getElementById('penulMark').value) || 0;
-
-            const btn = event.target;
-            btn.innerHTML = '<i class="fas fa-spinner loading"></i> Menyimpan...';
+async function checkPeerDone(targetKP) {
+    try {
+        const r = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(curUser.No_KP)}&targetKP=${encodeURIComponent(targetKP)}`);
+        const o = await r.json();
+        if (o.done) {
+            document.getElementById('peerDoneTag').style.display = 'flex';
+            const btn = document.getElementById('submitPeerBtn');
             btn.disabled = true;
-
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'submitMarks',
-                    ID_SISTEM: idSistem,
-                    Ujian_30: ujian,
-                    Persembahan_20: persemb,
-                    Penulisan_50: penul
-                })
-            })
-            .then(r => r.json())
-            .then(result => {
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Markah';
-                btn.disabled = false;
-                if (result.success) {
-                    alert('✅ ' + result.message);
-                    loadAllStudents();
-                } else {
-                    alert('❌ ' + result.message);
-                }
-            })
-            .catch(err => {
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Markah';
-                btn.disabled = false;
-                alert('❌ Ralat: ' + err.message);
-            });
+            btn.innerHTML = '<i class="fas fa-check me-2"></i> SUDAH DIHANTAR';
+            if (o.data) {
+                ['q1','q2','q3','q4','q5'].forEach(qid => {
+                    const val = o.data[qid];
+                    if (val) {
+                        const btns = document.querySelectorAll(`#${qid} .likert-btn`);
+                        btns.forEach(b => b.className = 'likert-btn');
+                        if (btns[val-1]) btns[val-1].className = `likert-btn sel-${val}`;
+                    }
+                });
+                document.getElementById('peerNote').value = o.data.note || '';
+            }
         }
+    } catch(e) {}
+}
 
-        function clearMarks() {
-            document.getElementById('ujianMark').value = '0';
-            document.getElementById('persembMark').value = '0';
-            document.getElementById('penulMark').value = '0';
-            calculateMarks();
+function setLikert(qid, val, btn) {
+    document.querySelectorAll(`#${qid} .likert-btn`).forEach(b => b.className = 'likert-btn');
+    btn.className = `likert-btn sel-${val}`;
+    if (!peerScores[peerTarget?.No_KP]) peerScores[peerTarget.No_KP] = {};
+    peerScores[peerTarget.No_KP][qid] = val;
+}
+
+async function submitPeerEval() {
+    if (!peerTarget) return;
+    const tgKP = peerTarget.No_KP.toString().trim();
+    const evKP = curUser.No_KP.toString().trim();
+    const scores = peerScores[tgKP] || {};
+    const missing = ['q1','q2','q3','q4','q5'].filter(q => !scores[q]);
+    if (missing.length > 0) { showToast(`Sila jawab semua ${missing.length} soalan!`, 'warn'); return; }
+    const btn = document.getElementById('submitPeerBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENGHANTAR...';
+    try {
+        const chk = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(evKP)}&targetKP=${encodeURIComponent(tgKP)}`);
+        const chkO = await chk.json();
+        if (chkO.done) { showToast('Anda sudah menilai rakan ini!', 'warn'); btn.innerHTML='<i class="fas fa-check me-2"></i> SUDAH DIHANTAR'; return; }
+    } catch(e) {}
+    const payload = {
+        action: "submitPeerEval",
+        evaluatorKP: evKP, evaluatorName: curUser.Nama_Pelajar, evaluatorKelas: curUser.Kelas,
+        targetKP: tgKP, targetName: peerTarget.Nama_Pelajar, targetKelas: peerTarget.Kelas,
+        q1: scores.q1, q2: scores.q2, q3: scores.q3, q4: scores.q4, q5: scores.q5,
+        note: document.getElementById('peerNote').value || ''
+    };
+    try {
+        await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        await new Promise(r => setTimeout(r, 1500));
+        const vr = await fetch(`${API}?action=checkPeerDone&evaluatorKP=${encodeURIComponent(evKP)}&targetKP=${encodeURIComponent(tgKP)}`);
+        const vO = await vr.json();
+        showToast(vO.done ? 'Penilaian berjaya dihantar!' : 'Data dihantar. Muat semula untuk sahkan.', vO.done ? 'success' : 'warn');
+        document.getElementById('peerDoneTag').style.display = 'flex';
+        btn.innerHTML = '<i class="fas fa-check me-2"></i> SUDAH DIHANTAR';
+        await loadPeerList();
+    } catch(e) {
+        showToast('Ralat menghantar penilaian', 'err');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> HANTAR PENILAIAN';
+    }
+}
+
+// ==============================================================
+// UPLOAD GAMBAR — FIX
+// ==============================================================
+async function hUp() {
+    const f = document.getElementById('fIn');
+    if (!f.files[0]) return showToast('Pilih fail dahulu!', 'warn');
+    const btn = document.getElementById('uploadBtn');
+    const statusEl = document.getElementById('uploadStatus');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Memuat naik gambar...';
+    try {
+        const base64 = await fileToBase64(f.files[0]);
+        await fetch(API, {
+            method: 'POST', mode: 'no-cors',
+            body: JSON.stringify({
+                action: "uploadImage",
+                noKP: curUser.No_KP.toString(),
+                imageData: base64,
+                mimeType: f.files[0].type,
+                fileName: "GKKO1062_" + curUser.No_KP + "_" + Date.now()
+            })
+        });
+        statusEl.textContent = 'Menyemak status...';
+        await new Promise(r => setTimeout(r, 3000)); // Tunggu GAS process
+        const res = await fetch(`${API}?action=checkLogin&noKP=${encodeURIComponent(curUser.No_KP)}`);
+        const o = await res.json();
+        if (o.status === "success" && o.data.Status_Upload === "Selesai") {
+            curUser = o.data;
+            localStorage.setItem('userMPU', JSON.stringify(o.data));
+            loadImage(document.getElementById('sImg'), document.getElementById('sPl'), o.data.Link_Gambar);
+            document.getElementById('sS').textContent = "✓ SELESAI";
+            document.getElementById('sS').style.color = '#6ee7b7';
+            showToast('Gambar berjaya dimuatnaik!');
+            statusEl.textContent = '';
+            statusEl.style.display = 'none';
+        } else {
+            showToast('Gambar dihantar. Muat semula untuk sahkan.', 'warn');
+            statusEl.textContent = 'Gambar dihantar — muat semula halaman untuk semak status.';
         }
-    </script>
+    } catch(e) {
+        showToast('Ralat upload: ' + e.message, 'err');
+        statusEl.textContent = '';
+        statusEl.style.display = 'none';
+    }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-upload me-1"></i> UPLOAD';
+}
+
+function fileToBase64(file) {
+    return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result.split(',')[1]);
+        r.onerror = () => rej(new Error("Gagal baca fail"));
+        r.readAsDataURL(file);
+    });
+}
+
+function pImg(input) {
+    if (input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.getElementById('sImg');
+            img.src = e.target.result; img.style.display = 'block';
+            document.getElementById('sPl').style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// ==============================================================
+// LECTURER
+// ==============================================================
+async function initLecturer(email, name) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('lecturerDash').style.display = 'flex';
+    document.getElementById('lecturerDash').style.flexDirection = 'column';
+    document.getElementById('lecName').textContent = name || email;
+    curLecEmail = email;
+    try {
+        const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(email)}`);
+        const o = await r.json();
+        sData = o.data || [];
+        renderLecStudentList();
+        renderSummaryTable();
+    } catch(e) { showToast('Gagal memuatkan data', 'err'); }
+}
+
+function renderLecStudentList() {
+    const kelas = sData.length > 0 ? [...new Set(sData.map(s=>s.Kelas))].join(', ') : '';
+    document.getElementById('classInfo').textContent = kelas;
+    document.getElementById('sList').innerHTML = sData.map(s => {
+        const hasMark = s.markahSediaAda;
+        const hasCL   = s.rubrikChecklist;
+        return `<div class="s-card ${hasMark?'done':''}" data-kp="${s.No_KP}" onclick="selectStudent('${s.No_KP}')">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="eval-dot ${hasMark?'done':'pending'}"></div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600;">${s.Nama_Pelajar}</div>
+                    <div style="font-size:9px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.3); margin-top:1px;">${s.Kelas}</div>
+                </div>
+                ${hasCL ? `<span style="font-size:9px; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:#fcd34d; padding:2px 6px; border-radius:20px; font-weight:700;"><i class="fas fa-list-check"></i></span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function showLecTab(t) {
+    ['marking','checklist','peer','summary'].forEach(id => {
+        const el = document.getElementById('ltab-'+id);
+        if (el) el.style.display = 'none';
+    });
+    const el = document.getElementById('ltab-'+t);
+    if (el) el.style.display = 'block';
+
+    document.querySelectorAll('#lecturerDash .tab-bar .tab').forEach((btn, i) => {
+        btn.classList.toggle('active', ['marking','checklist','peer','summary'][i] === t);
+    });
+
+    if (t === 'marking') {
+        if (curS) { document.getElementById('gradingPanel').style.display='block'; document.getElementById('gradingEmpty').style.display='none'; }
+        else { document.getElementById('gradingPanel').style.display='none'; document.getElementById('gradingEmpty').style.display='flex'; }
+    }
+    if (t === 'checklist') {
+        if (curS) showChecklistPanel(curS);
+        else { document.getElementById('checklistEmpty').style.display='flex'; document.getElementById('checklistPanel').style.display='none'; }
+    }
+    if (t === 'peer') {
+        if (radarChart) { radarChart.destroy(); radarChart = null; }
+        setTimeout(() => {
+            if (curS) loadPeerData(curS.No_KP.toString().trim());
+            else { document.getElementById('radarEmpty').style.display='flex'; document.getElementById('radarContent').style.display='none'; }
+        }, 150);
+    }
+    if (t === 'summary') renderSummaryTable();
+}
+
+async function selectStudent(kp) {
+    curS = sData.find(s => s.No_KP == kp);
+    if (!curS) return;
+
+    document.querySelectorAll('#sList .s-card').forEach(c => c.classList.remove('selected'));
+    const clicked = document.querySelector(`#sList .s-card[data-kp="${kp}"]`);
+    if (clicked) clicked.classList.add('selected');
+
+    const activeTab = ['marking','checklist','peer','summary'].find(id => {
+        const el = document.getElementById('ltab-'+id);
+        return el && el.style.display !== 'none';
+    }) || 'marking';
+
+    // Update marking panel
+    document.getElementById('gradingPanel').style.display = 'block';
+    document.getElementById('gradingEmpty').style.display = 'none';
+    document.getElementById('ln').textContent = curS.Nama_Pelajar;
+    document.getElementById('lk').textContent = `KP: ${curS.No_KP} | ${curS.Kelas}`;
+    loadImage(document.getElementById('li'), document.getElementById('liPh'), curS.Link_Gambar);
+
+    if (curS.markahSediaAda) {
+        document.getElementById('h1').value  = curS.markahSediaAda.hp1  || '';
+        document.getElementById('h2').value  = curS.markahSediaAda.hp2  || '';
+        document.getElementById('h3').value  = curS.markahSediaAda.hp3  || '';
+        document.getElementById('justTxt').value = (curS.markahSediaAda.just === "-") ? "" : (curS.markahSediaAda.just||"");
+    } else {
+        ['h1','h2','h3','justTxt'].forEach(id => document.getElementById(id).value = '');
+    }
+    calc(); checkLimits();
+
+    // Papar cadangan dari checklist jika ada
+    curCadHP1 = null; curCadHP2 = null;
+    if (curS.rubrikChecklist) {
+        curCadHP1 = curS.rubrikChecklist.cadHP1;
+        curCadHP2 = curS.rubrikChecklist.cadHP2;
+        showCadangan(curCadHP1, curCadHP2);
+    } else {
+        document.getElementById('cadanganBadge').style.display = 'none';
+        document.getElementById('checklistCadNote').style.display = 'none';
+        document.getElementById('h1CadBtn').style.display = 'none';
+        document.getElementById('h2CadBtn').style.display = 'none';
+    }
+
+    if (activeTab === 'checklist') showChecklistPanel(curS);
+    if (activeTab === 'peer') loadPeerData(kp);
+}
+
+function showCadangan(cad1, cad2) {
+    if (cad1 === null && cad2 === null) return;
+    // Badge di atas
+    document.getElementById('cadanganBadge').style.display = 'block';
+    document.getElementById('cadHP1disp').textContent = cad1 !== null ? cad1 : '--';
+    document.getElementById('cadHP2disp').textContent = cad2 !== null ? cad2 : '--';
+    // Notis
+    document.getElementById('checklistCadNote').style.display = 'flex';
+    document.getElementById('checklistCadText').textContent =
+        `Checklist mengesyorkan HP1: ${cad1}/30 dan HP2: ${cad2}/20. Anda boleh terima atau laraskan.`;
+    // Butang guna cadangan
+    if (cad1 !== null) {
+        document.getElementById('h1CadBtn').style.display = 'block';
+        document.getElementById('h1CadVal').textContent = cad1;
+    }
+    if (cad2 !== null) {
+        document.getElementById('h2CadBtn').style.display = 'block';
+        document.getElementById('h2CadVal').textContent = cad2;
+    }
+}
+
+function applyCAD(field) {
+    if (field === 'h1' && curCadHP1 !== null) {
+        document.getElementById('h1').value = Math.min(30, curCadHP1);
+    } else if (field === 'h2' && curCadHP2 !== null) {
+        document.getElementById('h2').value = Math.min(20, curCadHP2);
+    }
+    calc(); checkLimits();
+}
+
+// ==============================================================
+// CHECKLIST PANEL
+// ==============================================================
+function showChecklistTab(t) {
+    document.getElementById('clUjian').style.display = t === 'ujian' ? 'block' : 'none';
+    document.getElementById('clPres').style.display  = t === 'pres'  ? 'block' : 'none';
+    document.getElementById('clTab1').classList.toggle('active', t === 'ujian');
+    document.getElementById('clTab2').classList.toggle('active', t === 'pres');
+}
+
+function renderChecklistItems(containerId, items, typeKey, existingData) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = items.map(item => {
+        const existVal = existingData ? (existingData[item.id] || 0) : 0;
+        clScores[typeKey][item.id] = existVal;
+        return `<div style="padding:12px 14px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px;">
+            <div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:200px;">
+                    <div style="font-size:12px; font-weight:700; margin-bottom:3px;">${item.nama}</div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); line-height:1.5;">${item.huraian}</div>
+                </div>
+                <div class="rating-group" style="min-width:220px;">
+                    ${RATING_LABELS.map(r => `<button class="rating-btn ${existVal === r.val ? r.cls : ''}" 
+                        onclick="setRating('${item.id}','${typeKey}',${r.val},this)">${r.lbl}</button>`).join('')}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setRating(itemId, typeKey, val, btn) {
+    const container = btn.closest('.rating-group');
+    container.querySelectorAll('.rating-btn').forEach(b => {
+        b.className = 'rating-btn';
+    });
+    btn.className = `rating-btn ${RATING_LABELS.find(r => r.val === val).cls}`;
+    clScores[typeKey][itemId] = val;
+    calcChecklistTotals();
+}
+
+function calcChecklistTotals() {
+    const ujianSum = UJIAN_CHECKLIST.reduce((s,i) => s + (clScores.ujian[i.id]||0), 0);
+    const presSum  = PRES_CHECKLIST.reduce((s,i) => s + (clScores.pres[i.id]||0), 0);
+    const cadHP1 = Math.round((ujianSum / 32) * 30 * 10) / 10;
+    const cadHP2 = Math.round((presSum  / 32) * 20 * 10) / 10;
+
+    document.getElementById('ujianJumlah').textContent = ujianSum;
+    document.getElementById('ujianCad').textContent    = cadHP1;
+    document.getElementById('presJumlah').textContent  = presSum;
+    document.getElementById('presCad').textContent     = cadHP2;
+    document.getElementById('sumCadHP1').textContent   = cadHP1;
+    document.getElementById('sumCadHP2').textContent   = cadHP2;
+}
+
+async function showChecklistPanel(student) {
+    if (!student) return;
+    document.getElementById('checklistEmpty').style.display = 'none';
+    document.getElementById('checklistPanel').style.display = 'block';
+    document.getElementById('clStudentName').textContent = student.Nama_Pelajar;
+    document.getElementById('clStudentKP').textContent   = `KP: ${student.No_KP} | ${student.Kelas}`;
+
+    clScores = { ujian: {}, pres: {} };
+
+    try {
+        const r = await fetch(`${API}?action=getRubrikStatus&noKP=${encodeURIComponent(student.No_KP)}`);
+        const o = await r.json();
+        const hasData = o.status === 'success' && o.ada;
+        document.getElementById('clExistBadge').style.display = hasData ? 'flex' : 'none';
+        const existData = hasData ? o : null;
+        renderChecklistItems('ujianChecklist', UJIAN_CHECKLIST, 'ujian', existData);
+        renderChecklistItems('presChecklist',  PRES_CHECKLIST,  'pres',  existData);
+        calcChecklistTotals();
+    } catch(e) {
+        renderChecklistItems('ujianChecklist', UJIAN_CHECKLIST, 'ujian', null);
+        renderChecklistItems('presChecklist',  PRES_CHECKLIST,  'pres',  null);
+        calcChecklistTotals();
+    }
+}
+
+async function saveChecklist() {
+    if (!curS) return;
+    const btn = document.getElementById('saveChecklistBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENYIMPAN...';
+
+    const ujianObj = {};
+    UJIAN_CHECKLIST.forEach(i => { ujianObj[i.id] = clScores.ujian[i.id] || 0; });
+    const presObj = {};
+    PRES_CHECKLIST.forEach(i => { presObj[i.id] = clScores.pres[i.id] || 0; });
+
+    const payload = {
+        action: "submitRubrik",
+        noKP: curS.No_KP.toString().trim(),
+        nama: curS.Nama_Pelajar,
+        kelas: curS.Kelas,
+        ujian: ujianObj,
+        persembahan: presObj,
+        penilai: curLecEmail
+    };
+
+    try {
+        await fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        await new Promise(r => setTimeout(r, 2000));
+
+        // Kira cadangan
+        const ujianSum = UJIAN_CHECKLIST.reduce((s,i) => s + (clScores.ujian[i.id]||0), 0);
+        const presSum  = PRES_CHECKLIST.reduce((s,i) => s + (clScores.pres[i.id]||0), 0);
+        const cadHP1 = Math.round((ujianSum / 32) * 30 * 10) / 10;
+        const cadHP2 = Math.round((presSum  / 32) * 20 * 10) / 10;
+
+        showToast(`Checklist disimpan! Cadangan HP1: ${cadHP1} | HP2: ${cadHP2}`, 'success');
+        document.getElementById('clExistBadge').style.display = 'flex';
+
+        // Update dalam sData supaya cadangan muncul dalam marking tab
+        curCadHP1 = cadHP1; curCadHP2 = cadHP2;
+        const idx = sData.findIndex(s => s.No_KP == curS.No_KP);
+        if (idx >= 0) sData[idx].rubrikChecklist = { cadHP1, cadHP2 };
+        showCadangan(cadHP1, cadHP2);
+
+        // Refresh
+        const r2 = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(curLecEmail)}`);
+        const o2 = await r2.json();
+        sData = o2.data || [];
+        renderLecStudentList();
+        renderSummaryTable();
+    } catch(e) { showToast('Ralat menyimpan checklist', 'err'); }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN CHECKLIST & JANA CADANGAN MARKAH';
+}
+
+// ==============================================================
+// PEMARKAHAN AKHIR
+// ==============================================================
+function calc() {
+    const hp1  = Math.max(0, Number(document.getElementById('h1').value)||0);
+    const hp2  = Math.max(0, Number(document.getElementById('h2').value)||0);
+    const hp3  = Math.max(0, Number(document.getElementById('h3').value)||0);
+    const t = hp1 + hp2 + hp3;
+    document.getElementById('tm').textContent = t;
+    const g = calculateGred(t);
+    document.getElementById('gd').textContent = g;
+    const gColor = g==='A+'||g==='A'||g==='A-' ? '#10b981' : g.startsWith('B') ? '#6366f1' : g.startsWith('C') ? '#f59e0b' : '#ef4444';
+    document.getElementById('gd').style.color = gColor;
+    document.getElementById('tm').style.color = gColor;
+    document.getElementById('justArea').style.display = g === 'A+' ? 'block' : 'none';
+    validate();
+}
+
+function checkLimits() {
+    const limits = { h1: 30, h2: 20, h3: 50 };
+    let exceeded = false;
+    Object.entries(limits).forEach(([id, max]) => {
+        const val = Number(document.getElementById(id).value);
+        const el = document.getElementById(id);
+        if (val > max) { el.value = max; calc(); el.style.borderColor = '#ef4444'; exceeded = true; }
+        else { el.style.borderColor = ''; }
+    });
+    document.getElementById('limitWarn').style.display = exceeded ? 'flex' : 'none';
+}
+
+function validate() {
+    const g = document.getElementById('gd').textContent;
+    const j = document.getElementById('justTxt').value.trim();
+    document.getElementById('saveBtn').disabled = (g === 'A+' && j === '');
+}
+
+async function save() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> MENYIMPAN...';
+    const p = {
+        action: "submitScores",
+        noKP:  curS.No_KP,
+        hp1:   Math.min(30, Number(document.getElementById('h1').value)||0),
+        hp2:   Math.min(20, Number(document.getElementById('h2').value)||0),
+        hp3:   Math.min(50, Number(document.getElementById('h3').value)||0),
+        justifikasi: document.getElementById('justTxt').value || "-",
+        penilai: curLecEmail
+    };
+    try {
+        await fetch(API, { method:'POST', mode:'no-cors', body: JSON.stringify(p) });
+        showToast('Markah berjaya disimpan!');
+        const r = await fetch(`${API}?action=getLecturerStudents&email=${encodeURIComponent(curLecEmail)}`);
+        const o = await r.json();
+        sData = o.data || [];
+        renderLecStudentList();
+        renderSummaryTable();
+    } catch(e) { showToast('Ralat menyimpan markah', 'err'); }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save me-2"></i> SIMPAN MARKAH';
+}
+
+// ==============================================================
+// PEER RADAR
+// ==============================================================
+async function loadPeerData(kp) {
+    try {
+        const r = await fetch(`${API}?action=getPeerSummary&targetKP=${encodeURIComponent(kp.toString().trim())}`);
+        const o = await r.json();
+        if (o.status === 'success' && o.evals && o.evals.length > 0) {
+            updateRadarPanel(kp, o);
+        } else {
+            document.getElementById('radarEmpty').style.display = 'flex';
+            document.getElementById('radarContent').style.display = 'none';
+            document.getElementById('radarEmpty').innerHTML = `
+                <div style="text-align:center; color:rgba(255,255,255,0.25);">
+                    <i class="fas fa-spider" style="font-size:2.5rem; margin-bottom:12px; display:block;"></i>
+                    <p style="font-size:13px;">${curS?.Nama_Pelajar || '--'}</p>
+                    <p style="font-size:11px; color:rgba(255,255,255,0.18);">Belum ada penilaian rakan diterima</p>
+                </div>`;
+        }
+    } catch(e) { console.error(e); }
+}
+
+function updateRadarPanel(kp, o) {
+    if (!curS) return;
+    document.getElementById('radarEmpty').style.display   = 'none';
+    document.getElementById('radarContent').style.display = 'block';
+    document.getElementById('radarStudentName').textContent = curS.Nama_Pelajar;
+    document.getElementById('radarMeta').textContent = `KP: ${curS.No_KP} | Kelas: ${curS.Kelas} | ${o.count} penilai`;
+
+    const avgDims    = o.avgDims || [0,0,0,0,0];
+    const overallAvg = avgDims.reduce((a,b)=>a+b,0)/5;
+    const minDim = DIMS[avgDims.indexOf(Math.min(...avgDims))];
+    const maxDim = DIMS[avgDims.indexOf(Math.max(...avgDims))];
+
+    document.getElementById('dimBreakdown').innerHTML = avgDims.map((v,i) => `
+        <div style="margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="font-size:11px; color:rgba(255,255,255,0.6); display:flex; align-items:center; gap:6px;">
+                    <span style="width:8px;height:8px;border-radius:50%;background:${DIM_COLORS[i]};display:inline-block;"></span>${DIMS[i]}
+                </span>
+                <span style="font-size:11px; font-weight:700; font-family:'Space Mono',monospace;">${v.toFixed(2)}/5</span>
+            </div>
+            <div class="prog-bar"><div class="prog-bar-fill" style="width:${(v/5)*100}%; background:${DIM_COLORS[i]};"></div></div>
+        </div>`).join('');
+
+    let interpret = '';
+    if (overallAvg >= 4.5) interpret = `Cemerlang. Kekuatan utama: <strong>${maxDim}</strong>.`;
+    else if (overallAvg >= 3.5) interpret = `Baik. Kekuatan: <strong>${maxDim}</strong>. Boleh tingkatkan: <strong>${minDim}</strong>.`;
+    else if (overallAvg >= 2.5) interpret = `Memuaskan. Perhatian diperlukan pada <strong>${minDim}</strong>.`;
+    else interpret = `Kurang memuaskan. <strong>${minDim}</strong> memerlukan perhatian serius.`;
+    document.getElementById('radarInterpret').innerHTML = interpret;
+
+    if (o.evals && o.evals.length > 0) {
+        document.getElementById('evalBreakdown').innerHTML = o.evals.map((ev, idx) => {
+            const avg = ((ev.q1+ev.q2+ev.q3+ev.q4+ev.q5)/5).toFixed(1);
+            return `<div style="padding:12px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; text-align:center;">
+                <div style="font-size:9px; color:rgba(255,255,255,0.3); margin-bottom:6px;">Penilai #${idx+1}</div>
+                <div style="font-size:20px; font-weight:800; font-family:'Space Mono',monospace; color:${avg>=4?'#10b981':avg>=3?'#f59e0b':'#ef4444'};">${avg}</div>
+                <div style="margin-top:8px; display:flex; justify-content:center; gap:3px;">
+                    ${[ev.q1,ev.q2,ev.q3,ev.q4,ev.q5].map((v,i) => `<div style="width:20px;height:20px;border-radius:4px;background:${DIM_COLORS[i]};opacity:${v/5};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;">${v}</div>`).join('')}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        const canvas = document.getElementById('radarChart');
+        if (!canvas) return;
+        const peerTab = document.getElementById('ltab-peer');
+        if (peerTab && peerTab.style.display === 'none') return;
+        radarChart = new Chart(canvas.getContext('2d'), {
+            type: 'radar',
+            data: {
+                labels: DIMS,
+                datasets: [{
+                    label: 'Peer Score', data: avgDims,
+                    backgroundColor: 'rgba(99,102,241,0.15)',
+                    borderColor: '#6366f1', borderWidth: 2,
+                    pointBackgroundColor: DIM_COLORS, pointBorderColor: 'transparent',
+                    pointRadius: 5, pointHoverRadius: 7,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { display: false }, tooltip: {
+                    backgroundColor: 'rgba(15,23,42,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    callbacks: { label: ctx => ` ${ctx.formattedValue} / 5` }
+                }},
+                scales: { r: {
+                    min: 0, max: 5,
+                    ticks: { stepSize: 1, color: 'rgba(255,255,255,0.2)', font: { size: 10 }, backdropColor: 'transparent' },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
+                    angleLines: { color: 'rgba(255,255,255,0.06)' },
+                    pointLabels: { color: 'rgba(255,255,255,0.5)', font: { size: 11, weight: '600' } }
+                }}
+            }
+        });
+    }));
+}
+
+// ==============================================================
+// RINGKASAN
+// ==============================================================
+function renderSummaryTable() {
+    const tbody = document.getElementById('summaryBody');
+    if (!sData.length) { tbody.innerHTML = ''; return; }
+    tbody.innerHTML = sData.map(s => {
+        const m  = s.markahSediaAda || {};
+        const cl = s.rubrikChecklist || {};
+        const hp1 = m.hp1 || '-', hp2 = m.hp2 || '-', hp3 = m.hp3 || '-';
+        const t   = (Number(m.hp1)||0)+(Number(m.hp2)||0)+(Number(m.hp3)||0);
+        const g   = t > 0 ? calculateGred(t) : '--';
+        const gCol = g==='A+'||g==='A'||g==='A-' ? '#10b981' : g.startsWith('B') ? '#6366f1' : g.startsWith('C') ? '#f59e0b' : g==='--' ? 'rgba(255,255,255,0.3)' : '#ef4444';
+        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background=''">
+            <td style="padding:10px 12px; font-weight:600;">${s.Nama_Pelajar}<br><span style="font-size:9px; font-family:'Space Mono',monospace; color:rgba(255,255,255,0.3);">${s.Kelas}</span></td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; color:#a5b4fc; font-weight:700;">${hp1}</td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; color:#67e8f9; font-weight:700;">${hp2}</td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; color:#d8b4fe; font-weight:700;">${hp3}</td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; font-weight:800; font-size:15px;">${t||'-'}</td>
+            <td style="padding:10px 12px; text-align:center; font-weight:800; color:${gCol}; font-size:15px;">${g}</td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; color:rgba(245,158,11,0.8);">${cl.cadHP1 !== undefined ? cl.cadHP1 : '-'}</td>
+            <td style="padding:10px 12px; text-align:center; font-family:'Space Mono',monospace; color:rgba(6,182,212,0.8);">${cl.cadHP2 !== undefined ? cl.cadHP2 : '-'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function logout() { localStorage.clear(); location.reload(); }
+
+window.onload = () => {
+    const u = localStorage.getItem('userMPU');
+    if (u) { try { renderStudent(JSON.parse(u)); } catch(e) { localStorage.clear(); } }
+    const le = localStorage.getItem('le');
+    if (le) { initLecturer(le, localStorage.getItem('leName')); }
+};
+</script>
 </body>
 </html>
