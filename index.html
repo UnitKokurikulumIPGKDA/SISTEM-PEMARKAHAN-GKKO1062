@@ -1,283 +1,827 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal GKKO1062 | Sistem Penilaian Kokurikulum IPGKDA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            /* MODERN ELEGANT THEME: Midnight Sapphire */
-            --indigo: #818cf8;      /* Soft Indigo */
-            --purple: #a78bfa;      /* Lighter Purple */
-            --pink: #f472b6;        /* Soft Pink */
-            --cyan: #22d3ee;        /* Vivid Cyan */
-            --emerald: #34d399;     /* Mint Green */
-            --amber: #fbbf24;       /* Rich Gold */
-            
-            --bg: #0f172a;          /* Deep Slate Blue Background */
-            --surface: rgba(255,255,255,0.03);
-            --border: rgba(255,255,255,0.08);
-            
-            /* Specific Element Colors */
-            --grad-start: #3b82f6;  /* Blue 500 */
-            --grad-end: #8b5cf6;    /* Violet 500 */
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+/**
+ * BACKEND API — PORTAL PEMARKAHAN GKKO1062
+ * VERSI: v4.1 — Perbaikan:
+ *   1. Tambah action getStudentMarkah untuk paparan markah pelajar
+ *   2. Baiki uploadImage — simpan URL betul & kembalikan fileId
+ *   3. Baiki lecturerLogin — password check betul
+ *   4. Tambah CORS headers
+ */
+
+const SHEET_ID            = "MASUKKAN_SHEET_ID_ANDA_DI_SINI";  // ← TUKAR INI
+const DATA_SHEET_NAME     = "DATA_PELAJAR";
+const LECTURER_SHEET_NAME = "DATA_PENSYARAH";
+const MARKAH_SHEET_NAME   = "MARKAH_PELAJAR";
+const PEER_SHEET_NAME     = "PEER_EVAL";
+const RUBRIK_SHEET_NAME   = "RUBRIK_HP5";
+const TARGET_FOLDER_ID    = "MASUKKAN_FOLDER_ID_ANDA_DI_SINI";  // ← TUKAR INI
+
+// Standard header untuk PEER_EVAL
+const PEER_HEADERS = [
+  "ID","Tarikh_Masa",
+  "Evaluator_KP","Evaluator_Nama","Evaluator_Kelas",
+  "Target_KP","Target_Nama","Target_Kelas",
+  "Q1_Kepimpinan","Q2_Autonomi","Q3_Tanggungjawab",
+  "Q4_Persembahan","Q5_Kerjasama",
+  "Avg_Score","Catatan"
+];
+
+// ================================================================
+// HELPER — Tukar URL Google Drive kepada thumbnail stabil
+// ================================================================
+function convertDriveUrl(url) {
+  if (!url) return "";
+  const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m1) return "https://drive.google.com/thumbnail?id=" + m1[1] + "&sz=w400";
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m2) return "https://drive.google.com/thumbnail?id=" + m2[1] + "&sz=w400";
+  if (url.includes("thumbnail")) return url;
+  return url;
+}
+
+// ================================================================
+// HELPER — Cari column index berdasarkan nama header
+// ================================================================
+function col(headers, name) {
+  const target = name.toString().trim().toLowerCase();
+  for (let i = 0; i < headers.length; i++) {
+    if (headers[i].toString().trim().toLowerCase() === target) return i;
+  }
+  return -1;
+}
+
+// ================================================================
+// HELPER — Dapatkan atau cipta sheet PEER_EVAL
+// ================================================================
+function getPeerSheet() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(PEER_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(PEER_SHEET_NAME);
+    sheet.appendRow(PEER_HEADERS);
+    sheet.getRange(1,1,1,PEER_HEADERS.length)
+         .setBackground("#1e1b4b").setFontColor("white").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+    return sheet;
+  }
+  const h = sheet.getRange(1,1,1,20).getValues()[0];
+  if (col(h,"Evaluator_KP") < 0 || col(h,"Target_KP") < 0) {
+    sheet.insertRowBefore(1);
+    sheet.getRange(1,1,1,PEER_HEADERS.length).setValues([PEER_HEADERS]);
+    sheet.getRange(1,1,1,PEER_HEADERS.length)
+         .setBackground("#1e1b4b").setFontColor("white").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// ================================================================
+// HELPER — Dapatkan atau cipta sheet RUBRIK
+// ================================================================
+function getRubrikSheet() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(RUBRIK_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(RUBRIK_SHEET_NAME);
+    const headers = [
+      "Tarikh_Masa","Kumpulan_KP","Nama_Pelajar","Kelas",
+      "U1_FahamanKonsep","U2_HuraianContoh","U3_AplikasiPengetahuan",
+      "U4_PerkaitanAnalisis","U5_KetepatenJawapan","U6_KelebihanHuraian",
+      "U7_NilaiKritis","U8_Keseluruhan",
+      "Jumlah_HP1","CadanganMarkah_HP1",
+      "P1_PenilaianMaklumbalas","P2_KomunikasiBekerjasama","P3_KejjelasanYakin",
+      "P4_LancarSistematik","P5_PenguasaanIsi","P6_BahasaTepat",
+      "P7_InteraksiAudiens","P8_Keseluruhan",
+      "Jumlah_HP2","CadanganMarkah_HP2",
+      "Penilai","Status"
+    ];
+    sheet.appendRow(headers);
+    sheet.getRange(1,1,1,headers.length)
+         .setBackground("#0f172a").setFontColor("white").setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// ================================================================
+// HELPER — CORS response
+// ================================================================
+function createResponse(p) {
+  const output = ContentService.createTextOutput(JSON.stringify(p))
+    .setMimeType(ContentService.MimeType.JSON);
+  return output;
+}
+
+// ================================================================
+// doGet
+// ================================================================
+function doGet(e) {
+  try {
+    const a = e.parameter.action;
+    if (a === "checkLogin")          return checkLogin(e.parameter.noKP);
+    if (a === "lecturerLogin")       return lecturerLogin(e.parameter.email, e.parameter.pass);
+    if (a === "getLecturerStudents") return getLecturerStudents(e.parameter.email);
+    if (a === "getClassmates")       return getClassmates(e.parameter.noKP, e.parameter.kelas);
+    if (a === "checkPeerDone")       return checkPeerDone(e.parameter.evaluatorKP, e.parameter.targetKP);
+    if (a === "getPeerSummary")      return getPeerSummary(e.parameter.targetKP);
+    if (a === "getRubrikStatus")     return getRubrikStatus(e.parameter.noKP);
+    if (a === "getStudentMarkah")    return getStudentMarkah(e.parameter.noKP);   // ← BAHARU
+    return createResponse({status:"error", message:"Aksi tidak dikenali: " + a});
+  } catch(err) {
+    Logger.log("doGet ERR: " + err);
+    return createResponse({status:"error", message:err.toString()});
+  }
+}
+
+// ================================================================
+// doPost
+// ================================================================
+function doPost(e) {
+  try {
+    const p = JSON.parse(e.postData.contents);
+    if (p.action === "registerLecturer") return registerLecturer(p);
+    if (p.action === "submitScores")     return submitScoresWithSync(p);
+    if (p.action === "uploadImage")      return uploadImage(p);
+    if (p.action === "submitPeerEval")   return submitPeerEval(p);
+    if (p.action === "submitRubrik")     return submitRubrik(p);
+    return createResponse({status:"error", message:"Aksi tidak dikenali: " + p.action});
+  } catch(err) {
+    Logger.log("doPost ERR: " + err);
+    return createResponse({status:"error", message:err.toString()});
+  }
+}
+
+// ================================================================
+// checkLogin — Login pelajar
+// ================================================================
+function checkLogin(noKP) {
+  if (!noKP) return createResponse({status:"error", message:"No. KP tidak diberikan"});
+  
+  const ss    = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(DATA_SHEET_NAME);
+  if (!sheet) return createResponse({status:"error", message:"Sheet DATA_PELAJAR tidak dijumpai"});
+  
+  const data  = sheet.getDataRange().getValues();
+  const h     = data[0];
+  const kpIdx = h.indexOf("No_KP");
+  
+  if (kpIdx < 0) return createResponse({status:"error", message:"Kolum No_KP tidak dijumpai"});
+  
+  const kpStr = noKP.toString().trim();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][kpIdx].toString().trim() === kpStr) {
+      let obj = {};
+      h.forEach((hdr, idx) => {
+        if (hdr === "Link_Gambar") {
+          obj[hdr] = convertDriveUrl(data[i][idx]);
+        } else {
+          obj[hdr] = data[i][idx] ? data[i][idx].toString() : "";
         }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-main); }
-        
-        /* Background Decorative Elements (Modern Touch) */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+      });
+      Logger.log("checkLogin berjaya: " + kpStr);
+      return createResponse({status:"success", data:obj});
+    }
+  }
+  return createResponse({status:"error", message:"No. KP tidak dijumpai dalam sistem!"});
+}
+
+// ================================================================
+// getStudentMarkah — BAHARU: Dapatkan markah pelajar dari MARKAH_PELAJAR
+// ================================================================
+function getStudentMarkah(noKP) {
+  if (!noKP) return createResponse({status:"error", message:"No. KP tidak diberikan"});
+  
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(MARKAH_SHEET_NAME);
+  if (!sheet) return createResponse({status:"success", data:null, message:"Sheet markah belum wujud"});
+  
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return createResponse({status:"success", data:null});
+  
+  const h     = data[0];
+  const kpIdx = col(h, "No_KP");
+  if (kpIdx < 0) return createResponse({status:"error", message:"Kolum No_KP tidak dijumpai dalam MARKAH_PELAJAR"});
+  
+  const kpStr = noKP.toString().trim();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][kpIdx].toString().trim() === kpStr) {
+      // Dapatkan index semua kolum yang perlu
+      const hp1Col   = col(h, "HP1_Ujian(30)");
+      const hp2Col   = col(h, "HP2_Persembahan(20)");
+      const hp3Col   = col(h, "HP3_Penulisan(50)");
+      const jumCol   = col(h, "JUMLAH_AKHIR_100");
+      const gredCol  = col(h, "GRED");
+      const justCol  = col(h, "JUSTIFIKASI");
+      const penCol   = col(h, "Penilai");
+      const tarCol   = col(h, "Tarikh_Masa");
+      
+      const row = data[i];
+      return createResponse({
+        status: "success",
+        data: {
+          hp1:     hp1Col  >= 0 ? (row[hp1Col]  || 0) : 0,
+          hp2:     hp2Col  >= 0 ? (row[hp2Col]  || 0) : 0,
+          hp3:     hp3Col  >= 0 ? (row[hp3Col]  || 0) : 0,
+          jumlah:  jumCol  >= 0 ? (row[jumCol]  || 0) : 0,
+          gred:    gredCol >= 0 ? (row[gredCol] || "—") : "—",
+          just:    justCol >= 0 ? (row[justCol] || "") : "",
+          penilai: penCol  >= 0 ? (row[penCol]  || "") : "",
+          tarikh:  tarCol  >= 0 ? (row[tarCol]  ? row[tarCol].toString() : "") : ""
         }
+      });
+    }
+  }
+  
+  return createResponse({status:"success", data:null});
+}
 
-        .shell { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
-        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 2rem; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
-        .panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; }
-        
-        .btn-grad { 
-            background: linear-gradient(135deg, var(--grad-start), var(--grad-end)); 
-            border: none; cursor: pointer; transition: all 0.3s; color: white; font-family: inherit; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; 
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+// ================================================================
+// getClassmates
+// ================================================================
+function getClassmates(noKP, kelas) {
+  const ss      = SpreadsheetApp.openById(SHEET_ID);
+  const sheet   = ss.getSheetByName(DATA_SHEET_NAME);
+  const data    = sheet.getDataRange().getValues();
+  const h       = data[0];
+  const kpIdx   = h.indexOf("No_KP");
+  const kelIdx  = h.indexOf("Kelas");
+  const myKP    = noKP.toString().trim();
+  const myKelas = kelas.toString().trim();
+
+  const classmates = [];
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][kelIdx].toString().trim() === myKelas &&
+        data[i][kpIdx].toString().trim()  !== myKP) {
+      let obj = {};
+      h.forEach((hdr, idx) => {
+        obj[hdr] = (hdr === "Link_Gambar") ? convertDriveUrl(data[i][idx]) : (data[i][idx] ? data[i][idx].toString() : "");
+      });
+      classmates.push(obj);
+    }
+  }
+
+  const peerSheet = getPeerSheet();
+  const peerData  = peerSheet.getDataRange().getValues();
+  const ph        = peerData[0];
+  const evCol     = col(ph, "Evaluator_KP");
+  const tgCol     = col(ph, "Target_KP");
+
+  const doneSet = new Set();
+  if (evCol >= 0 && tgCol >= 0) {
+    for (let j = 1; j < peerData.length; j++) {
+      const ev = peerData[j][evCol].toString().trim();
+      const tg = peerData[j][tgCol].toString().trim();
+      if (ev === myKP && tg !== "") doneSet.add(tg);
+    }
+  }
+
+  return createResponse({
+    status:     "success",
+    data:       classmates,
+    done:       [...doneSet],
+    totalClass: classmates.length,
+    totalDone:  doneSet.size
+  });
+}
+
+// ================================================================
+// checkPeerDone
+// ================================================================
+function checkPeerDone(evaluatorKP, targetKP) {
+  const sheet   = getPeerSheet();
+  const data    = sheet.getDataRange().getValues();
+  const h       = data[0];
+  const evCol   = col(h,"Evaluator_KP");
+  const tgCol   = col(h,"Target_KP");
+  const evKP    = evaluatorKP.toString().trim();
+  const tgKP    = targetKP.toString().trim();
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][evCol].toString().trim() === evKP &&
+        data[i][tgCol].toString().trim() === tgKP) {
+      return createResponse({
+        done: true,
+        data: {
+          q1:   Number(data[i][col(h,"Q1_Kepimpinan")])    || 0,
+          q2:   Number(data[i][col(h,"Q2_Autonomi")])      || 0,
+          q3:   Number(data[i][col(h,"Q3_Tanggungjawab")]) || 0,
+          q4:   Number(data[i][col(h,"Q4_Persembahan")])   || 0,
+          q5:   Number(data[i][col(h,"Q5_Kerjasama")])     || 0,
+          note: data[i][col(h,"Catatan")] ? data[i][col(h,"Catatan")].toString() : ""
         }
-        .btn-grad:hover { 
-            opacity: 0.9; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-        }
-        .btn-grad:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-outline { background: transparent; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; color: var(--text-muted); font-family: inherit; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
-        .btn-outline:hover { border-color: var(--indigo); color: white; background: rgba(255,255,255,0.05); }
-        
-        .tab-bar { display: flex; gap: 4px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 1rem; border: 1px solid var(--border); }
-        .tab { flex: 1; padding: 10px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: all 0.25s; background: transparent; border: none; color: var(--text-muted); font-family: inherit; }
-        .tab.active { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2)); color: white; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 0 10px rgba(59,130,246,0.2); }
-        
-        .screen { display: none; }
-        .screen.active { display: flex; }
-        
-        .likert-group { display: flex; gap: 6px; }
-        .likert-btn { flex: 1; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: inherit; transition: all 0.2s; text-align: center; }
-        .likert-btn:hover { border-color: var(--indigo); color: white; background: rgba(255,255,255,0.05); }
-        
-        /* Updated Likert Colors for Elegance */
-        .likert-btn.sel-1 { background: rgba(239,68,68,0.15); border-color: #f87171; color: #fca5a5; }
-        .likert-btn.sel-2 { background: rgba(251,191,36,0.15); border-color: #fbbf24; color: #fcd34d; }
-        .likert-btn.sel-3 { background: rgba(34, 211, 238,0.15); border-color: #22d3ee; color: #67e8f9; }
-        .likert-btn.sel-4 { background: rgba(34, 197, 94,0.15); border-color: #22c55e; color: #4ade80; }
-        .likert-btn.sel-5 { background: rgba(99,102,241,0.15); border-color: #818cf8; color: #a5b4fc; }
-        
-        .rating-group { display: flex; gap: 5px; }
-        .rating-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; color: var(--text-muted); font-family: inherit; transition: all 0.2s; text-align: center; line-height: 1.3; }
-        .rating-btn:hover { border-color: var(--indigo); color: white; }
-        .rating-btn.r-1 { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
-        .rating-btn.r-2 { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fcd34d; }
-        .rating-btn.r-3 { background: rgba(34, 197, 94,0.1); border-color: rgba(34, 197, 94,0.3); color: #4ade80; }
-        .rating-btn.r-4 { background: rgba(59, 130, 246,0.1); border-color: rgba(59, 130, 246,0.3); color: #60a5fa; }
-        
-        .s-card { padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
-        .s-card:hover { background: rgba(59,130,246,0.05); border-left-color: var(--indigo); transform: translateX(4px); }
-        .s-card.selected { background: rgba(59,130,246,0.1); border-left-color: var(--indigo); border-color: rgba(129,140,248,0.3); }
-        .s-card.done { border-left-color: var(--emerald); }
-        
-        .scroll-thin::-webkit-scrollbar { width: 4px; }
-        .scroll-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        
-        input[type=number], input[type=text], input[type=password], textarea {
-            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-            color: white; font-family: inherit; outline: none; transition: all 0.2s;
-            border-radius: 12px;
-        }
-        input:focus, textarea:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2); }
-        
-        .alert-info { background: rgba(59, 130, 246,0.1); border: 1px solid rgba(59, 130, 246,0.3); color: #93c5fd; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
-        .alert-warn { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fcd34d; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
-        .alert-success { background: rgba(34, 197, 94,0.1); border: 1px solid rgba(34, 197, 94,0.3); color: #6ee7b7; padding:12px 16px; border-radius:12px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:10px; }
-        
-        .hpk-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700; font-family:'Space Mono',monospace; }
-        .hpk1 { background:rgba(129,140,248,0.15); border:1px solid rgba(129,140,248,0.3); color:#a5b4fc; }
-        .hpk2 { background:rgba(34,211,238,0.15); border:1px solid rgba(34,211,238,0.3); color:#67e8f9; }
-        .hpk3 { background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.3); color:#d8b4fe; }
-        
-        .cad-box { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2); border-radius: 14px; padding: 14px 16px; }
-        .cad-val { font-size: 28px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--amber); }
-        
-        #toast { position: fixed; top: 20px; right: 20px; z-index: 9999; transform: translateX(120%); transition: transform 0.3s; }
-        #toast.show { transform: translateX(0); }
-        
-        .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .eval-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .eval-dot.done { background: var(--emerald); box-shadow: 0 0 8px rgba(52, 211, 153, 0.5); }
-        .eval-dot.pending { background: rgba(255,255,255,0.2); }
-        
-        .q-block { padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); margin-bottom: 10px; }
-        .dim-label { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px; }
-        
-        .disclaimer-bar { background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(59,130,246,0.2); padding: 9px 20px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 10.5px; color: var(--text-muted); letter-spacing: 0.02em; text-align: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); }
-        .disclaimer-bar strong { color: rgba(255,255,255,0.7); font-weight: 700; }
-        .disclaimer-bar .sep { opacity: 0.25; margin: 0 4px; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.3s ease forwards; }
-        
-        .disclaimer-footer { background: rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.05); padding: 18px 24px; text-align: center; font-size: 10px; color: var(--text-muted); line-height: 1.8; }
-        .prog-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
-        .prog-bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
-        
-        /* Modern Icon Gradients */
-        .icon-gradient { background: linear-gradient(135deg, var(--grad-start), var(--grad-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      });
+    }
+  }
+  return createResponse({done: false});
+}
 
-        @media (max-width: 768px) {
-            .disclaimer-bar { font-size: 9px !important; padding: 8px 12px !important; }
-            .glass { border-radius: 1.2rem !important; }
-            .tab { padding: 8px 4px !important; font-size: 9px !important; }
-            .likert-group, .rating-group { flex-wrap: wrap !important; }
-            .likert-btn, .rating-btn { min-width: calc(33% - 4px) !important; }
-            #toast { left: 12px; right: 12px; top: 12px; transform: translateY(-120%) !important; }
-            #toast.show { transform: translateY(0) !important; }
-        }
-        @media (max-width: 900px) {
-            #lecturerDash > div:last-child { grid-template-columns: 1fr !important; }
-            #sList { display: flex !important; flex-direction: row !important; overflow-x: auto !important; overflow-y: hidden !important; max-height: none !important; gap: 8px !important; }
-            #sList .s-card { min-width: 160px !important; flex-shrink: 0 !important; margin-bottom: 0 !important; }
-        }
-        @media (max-width: 480px) {
-            .shell { align-items: flex-start !important; padding: 0 !important; }
-            .shell > .glass { border-radius: 0 !important; min-height: 100vh !important; border: none !important; justify-content: center !important; display: flex !important; flex-direction: column !important; }
-        }
-        @media (hover: none) and (pointer: coarse) {
-            .btn-grad, .btn-outline, .tab, .s-card, .likert-btn, .rating-btn { min-height: 44px; }
-            .tab { min-height: 36px; }
-        }
-    </style>
-</head>
-<body>
+// ================================================================
+// submitPeerEval
+// ================================================================
+function submitPeerEval(params) {
+  const sheet  = getPeerSheet();
+  const data   = sheet.getDataRange().getValues();
+  const h      = data[0];
+  const evCol  = col(h,"Evaluator_KP");
+  const tgCol  = col(h,"Target_KP");
+  const evKP   = params.evaluatorKP.toString().trim();
+  const tgKP   = params.targetKP.toString().trim();
 
-<!-- HTML structure remains exactly the same, only CSS changes are applied above -->
-<!-- ... (HTML body content is identical to your provided code) ... -->
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][evCol].toString().trim() === evKP &&
+        data[i][tgCol].toString().trim() === tgKP) {
+      return createResponse({status:"duplicate", message:"Anda sudah menilai pelajar ini."});
+    }
+  }
 
-<div class="disclaimer-bar" id="globalDisclaimer">
-    <i class="fas fa-shield-halved" style="color:#3b82f6; font-size:13px; flex-shrink:0;"></i>
-    <span style="flex:1;">
-        <strong>🔒 SULIT &amp; TERHAD</strong>
-        <span class="sep">|</span>
-        Sistem ini adalah <strong>SULIT</strong> dan hanya untuk kegunaan
-        <strong>Unit Kokurikulum IPG Kampus Darulaman</strong>
-        <span class="sep">|</span>
-        <strong>GKKO1062</strong>
-        <span class="sep">| Kokurikulum dan Kesihatan Diri |</span>
-        Dibangunkan oleh <strong>Unit Kokurikulum IPGKDA</strong>
-    </span>
-    <button onclick="document.getElementById('globalDisclaimer').style.display='none'"
-            style="background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer; font-size:14px; padding:0 4px; flex-shrink:0;">✕</button>
-</div>
+  const q1  = Number(params.q1) || 0;
+  const q2  = Number(params.q2) || 0;
+  const q3  = Number(params.q3) || 0;
+  const q4  = Number(params.q4) || 0;
+  const q5  = Number(params.q5) || 0;
+  const avg = (q1+q2+q3+q4+q5) / 5;
 
-<div id="toast">
-    <div class="glass px-5 py-3 flex items-center gap-3 text-sm font-bold" id="toastMsg">
-        <i class="fas fa-check-circle text-emerald-400"></i>
-        <span>Berjaya</span>
-    </div>
-</div>
+  const newRow = new Array(PEER_HEADERS.length).fill("");
+  newRow[col(h,"ID")]              = "PE_" + new Date().getTime();
+  newRow[col(h,"Tarikh_Masa")]     = new Date();
+  newRow[col(h,"Evaluator_KP")]    = evKP;
+  newRow[col(h,"Evaluator_Nama")]  = (params.evaluatorName  || "").toString();
+  newRow[col(h,"Evaluator_Kelas")] = (params.evaluatorKelas || "").toString();
+  newRow[col(h,"Target_KP")]       = tgKP;
+  newRow[col(h,"Target_Nama")]     = (params.targetName  || "").toString();
+  newRow[col(h,"Target_Kelas")]    = (params.targetKelas || "").toString();
+  newRow[col(h,"Q1_Kepimpinan")]      = q1;
+  newRow[col(h,"Q2_Autonomi")]        = q2;
+  newRow[col(h,"Q3_Tanggungjawab")]   = q3;
+  newRow[col(h,"Q4_Persembahan")]     = q4;
+  newRow[col(h,"Q5_Kerjasama")]       = q5;
+  newRow[col(h,"Avg_Score")]          = avg;
+  newRow[col(h,"Catatan")]            = (params.note || "").toString();
 
-<!-- LOGIN SCREEN -->
-<div class="shell" id="loginScreen">
-    <div class="glass w-full shadow-2xl" style="max-width:420px; padding: clamp(1.4rem, 5vw, 2.5rem);">
-        <div class="text-center" style="margin-bottom:20px;">
-            <div style="display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:18px; background:linear-gradient(135deg,#3b82f6,#8b5cf6); margin-bottom:14px; box-shadow:0 8px 28px rgba(59,102,241,0.4);">
-                <i class="fas fa-graduation-cap" style="font-size:1.6rem; color:white;"></i>
-            </div>
-            <div style="font-size:9px; font-weight:800; letter-spacing:0.2em; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">IPG Kampus Darulaman · Unit Kokurikulum</div>
-            <h1 style="font-size:clamp(1.5rem,6vw,2rem); font-weight:800; color:white; line-height:1.2; margin-bottom:3px;">Portal Pemarkahan</h1>
-            <p style="font-size:11px; color:#60a5fa; font-weight:600;">GKKO1062 — Kokurikulum dan Kesihatan Diri</p>
-        </div>
+  sheet.appendRow(newRow);
+  return createResponse({status:"success"});
+}
 
-        <div style="background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.15); border-radius:14px; padding:14px 16px; margin-bottom:20px;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                <i class="fas fa-shield-halved" style="color:#3b82f6; font-size:13px;"></i>
-                <span style="font-size:10px; font-weight:800; color:#93c5fd; text-transform:uppercase; letter-spacing:0.1em;">Penafian Rasmi</span>
-            </div>
-            <p style="font-size:10.5px; color:var(--text-muted); line-height:1.75;">
-                Sistem ini adalah <strong style="color:rgba(255,255,255,0.7);">SULIT</strong> untuk kegunaan
-                <strong style="color:rgba(255,255,255,0.7);">Unit Kokurikulum IPGKDA</strong> bagi kod kursus
-                <strong style="color:#93c5fd;">GKKO1062</strong>.
-            </p>
-        </div>
+// ================================================================
+// getPeerSummary
+// ================================================================
+function getPeerSummary(targetKP) {
+  const sheet   = getPeerSheet();
+  const data    = sheet.getDataRange().getValues();
+  const h       = data[0];
+  const tgCol   = col(h,"Target_KP");
+  const q1Col   = col(h,"Q1_Kepimpinan");
+  const q2Col   = col(h,"Q2_Autonomi");
+  const q3Col   = col(h,"Q3_Tanggungjawab");
+  const q4Col   = col(h,"Q4_Persembahan");
+  const q5Col   = col(h,"Q5_Kerjasama");
+  const noteCol = col(h,"Catatan");
+  const kpStr   = targetKP.toString().trim();
 
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:18px;">
-            <div style="text-align:center; padding:10px 6px; background:rgba(59,130,246,0.05); border:1px solid rgba(59,130,246,0.15); border-radius:12px;">
-                <div style="font-size:9px; font-weight:800; color:#93c5fd; text-transform:uppercase; margin-bottom:4px;">HPK1</div>
-                <div style="font-size:11px; font-weight:700; color:white;">Ujian</div>
-                <div style="font-size:18px; font-weight:800; color:#3b82f6; font-family:'Space Mono',monospace;">30%</div>
-            </div>
-            <div style="text-align:center; padding:10px 6px; background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.15); border-radius:12px;">
-                <div style="font-size:9px; font-weight:800; color:#67e8f9; text-transform:uppercase; margin-bottom:4px;">HPK2</div>
-                <div style="font-size:11px; font-weight:700; color:white;">Persembahan</div>
-                <div style="font-size:18px; font-weight:800; color:#06b6d4; font-family:'Space Mono',monospace;">20%</div>
-            </div>
-            <div style="text-align:center; padding:10px 6px; background:rgba(167,139,250,0.05); border:1px solid rgba(167,139,250,0.15); border-radius:12px;">
-                <div style="font-size:9px; font-weight:800; color:#d8b4fe; text-transform:uppercase; margin-bottom:4px;">HPK3</div>
-                <div style="font-size:11px; font-weight:700; color:white;">Penulisan</div>
-                <div style="font-size:18px; font-weight:800; color:#8b5cf6; font-family:'Space Mono',monospace;">50%</div>
-            </div>
-        </div>
+  if (tgCol < 0 || q1Col < 0) {
+    return createResponse({status:"error", message:"Header tidak jumpa"});
+  }
 
-        <div class="tab-bar" style="margin-bottom:16px;">
-            <button class="tab active" id="ts" onclick="setType('student')">
-                <i class="fas fa-user-graduate" style="margin-right:4px;"></i> PELAJAR
-            </button>
-            <button class="tab" id="tl" onclick="setType('lecturer')">
-                <i class="fas fa-chalkboard-teacher" style="margin-right:4px;"></i> PENSYARAH
-            </button>
-        </div>
+  const evals = [];
+  let t1=0,t2=0,t3=0,t4=0,t5=0;
 
-        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
-            <input type="text" id="idIn" placeholder="No. Kad Pengenalan / Emel"
-                style="padding:14px 16px; font-family:'Space Mono',monospace; font-size:13px; text-align:center; border-radius:14px; width:100%;"
-                autocomplete="username" inputmode="text">
-            <input type="password" id="pwIn" placeholder="Password"
-                style="padding:14px 16px; text-align:center; border-radius:14px; font-size:14px; width:100%; display:none;"
-                autocomplete="current-password">
-        </div>
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][tgCol].toString().trim() === kpStr) {
+      const q1=Number(data[i][q1Col])||0, q2=Number(data[i][q2Col])||0,
+            q3=Number(data[i][q3Col])||0, q4=Number(data[i][q4Col])||0,
+            q5=Number(data[i][q5Col])||0;
+      t1+=q1; t2+=q2; t3+=q3; t4+=q4; t5+=q5;
+      evals.push({q1,q2,q3,q4,q5, note: noteCol>=0 ? data[i][noteCol].toString() : ""});
+    }
+  }
 
-        <button onclick="handleAuth()" id="loginBtn" class="btn-grad w-full rounded-2xl" style="padding:15px; font-size:13px; width:100%;">
-            <i class="fas fa-right-to-bracket" style="margin-right:8px;"></i> MASUK SISTEM
-        </button>
+  if (evals.length === 0) return createResponse({status:"success",evals:[],count:0,avg:0,avgDims:[0,0,0,0,0]});
 
-        <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); text-align:center;">
-            <p style="font-size:9px; color:var(--text-muted); line-height:1.9;">
-                © 2025–2026 Unit Kokurikulum IPG Kampus Darulaman<br>
-                <span style="color:rgba(59,130,246,0.45); font-size:8px; letter-spacing:0.05em;">v4.0 · GKKO1062</span>
-            </p>
-        </div>
-    </div>
-</div>
+  const n = evals.length;
+  const avgDims = [t1/n, t2/n, t3/n, t4/n, t5/n];
+  const avg     = avgDims.reduce((a,b)=>a+b,0)/5;
+  return createResponse({status:"success",evals,count:n,avg,avgDims});
+}
 
-<!-- ... (REST OF HTML BODY REMAINS THE SAME) ... -->
-<!-- Note: For brevity, I have not repeated the entire HTML structure of the dashboards (Student/Lecturer) as no changes were made there other than the CSS affecting their appearance. Paste the rest of your body code here. -->
+// ================================================================
+// submitRubrik
+// ================================================================
+function submitRubrik(params) {
+  const rubrikSheet = getRubrikSheet();
+  const rubrikData  = rubrikSheet.getDataRange().getValues();
+  const rh          = rubrikData[0];
+  const kpStr       = params.noKP.toString().trim();
 
-<!-- IMPORTANT: Ensure the rest of your HTML code (Student Dash, Lecturer Dash, Footer) follows below exactly as it was in your original file. The CSS changes above will automatically style them. -->
+  let existingRow = -1;
+  for (let i = 1; i < rubrikData.length; i++) {
+    const rkp = col(rh,"Kumpulan_KP");
+    if (rkp >= 0 && rubrikData[i][rkp].toString().trim() === kpStr) {
+      existingRow = i + 1;
+      break;
+    }
+  }
 
-<!-- SCRIPT SECTION REMAINS UNCHANGED -->
-<script>
-// Your JavaScript code remains exactly the same
-// ... (Paste your full JS code here) ...
-</script>
-</body>
-</html>
+  const u  = params.ujian       || {};
+  const p  = params.persembahan || {};
+
+  const ujianJumlah = (u.u1||0)+(u.u2||0)+(u.u3||0)+(u.u4||0)+(u.u5||0)+(u.u6||0)+(u.u7||0)+(u.u8||0);
+  const presJumlah  = (p.p1||0)+(p.p2||0)+(p.p3||0)+(p.p4||0)+(p.p5||0)+(p.p6||0)+(p.p7||0)+(p.p8||0);
+
+  const cadHP1 = Math.round((ujianJumlah / 32) * 30 * 10) / 10;
+  const cadHP2 = Math.round((presJumlah  / 32) * 20 * 10) / 10;
+
+  const newRow = [
+    new Date(), kpStr, params.nama||"", params.kelas||"",
+    u.u1||0, u.u2||0, u.u3||0, u.u4||0, u.u5||0, u.u6||0, u.u7||0, u.u8||0,
+    ujianJumlah, cadHP1,
+    p.p1||0, p.p2||0, p.p3||0, p.p4||0, p.p5||0, p.p6||0, p.p7||0, p.p8||0,
+    presJumlah, cadHP2,
+    params.penilai||"", "Selesai"
+  ];
+
+  if (existingRow > 0) {
+    rubrikSheet.getRange(existingRow, 1, 1, newRow.length).setValues([newRow]);
+  } else {
+    rubrikSheet.appendRow(newRow);
+  }
+
+  Logger.log("submitRubrik: " + kpStr + " HP1cad=" + cadHP1 + " HP2cad=" + cadHP2);
+  return createResponse({status:"success", cadHP1, cadHP2, ujianJumlah, presJumlah});
+}
+
+// ================================================================
+// getRubrikStatus
+// ================================================================
+function getRubrikStatus(noKP) {
+  const sheet = getRubrikSheet();
+  const data  = sheet.getDataRange().getValues();
+  const h     = data[0];
+  const kpCol = col(h,"Kumpulan_KP");
+  const kpStr = noKP.toString().trim();
+
+  for (let i = 1; i < data.length; i++) {
+    if (kpCol >= 0 && data[i][kpCol].toString().trim() === kpStr) {
+      const row = data[i];
+      return createResponse({
+        status: "success",
+        ada:    true,
+        tarikh: row[0] ? row[0].toString() : "",
+        u1: Number(row[col(h,"U1_FahamanKonsep")])||0,
+        u2: Number(row[col(h,"U2_HuraianContoh")])||0,
+        u3: Number(row[col(h,"U3_AplikasiPengetahuan")])||0,
+        u4: Number(row[col(h,"U4_PerkaitanAnalisis")])||0,
+        u5: Number(row[col(h,"U5_KetepatenJawapan")])||0,
+        u6: Number(row[col(h,"U6_KelebihanHuraian")])||0,
+        u7: Number(row[col(h,"U7_NilaiKritis")])||0,
+        u8: Number(row[col(h,"U8_Keseluruhan")])||0,
+        ujianJumlah: Number(row[col(h,"Jumlah_HP1")])||0,
+        cadHP1:      Number(row[col(h,"CadanganMarkah_HP1")])||0,
+        p1: Number(row[col(h,"P1_PenilaianMaklumbalas")])||0,
+        p2: Number(row[col(h,"P2_KomunikasiBekerjasama")])||0,
+        p3: Number(row[col(h,"P3_KejjelasanYakin")])||0,
+        p4: Number(row[col(h,"P4_LancarSistematik")])||0,
+        p5: Number(row[col(h,"P5_PenguasaanIsi")])||0,
+        p6: Number(row[col(h,"P6_BahasaTepat")])||0,
+        p7: Number(row[col(h,"P7_InteraksiAudiens")])||0,
+        p8: Number(row[col(h,"P8_Keseluruhan")])||0,
+        presJumlah: Number(row[col(h,"Jumlah_HP2")])||0,
+        cadHP2:     Number(row[col(h,"CadanganMarkah_HP2")])||0,
+        penilai:    row[col(h,"Penilai")] ? row[col(h,"Penilai")].toString() : ""
+      });
+    }
+  }
+  return createResponse({status:"success", ada:false});
+}
+
+// ================================================================
+// getLecturerStudents
+// ================================================================
+function getLecturerStudents(email) {
+  const ss          = SpreadsheetApp.openById(SHEET_ID);
+  const dataSheet   = ss.getSheetByName(DATA_SHEET_NAME);
+  const markahSheet = ss.getSheetByName(MARKAH_SHEET_NAME);
+  const masterData  = dataSheet.getDataRange().getValues();
+  const h           = masterData[0];
+  const penilaiIdx  = h.indexOf("Penilai");
+
+  // Bina markah map
+  const markahMap = {};
+  if (markahSheet) {
+    const mData = markahSheet.getDataRange().getValues();
+    const mh    = mData[0];
+    for (let j = 1; j < mData.length; j++) {
+      const kpCol  = col(mh, "No_KP");
+      const hp1Col = col(mh, "HP1_Ujian(30)");
+      const hp2Col = col(mh, "HP2_Persembahan(20)");
+      const hp3Col = col(mh, "HP3_Penulisan(50)");
+      const jumCol = col(mh, "JUMLAH_AKHIR_100");
+      const greCol = col(mh, "GRED");
+      const jusCol = col(mh, "JUSTIFIKASI");
+      if (kpCol >= 0 && mData[j][kpCol]) {
+        const kp = mData[j][kpCol].toString().trim();
+        markahMap[kp] = {
+          hp1:    mData[j][hp1Col] || 0,
+          hp2:    mData[j][hp2Col] || 0,
+          hp3:    mData[j][hp3Col] || 0,
+          jumlah: mData[j][jumCol] || 0,
+          gred:   mData[j][greCol] || "—",
+          just:   mData[j][jusCol] || ""
+        };
+      }
+    }
+  }
+
+  // Peer eval aggregates
+  const peerSheet = getPeerSheet();
+  const peerData  = peerSheet.getDataRange().getValues();
+  const ph        = peerData[0];
+  const tgCol2    = col(ph,"Target_KP");
+  const q1Col     = col(ph,"Q1_Kepimpinan");
+  const q2Col     = col(ph,"Q2_Autonomi");
+  const q3Col     = col(ph,"Q3_Tanggungjawab");
+  const q4Col     = col(ph,"Q4_Persembahan");
+  const q5Col     = col(ph,"Q5_Kerjasama");
+
+  const peerMap = {};
+  if (tgCol2 >= 0 && q1Col >= 0) {
+    for (let p = 1; p < peerData.length; p++) {
+      const tKP = peerData[p][tgCol2].toString().trim();
+      if (!tKP) continue;
+      if (!peerMap[tKP]) peerMap[tKP] = {count:0,q1:0,q2:0,q3:0,q4:0,q5:0};
+      peerMap[tKP].count++;
+      peerMap[tKP].q1 += Number(peerData[p][q1Col])||0;
+      peerMap[tKP].q2 += Number(peerData[p][q2Col])||0;
+      peerMap[tKP].q3 += Number(peerData[p][q3Col])||0;
+      peerMap[tKP].q4 += Number(peerData[p][q4Col])||0;
+      peerMap[tKP].q5 += Number(peerData[p][q5Col])||0;
+    }
+  }
+
+  // Rubrik map
+  const rubrikSheet = getRubrikSheet();
+  const rubrikData  = rubrikSheet.getDataRange().getValues();
+  const rh          = rubrikData[0];
+  const rubrikMap   = {};
+  const rkpCol      = col(rh,"Kumpulan_KP");
+  if (rkpCol >= 0) {
+    for (let r = 1; r < rubrikData.length; r++) {
+      const kp = rubrikData[r][rkpCol].toString().trim();
+      if (kp) rubrikMap[kp] = {
+        cadHP1:      Number(rubrikData[r][col(rh,"CadanganMarkah_HP1")])||0,
+        cadHP2:      Number(rubrikData[r][col(rh,"CadanganMarkah_HP2")])||0,
+        ujianJumlah: Number(rubrikData[r][col(rh,"Jumlah_HP1")])||0,
+        presJumlah:  Number(rubrikData[r][col(rh,"Jumlah_HP2")])||0,
+        // Juga kembalikan skor individu untuk paparan dalam panel
+        u1: Number(rubrikData[r][col(rh,"U1_FahamanKonsep")])||0,
+        u2: Number(rubrikData[r][col(rh,"U2_HuraianContoh")])||0,
+        u3: Number(rubrikData[r][col(rh,"U3_AplikasiPengetahuan")])||0,
+        u4: Number(rubrikData[r][col(rh,"U4_PerkaitanAnalisis")])||0,
+        u5: Number(rubrikData[r][col(rh,"U5_KetepatenJawapan")])||0,
+        u6: Number(rubrikData[r][col(rh,"U6_KelebihanHuraian")])||0,
+        u7: Number(rubrikData[r][col(rh,"U7_NilaiKritis")])||0,
+        u8: Number(rubrikData[r][col(rh,"U8_Keseluruhan")])||0,
+        p1: Number(rubrikData[r][col(rh,"P1_PenilaianMaklumbalas")])||0,
+        p2: Number(rubrikData[r][col(rh,"P2_KomunikasiBekerjasama")])||0,
+        p3: Number(rubrikData[r][col(rh,"P3_KejjelasanYakin")])||0,
+        p4: Number(rubrikData[r][col(rh,"P4_LancarSistematik")])||0,
+        p5: Number(rubrikData[r][col(rh,"P5_PenguasaanIsi")])||0,
+        p6: Number(rubrikData[r][col(rh,"P6_BahasaTepat")])||0,
+        p7: Number(rubrikData[r][col(rh,"P7_InteraksiAudiens")])||0,
+        p8: Number(rubrikData[r][col(rh,"P8_Keseluruhan")])||0
+      };
+    }
+  }
+
+  const filtered = masterData.slice(1)
+    .filter(row => {
+      if (penilaiIdx < 0) return false;
+      return row[penilaiIdx] &&
+             row[penilaiIdx].toString().toLowerCase() === email.toLowerCase();
+    })
+    .map(row => {
+      let obj = {};
+      h.forEach((hdr,i) => {
+        obj[hdr] = (hdr === "Link_Gambar") ? convertDriveUrl(row[i]) : (row[i] ? row[i].toString() : "");
+      });
+      const kp = obj.No_KP ? obj.No_KP.toString().trim() : "";
+      obj.markahSediaAda  = markahMap[kp] || null;
+      const pm = peerMap[kp];
+      if (pm && pm.count > 0) {
+        const n = pm.count;
+        obj.peerSummary = {
+          count:   n,
+          avgDims: [pm.q1/n, pm.q2/n, pm.q3/n, pm.q4/n, pm.q5/n],
+          avg:     (pm.q1+pm.q2+pm.q3+pm.q4+pm.q5)/(n*5)
+        };
+      } else { obj.peerSummary = null; }
+      obj.rubrikChecklist = rubrikMap[kp] || null;
+      return obj;
+    });
+
+  return createResponse({status:"success", data:filtered});
+}
+
+// ================================================================
+// lecturerLogin — PERBAIKI: semak password dengan betul
+// ================================================================
+function lecturerLogin(email, pass) {
+  if (!email) return createResponse({status:"error", message:"Emel tidak diberikan"});
+  
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(LECTURER_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(LECTURER_SHEET_NAME);
+    sheet.appendRow(["Email","Nama","Password","Tarikh"]);
+    sheet.getRange(1,1,1,4).setBackground("#1e1b4b").setFontColor("white").setFontWeight("bold");
+    return createResponse({status:"new_user"});
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return createResponse({status:"new_user"});
+  
+  const emailIdx = 0, namaIdx = 1, passIdx = 2;
+  const emailStr = email.toString().toLowerCase().trim();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][emailIdx].toString().toLowerCase().trim() === emailStr) {
+      const storedPass = data[i][passIdx].toString().trim();
+      const inputPass  = (pass || "").toString().trim();
+      if (storedPass === inputPass) {
+        return createResponse({status:"success", name: data[i][namaIdx].toString()});
+      }
+      return createResponse({status:"error", message:"Password salah! Sila cuba lagi."});
+    }
+  }
+  return createResponse({status:"new_user"});
+}
+
+// ================================================================
+// registerLecturer
+// ================================================================
+function registerLecturer(params) {
+  const ss    = SpreadsheetApp.openById(SHEET_ID);
+  let sheet   = ss.getSheetByName(LECTURER_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(LECTURER_SHEET_NAME);
+    sheet.appendRow(["Email","Nama","Password","Tarikh"]);
+    sheet.getRange(1,1,1,4).setBackground("#1e1b4b").setFontColor("white").setFontWeight("bold");
+  }
+  
+  // Semak jika emel sudah ada
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0].toString().toLowerCase().trim() === params.email.toLowerCase().trim()) {
+      return createResponse({status:"error", message:"Emel sudah berdaftar."});
+    }
+  }
+  
+  sheet.appendRow([params.email, params.nama, params.pass, new Date()]);
+  return createResponse({status:"success"});
+}
+
+// ================================================================
+// submitScoresWithSync — HPK1=HP1(30), HPK2=HP2(20), HPK3=HP3(50)
+// ================================================================
+function submitScoresWithSync(params) {
+  const ss         = SpreadsheetApp.openById(SHEET_ID);
+  const masterData = ss.getSheetByName(DATA_SHEET_NAME).getDataRange().getValues();
+  let markahSheet  = ss.getSheetByName(MARKAH_SHEET_NAME);
+  
+  const mHeaders = [
+    "ID_SISTEM","Nama_Pelajar","JANTINA","No_KP","No_Giliran","Kelas",
+    "HP1_Ujian(30)","HP2_Persembahan(20)","HP3_Penulisan(50)",
+    "JUMLAH_AKHIR_100","GRED","JUSTIFIKASI","Penilai","Tarikh_Masa"
+  ];
+  
+  if (!markahSheet) {
+    markahSheet = ss.insertSheet(MARKAH_SHEET_NAME);
+  }
+
+  // Bina map markah sedia ada
+  const markahMap = {};
+  const existData = markahSheet.getDataRange().getValues();
+  if (existData.length > 1) {
+    const eh = existData[0];
+    const ekpIdx = col(eh,"No_KP");
+    for (let i = 1; i < existData.length; i++) {
+      if (ekpIdx >= 0 && existData[i][ekpIdx]) {
+        const kp = existData[i][ekpIdx].toString().trim();
+        markahMap[kp] = existData[i].slice(6, 14); // kolum 6 hingga 13
+      }
+    }
+  }
+
+  const hp1  = Math.min(30, Math.max(0, Number(params.hp1)||0));
+  const hp2  = Math.min(20, Math.max(0, Number(params.hp2)||0));
+  const hp3  = Math.min(50, Math.max(0, Number(params.hp3)||0));
+  const total = hp1 + hp2 + hp3;
+  const tKP  = params.noKP.toString().trim();
+
+  const mh  = masterData[0];
+  const newRows = [mHeaders];
+  
+  for (let i = 1; i < masterData.length; i++) {
+    const kpIdx = col(mh,"No_KP");
+    const kp    = kpIdx >= 0 ? masterData[i][kpIdx].toString().trim() : "";
+    
+    let score;
+    if (kp === tKP) {
+      score = [hp1, hp2, hp3, total, calculateGred(total), params.justifikasi||"-", params.penilai, new Date()];
+    } else {
+      score = markahMap[kp] || ["","","","","","","",""];
+    }
+    
+    // Ambil 6 kolum pertama dari masterData (ID, Nama, Jantina, KP, Giliran, Kelas)
+    const baseRow = [
+      masterData[i][col(mh,"ID_SISTEM")]  || "",
+      masterData[i][col(mh,"Nama_Pelajar")] || "",
+      masterData[i][col(mh,"JANTINA")]    || "",
+      masterData[i][col(mh,"No_KP")]      || "",
+      masterData[i][col(mh,"No_Giliran")] || "",
+      masterData[i][col(mh,"Kelas")]      || ""
+    ];
+    
+    newRows.push([...baseRow, ...score]);
+  }
+
+  markahSheet.clear();
+  markahSheet.getRange(1, 1, newRows.length, mHeaders.length).setValues(newRows);
+  markahSheet.getRange(1, 1, 1, mHeaders.length)
+    .setBackground("#1e1b4b").setFontColor("white").setFontWeight("bold");
+  markahSheet.setFrozenRows(1);
+  
+  Logger.log("submitScores: KP=" + tKP + " HP1=" + hp1 + " HP2=" + hp2 + " HP3=" + hp3 + " Total=" + total);
+  return createResponse({status:"success"});
+}
+
+// ================================================================
+// uploadImage — PERBAIKI: Simpan URL betul ke kolum Link_Gambar
+// ================================================================
+function uploadImage(params) {
+  try {
+    const folder = DriveApp.getFolderById(TARGET_FOLDER_ID);
+    const blob   = Utilities.newBlob(
+      Utilities.base64Decode(params.imageData),
+      params.mimeType,
+      params.fileName
+    );
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    const fileUrl = file.getUrl();
+    const fileId  = file.getId();
+    Logger.log("uploadImage: fileId=" + fileId + " url=" + fileUrl);
+
+    const ss    = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(DATA_SHEET_NAME);
+    const data  = sheet.getDataRange().getValues();
+    const h     = data[0];
+    const kpIdx = h.indexOf("No_KP");
+    const lgIdx = h.indexOf("Link_Gambar");
+    const suIdx = h.indexOf("Status_Upload");
+
+    if (lgIdx < 0) {
+      Logger.log("uploadImage: kolum Link_Gambar tidak dijumpai! Headers: " + JSON.stringify(h));
+      return createResponse({status:"error", message:"Kolum Link_Gambar tidak dijumpai dalam sheet"});
+    }
+
+    const kpStr = params.noKP.toString().trim();
+    let found = false;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][kpIdx].toString().trim() === kpStr) {
+        sheet.getRange(i + 1, lgIdx + 1).setValue(fileUrl);
+        if (suIdx >= 0) sheet.getRange(i + 1, suIdx + 1).setValue("Selesai");
+        found = true;
+        Logger.log("uploadImage: URL disimpan untuk KP=" + kpStr + " row=" + (i+1));
+        break;
+      }
+    }
+
+    if (!found) {
+      Logger.log("uploadImage: KP tidak dijumpai: " + kpStr);
+      return createResponse({status:"error", message:"KP tidak dijumpai dalam DATA_PELAJAR"});
+    }
+
+    return createResponse({
+      status:  "success",
+      fileId:  fileId,
+      fileUrl: fileUrl,
+      thumbUrl: "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w400"
+    });
+
+  } catch(err) {
+    Logger.log("uploadImage ERR: " + err);
+    return createResponse({status:"error", message: err.toString()});
+  }
+}
+
+// ================================================================
+// calculateGred
+// ================================================================
+function calculateGred(m) {
+  if (m>=90) return "A+"; if (m>=80) return "A"; if (m>=75) return "A-";
+  if (m>=70) return "B+"; if (m>=65) return "B"; if (m>=60) return "B-";
+  if (m>=55) return "C+"; if (m>=50) return "C"; if (m>=40) return "C-";
+  if (m>=30) return "D+"; if (m>=20) return "D"; return "F";
+}
