@@ -89,7 +89,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
 .fade-in{animation:fadeIn 0.3s ease forwards;}
 .prog-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;}
 .prog-bar-fill{height:100%;border-radius:6px;transition:width 0.5s;}
-/* Avatar image fix */
 .avatar-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;}
 .avatar-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(139,92,246,0.3));border-radius:inherit;}
 @media(max-width:768px){
@@ -220,7 +219,7 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
     <div style="margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
       <p style="font-size:9px;color:var(--text-muted);line-height:1.9;">
         © 2025–2026 Unit Kokurikulum IPG Kampus Darulaman<br>
-        <span style="color:rgba(59,130,246,0.45);font-size:8px;letter-spacing:0.05em;">v4.2 · GKKO1062</span>
+        <span style="color:rgba(59,130,246,0.45);font-size:8px;letter-spacing:0.05em;">v4.3 · GKKO1062</span>
       </p>
     </div>
   </div>
@@ -248,11 +247,9 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
 
   <!-- Student Content -->
   <div style="max-width:800px;width:100%;margin:0 auto;padding:20px 16px;flex:1;">
-
     <!-- Profile Card -->
     <div class="glass fade-in" style="padding:20px;margin-bottom:16px;border-radius:1.5rem;">
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <!-- Avatar -->
         <div id="sAvatarWrap" style="width:72px;height:72px;border-radius:16px;overflow:hidden;flex-shrink:0;border:2px solid rgba(59,130,246,0.3);position:relative;">
           <div class="avatar-placeholder" id="sAvatarPlaceholder">
             <i class="fas fa-user" style="color:rgba(255,255,255,0.4);font-size:24px;"></i>
@@ -268,7 +265,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
             <span class="hpk-badge hpk3"><i class="fas fa-list-ol" style="font-size:9px;"></i> Giliran: <span id="sGiliran">—</span></span>
           </div>
         </div>
-        <!-- Upload Photo -->
         <div style="flex-shrink:0;">
           <input type="file" id="photoUpload" accept="image/*" style="display:none;" onchange="uploadPhoto()">
           <button onclick="document.getElementById('photoUpload').click()" class="btn-outline" style="padding:10px 14px;border-radius:12px;font-size:10px;display:flex;align-items:center;gap:6px;">
@@ -288,7 +284,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
 
     <!-- Tab: Markah -->
     <div id="sTab-markah" class="fade-in">
-      <!-- Scores Display -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
         <div style="padding:14px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);border-radius:14px;text-align:center;">
           <div style="font-size:9px;font-weight:800;color:#93c5fd;text-transform:uppercase;margin-bottom:6px;">HPK1 · Ujian</div>
@@ -307,7 +302,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
         </div>
       </div>
 
-      <!-- Jumlah & Gred -->
       <div class="panel" style="padding:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
           <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Jumlah Markah Akhir</div>
@@ -347,7 +341,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
         <div class="alert-info"><i class="fas fa-spinner fa-spin"></i> Memuatkan data rubrik...</div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -361,7 +354,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
       <button onclick="closePeerModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;">✕</button>
     </div>
 
-    <!-- Target info -->
     <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;">
       <div id="peerTargetAvatar" style="width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(139,92,246,0.3));display:flex;align-items:center;justify-content:center;">
         <i class="fas fa-user" style="color:rgba(255,255,255,0.4);font-size:18px;"></i>
@@ -372,7 +364,6 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
       </div>
     </div>
 
-    <!-- Questions -->
     <div id="peerQs"></div>
 
     <div style="margin-top:12px;">
@@ -475,7 +466,7 @@ let peerScores    = {};
 let newUserReg    = false;
 
 // =================================================================
-// UTILITY
+// UTILITY FUNCTIONS
 // =================================================================
 function toast(msg, type='success') {
   const t = document.getElementById('toast');
@@ -497,46 +488,79 @@ function showErr(msg) {
   setTimeout(() => d.style.display = 'none', 5000);
 }
 
+// Fungsi apiGet yang dibetulkan
 async function apiGet(params) {
   const qs = new URLSearchParams(params).toString();
-  // Google Apps Script perlu redirect:follow dan no mode:cors
-  const res = await fetch(API + '?' + qs, {
-    redirect: 'follow',
-    method: 'GET',
-    headers: { 'Content-Type': 'text/plain' }
-  });
-  const txt = await res.text();
-  try { return JSON.parse(txt); }
-  catch(e) { console.error('apiGet parse error:', txt); throw e; }
+  const url = API + '?' + qs;
+  
+  console.log('API GET URL:', url);
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    
+    const text = await response.text();
+    console.log('API Response text:', text.substring(0, 200));
+    
+    try {
+      const data = JSON.parse(text);
+      console.log('Parsed JSON:', data);
+      return data;
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      throw new Error('Respons pelayan tidak sah. Sila semak Console (F12) untuk maklumat lanjut.');
+    }
+  } catch (error) {
+    console.error('API GET Error:', error);
+    throw error;
+  }
 }
 
+// Fungsi apiPost yang dibetulkan
 async function apiPost(body) {
-  // GAS tidak boleh baca application/json dari CORS — hantar sebagai text/plain
-  const res = await fetch(API, {
-    redirect: 'follow',
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(body)
-  });
-  const txt = await res.text();
-  try { return JSON.parse(txt); }
-  catch(e) { console.error('apiPost parse error:', txt); throw e; }
+  console.log('API POST Body:', body);
+  
+  try {
+    const response = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(body)
+    });
+    
+    const text = await response.text();
+    console.log('API POST Response:', text.substring(0, 200));
+    
+    try {
+      return JSON.parse(text);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      throw new Error('Respons pelayan tidak sah. Sila semak Console (F12) untuk maklumat lanjut.');
+    }
+  } catch (error) {
+    console.error('API POST Error:', error);
+    throw error;
+  }
 }
 
-// Tukar Google Drive URL kepada thumbnail
+// Convert Google Drive URL to thumbnail
 function driveThumb(url) {
   if (!url) return null;
   const m1 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (m1) return 'https://drive.google.com/thumbnail?id=' + m1[1] + '&sz=w400';
   const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   if (m2) return 'https://drive.google.com/thumbnail?id=' + m2[1] + '&sz=w400';
-  // Kalau sudah dalam format thumbnail
   if (url.includes('thumbnail')) return url;
   return null;
 }
 
 // =================================================================
-// LOGIN
+// LOGIN FUNCTIONS
 // =================================================================
 function setType(t) {
   loginType = t;
@@ -555,66 +579,99 @@ async function handleAuth() {
   const nama = document.getElementById('namaIn').value.trim();
   const btn = document.getElementById('loginBtn');
 
-  if (!id) { showErr('Sila masukkan ID/Emel'); return; }
+  if (!id) { 
+    showErr('Sila masukkan ID/Emel'); 
+    return; 
+  }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Menyemak...';
 
   try {
     if (loginType === 'student') {
+      console.log('Student login attempt with KP:', id);
       const r = await apiGet({ action: 'checkLogin', noKP: id });
-      if (r.status === 'success') {
+      console.log('Student login response:', r);
+      
+      if (r && r.status === 'success') {
         studentState.data = r.data;
         showStudentDash();
         toast('Selamat datang, ' + r.data.Nama_Pelajar);
       } else {
-        showErr(r.message || 'No. KP tidak dijumpai dalam sistem.');
+        showErr(r?.message || 'No. KP tidak dijumpai dalam sistem.');
       }
     } else {
-      // Lecturer
+      // Lecturer login
       if (newUserReg) {
-        // Daftar baru
-        if (!nama) { showErr('Sila masukkan nama anda'); btn.disabled=false; btn.innerHTML='<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i><span id="loginBtnTxt">DAFTAR</span>'; return; }
-        if (!pw)   { showErr('Sila masukkan password'); btn.disabled=false; btn.innerHTML='<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i><span id="loginBtnTxt">DAFTAR</span>'; return; }
-        const r = await apiPost({ action: 'registerLecturer', email: id, nama: nama, pass: pw });
-        if (r.status === 'success') {
+        if (!nama) { 
+          showErr('Sila masukkan nama anda'); 
+          btn.disabled = false; 
+          btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i>DAFTAR'; 
+          return; 
+        }
+        if (!pw) { 
+          showErr('Sila masukkan password'); 
+          btn.disabled = false; 
+          btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i>DAFTAR'; 
+          return; 
+        }
+        
+        console.log('Registering new lecturer:', { email: id, nama, pass: pw });
+        const r = await apiPost({ 
+          action: 'registerLecturer', 
+          email: id, 
+          nama: nama, 
+          pass: pw 
+        });
+        console.log('Register response:', r);
+        
+        if (r && r.status === 'success') {
           lecturerState.email = id;
-          lecturerState.name  = nama;
+          lecturerState.name = nama;
           showLecturerDash();
           toast('Akaun berjaya didaftar!');
         } else {
-          showErr('Gagal mendaftar. Cuba lagi.');
+          showErr(r?.message || 'Gagal mendaftar. Cuba lagi.');
         }
       } else {
-        if (!pw) { showErr('Sila masukkan password'); btn.disabled=false; btn.innerHTML='<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i><span id="loginBtnTxt">MASUK SISTEM</span>'; return; }
-        const r = await apiGet({ action: 'lecturerLogin', email: id, pass: pw });
-        if (r.status === 'success') {
+        if (!pw) { 
+          showErr('Sila masukkan password'); 
+          btn.disabled = false; 
+          btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i>MASUK SISTEM'; 
+          return; 
+        }
+        
+        console.log('Lecturer login attempt:', { email: id, pass: pw });
+        const r = await apiGet({ 
+          action: 'lecturerLogin', 
+          email: id, 
+          pass: pw 
+        });
+        console.log('Lecturer login response:', r);
+        
+        if (r && r.status === 'success') {
           lecturerState.email = id;
-          lecturerState.name  = r.name;
+          lecturerState.name = r.name;
           showLecturerDash();
           toast('Selamat datang, ' + r.name);
-        } else if (r.status === 'new_user') {
-          // Tunjuk borang pendaftaran
+        } else if (r && r.status === 'new_user') {
           newUserReg = true;
           document.getElementById('namaIn').style.display = 'block';
           document.getElementById('loginBtnTxt').textContent = 'DAFTAR AKAUN';
           showErr('Emel baru. Sila masukkan nama untuk mendaftar.');
         } else {
-          showErr(r.message || 'Login gagal.');
+          showErr(r?.message || 'Login gagal. Sila semak emel dan password.');
         }
       }
     }
   } catch(e) {
     console.error('Auth error:', e);
-    if (e instanceof TypeError && e.message.includes('fetch')) {
-      showErr('Ralat sambungan: Tidak dapat hubungi pelayan. Pastikan Apps Script sudah di-deploy sebagai "Anyone".');
-    } else {
-      showErr('Ralat: ' + e.message);
-    }
+    showErr('Ralat sambungan: ' + e.message + '\n\nSila pastikan:\n1. Apps Script sudah di-deploy sebagai "Anyone"\n2. URL API adalah betul\n3. Sheet ID adalah betul\n\nLihat console (F12) untuk maklumat lanjut.');
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i><span id="loginBtnTxt">' + (newUserReg ? 'DAFTAR AKAUN' : 'MASUK SISTEM') + '</span>';
+  btn.innerHTML = '<i class="fas fa-right-to-bracket" style="margin-right:8px;"></i>' + 
+    (newUserReg ? 'DAFTAR AKAUN' : 'MASUK SISTEM');
 }
 
 // =================================================================
@@ -631,16 +688,9 @@ function showStudentDash() {
   document.getElementById('sKelas').textContent   = s.Kelas || '—';
   document.getElementById('sGiliran').textContent = s.No_Giliran || '—';
 
-  // Paparkan gambar kalau ada
   loadStudentAvatar(s.Link_Gambar);
-
-  // Muatkan markah
   loadStudentMarkah();
-
-  // Muatkan peer eval
   loadPeerList();
-
-  // Muatkan rubrik
   loadRubrikStatus();
 }
 
@@ -665,18 +715,9 @@ function loadStudentAvatar(url) {
 
 function loadStudentMarkah() {
   const s = studentState.data;
-  // Markah ada dalam data pelajar jika sudah diisi
-  // Cuba cari dalam markahSediaAda (untuk pelajar, kita check data terus)
-  // Markah disimpan dalam MARKAH_PELAJAR, jadi kita perlu panggil API semula dengan data yang ada
-  // Kita akan display apa yang ada dalam data dari checkLogin
-  // Kalau markah belum ada, tunjuk mesej
-  
-  // Note: markah pelajar tidak disimpan dalam DATA_PELAJAR, 
-  // tapi dalam MARKAH_PELAJAR. Kita perlu cara lain.
-  // Penyelesaian: Tambah action getStudentMarkah atau embed dalam checkLogin
-  // Untuk sekarang, kita muatkan semula dengan action khas
   
   apiGet({ action: 'getStudentMarkah', noKP: s.No_KP }).then(r => {
+    console.log('Markah response:', r);
     if (r && r.status === 'success' && r.data) {
       const m = r.data;
       const hp1 = parseFloat(m.hp1) || 0;
@@ -699,7 +740,8 @@ function loadStudentMarkah() {
     } else {
       document.getElementById('sNoMarkah').style.display = 'flex';
     }
-  }).catch(() => {
+  }).catch(err => {
+    console.error('Error loading markah:', err);
     document.getElementById('sNoMarkah').style.display = 'flex';
   });
 }
@@ -709,7 +751,7 @@ function sTabs(tab, btn) {
     const el = document.getElementById('sTab-' + t);
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
-  document.querySelectorAll('.tab-bar .tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#studentDash .tab-bar .tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 }
 
@@ -721,6 +763,8 @@ async function loadPeerList() {
   const cont = document.getElementById('peerContent');
   try {
     const r = await apiGet({ action: 'getClassmates', noKP: s.No_KP, kelas: s.Kelas });
+    console.log('Classmates response:', r);
+    
     if (r.status !== 'success') {
       cont.innerHTML = '<div class="alert-warn"><i class="fas fa-exclamation-triangle"></i> Gagal memuatkan senarai rakan.</div>';
       return;
@@ -733,7 +777,6 @@ async function loadPeerList() {
       return;
     }
 
-    // Progress
     const done  = studentState.peerDone.size;
     const total = studentState.classmates.length;
     const pct   = Math.round((done / total) * 100);
@@ -796,7 +839,6 @@ function openPeerModal(targetKP) {
   document.getElementById('peerTargetNama').textContent  = cm.Nama_Pelajar || '—';
   document.getElementById('peerTargetKelas').textContent = cm.Kelas || '—';
 
-  // Avatar dalam modal
   const avatarDiv = document.getElementById('peerTargetAvatar');
   const thumb = driveThumb(cm.Link_Gambar);
   if (thumb) {
@@ -805,7 +847,6 @@ function openPeerModal(targetKP) {
     avatarDiv.innerHTML = '<i class="fas fa-user" style="color:rgba(255,255,255,0.4);font-size:18px;"></i>';
   }
 
-  // Soalan
   let qHtml = '';
   peerQDefs.forEach(q => {
     qHtml += `
@@ -862,6 +903,8 @@ async function submitPeerEval() {
       note: document.getElementById('peerNote').value
     });
 
+    console.log('Peer eval response:', r);
+
     if (r.status === 'success') {
       toast('Penilaian berjaya dihantar!');
       closePeerModal();
@@ -889,6 +932,8 @@ async function loadRubrikStatus() {
   const cont = document.getElementById('rubrikContent');
   try {
     const r = await apiGet({ action: 'getRubrikStatus', noKP: s.No_KP });
+    console.log('Rubrik response:', r);
+    
     if (!r.ada) {
       cont.innerHTML = '<div class="alert-warn"><i class="fas fa-clock"></i> Rubrik belum dinilai oleh pensyarah.</div>';
       return;
@@ -965,6 +1010,8 @@ async function uploadPhoto() {
         fileName:  'gambar_' + studentState.data.No_KP + '_' + Date.now() + '.' + file.name.split('.').pop()
       });
 
+      console.log('Upload response:', r);
+
       if (r.status === 'success') {
         const thumbUrl = 'https://drive.google.com/thumbnail?id=' + r.fileId + '&sz=w400';
         loadStudentAvatar(r.fileUrl);
@@ -1003,7 +1050,6 @@ async function loadLecturerStudents() {
   try {
     const r = await apiGet({ action: 'getLecturerStudents', email: lecturerState.email });
     
-    // Debug — tunjuk dalam console untuk diagnos masalah
     console.log('=== DEBUG getLecturerStudents ===');
     console.log('Email dihantar:', lecturerState.email);
     console.log('Nama pensyarah:', r.debug_nama);
@@ -1015,7 +1061,6 @@ async function loadLecturerStudents() {
       return;
     }
     
-    // Kalau tiada pelajar dijumpai, tunjuk info debug
     if (!r.data || r.data.length === 0) {
       const penilaiList = r.debug_penilai ? Object.keys(r.debug_penilai).join(', ') : '(kosong)';
       document.getElementById('sList').innerHTML = `
@@ -1096,7 +1141,6 @@ function filterStudents(q) {
 let selectedStudentIdx = null;
 
 function selectStudent(i) {
-  // Highlight selected
   document.querySelectorAll('#sList .s-card').forEach(c => c.classList.remove('selected'));
   const card = document.getElementById('scard-' + i);
   if (card) card.classList.add('selected');
@@ -1114,7 +1158,6 @@ function renderMarkingPanel(s) {
     ? `<img src="${thumb}" style="width:80px;height:80px;border-radius:16px;object-fit:cover;border:2px solid rgba(59,130,246,0.3);" onerror="this.style.display='none';">`
     : `<div style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(139,92,246,0.3));display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class='fas fa-user' style='color:rgba(255,255,255,0.4);font-size:28px;'></i></div>`;
 
-  // Peer summary
   let peerHtml = '';
   if (s.peerSummary && s.peerSummary.count > 0) {
     const ps = s.peerSummary;
@@ -1134,7 +1177,6 @@ function renderMarkingPanel(s) {
     `;
   }
 
-  // Rubrik checklist
   let rubrikHtml = '';
   if (s.rubrikChecklist) {
     rubrikHtml = `
@@ -1150,7 +1192,6 @@ function renderMarkingPanel(s) {
 
   document.getElementById('lDetailPanel').innerHTML = `
     <div class="fade-in">
-      <!-- Profile -->
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
         ${avatarHtml}
         <div>
@@ -1167,13 +1208,11 @@ function renderMarkingPanel(s) {
       ${peerHtml}
       ${rubrikHtml}
 
-      <!-- Marking Form -->
       <div class="panel" style="padding:16px;margin-bottom:14px;">
         <div style="font-size:11px;font-weight:800;color:white;margin-bottom:14px;">
           <i class="fas fa-star" style="color:var(--amber);margin-right:6px;"></i>Pemarkahan Pelajar
         </div>
 
-        <!-- HPK1 -->
         <div class="q-block">
           <div class="dim-label">HPK1 — Ujian <span style="color:var(--text-muted);">(0–30)</span></div>
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1186,7 +1225,6 @@ function renderMarkingPanel(s) {
           </div>
         </div>
 
-        <!-- HPK2 -->
         <div class="q-block">
           <div class="dim-label">HPK2 — Persembahan <span style="color:var(--text-muted);">(0–20)</span></div>
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1199,7 +1237,6 @@ function renderMarkingPanel(s) {
           </div>
         </div>
 
-        <!-- HPK3 -->
         <div class="q-block">
           <div class="dim-label">HPK3 — Penulisan <span style="color:var(--text-muted);">(0–50)</span></div>
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1212,7 +1249,6 @@ function renderMarkingPanel(s) {
           </div>
         </div>
 
-        <!-- Preview -->
         <div id="markahPreview" style="display:flex;gap:16px;padding:14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;margin-top:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
           <div style="flex:1;">
             <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">Jumlah</div>
@@ -1224,7 +1260,6 @@ function renderMarkingPanel(s) {
           </div>
         </div>
 
-        <!-- Justifikasi -->
         <div style="margin-bottom:12px;">
           <label style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px;">Justifikasi / Komen</label>
           <textarea id="mJustifikasi" style="width:100%;padding:10px 14px;font-size:12px;border-radius:12px;resize:none;" rows="2"
@@ -1237,12 +1272,11 @@ function renderMarkingPanel(s) {
         ${m ? '<div class="alert-success" style="margin-top:10px;font-size:11px;"><i class="fas fa-check-circle"></i> Markah sudah disimpan. Anda boleh kemas kini.</div>' : ''}
       </div>
 
-      <!-- Rubrik Checklist Form -->
       <div class="panel" style="padding:16px;">
         <div style="font-size:11px;font-weight:800;color:white;margin-bottom:14px;">
           <i class="fas fa-clipboard-list" style="color:var(--cyan);margin-right:6px;"></i>Rubrik Pemarkahan Checklist
         </div>
-        <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Tandakan skor 1-4 bagi setiap kriteria.</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Tandakan skor 1-5 bagi setiap kriteria.</div>
 
         <div style="font-size:10px;font-weight:800;color:#93c5fd;text-transform:uppercase;margin-bottom:8px;">HPK1 — Ujian</div>
         ${renderRubrikQ('u', [
@@ -1258,7 +1292,7 @@ function renderMarkingPanel(s) {
           'Interaksi Audiens','Keseluruhan'
         ], s.rubrikChecklist, true)}
 
-        <button onclick="submitRubrikChecklist('${s.No_KP}','${(s.Nama_Pelajar||'').replace(/'/g,'')}',' ${s.Kelas||''}')" 
+        <button onclick="submitRubrikChecklist('${s.No_KP}','${(s.Nama_Pelajar||'').replace(/'/g,"\\'")}','${s.Kelas||''}')" 
           class="btn-grad" style="width:100%;padding:12px;border-radius:12px;font-size:11px;margin-top:12px;"
           id="submitRubrikBtn">
           <i class="fas fa-save" style="margin-right:8px;"></i>SIMPAN RUBRIK
@@ -1270,7 +1304,7 @@ function renderMarkingPanel(s) {
   updateMarkahPreview();
 }
 
-function renderRubrikQ(prefix, labels, existing, isP = false) {
+function renderRubrikQ(prefix, labels, existing) {
   const src = existing || {};
   return labels.map((lbl, i) => {
     const key = prefix + (i+1);
@@ -1291,8 +1325,6 @@ let rubrikScores = {};
 
 function setRubrikScore(key, val) {
   rubrikScores[key] = val;
-  const prefix = key[0];
-  const idx    = parseInt(key.slice(1));
   for (let v = 1; v <= 5; v++) {
     const btn = document.getElementById(`rub-${key}-${v}`);
     if (btn) {
@@ -1323,9 +1355,10 @@ async function submitRubrikChecklist(noKP, nama, kelas) {
       penilai:      lecturerState.name
     });
 
+    console.log('Rubrik submit response:', r);
+
     if (r.status === 'success') {
       toast(`Rubrik disimpan. Cad HP1: ${r.cadHP1}, HP2: ${r.cadHP2}`);
-      // Refresh student data
       loadLecturerStudents();
     } else {
       toast('Gagal simpan rubrik.', 'error');
@@ -1386,9 +1419,10 @@ async function submitMarkah(noKP) {
       penilai:     lecturerState.name
     });
 
+    console.log('Submit markah response:', r);
+
     if (r.status === 'success') {
       toast('Markah berjaya disimpan!');
-      // Update local state
       const idx = lecturerState.students.findIndex(s => s.No_KP && s.No_KP.toString().trim() === noKP);
       if (idx >= 0) {
         lecturerState.students[idx].markahSediaAda = {
