@@ -55,6 +55,7 @@ body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .rating-btn.r-2{background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:#fcd34d;}
 .rating-btn.r-3{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#4ade80;}
 .rating-btn.r-4{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#60a5fa;}
+.rating-btn.r-5{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#a5b4fc;}
 .s-card{padding:14px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
 .s-card:hover{background:rgba(59,130,246,0.05);border-left-color:var(--indigo);transform:translateX(4px);}
 .s-card.selected{background:rgba(59,130,246,0.1);border-left-color:var(--indigo);border-color:rgba(129,140,248,0.3);}
@@ -219,7 +220,7 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
     <div style="margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
       <p style="font-size:9px;color:var(--text-muted);line-height:1.9;">
         © 2025–2026 Unit Kokurikulum IPG Kampus Darulaman<br>
-        <span style="color:rgba(59,130,246,0.45);font-size:8px;letter-spacing:0.05em;">v4.1 · GKKO1062</span>
+        <span style="color:rgba(59,130,246,0.45);font-size:8px;letter-spacing:0.05em;">v4.2 · GKKO1062</span>
       </p>
     </div>
   </div>
@@ -463,7 +464,7 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
 // =================================================================
 // CONFIG — TUKAR URL INI KEPADA URL GOOGLE APPS SCRIPT ANDA
 // =================================================================
-const API = "https://script.google.com/macros/s/AKfycbxpByTSzO3-9bvM2AY35XWQJeqW76005HmzXMsOiDmU3_l8tSp2vd6slUY2L84m1kIU/exec";
+const API = "https://script.google.com/macros/s/AKfycbxWURK4PCKO-3sCMBQ-5PqCcS2MxiPGQ_VRVBTPLWNvY7-WRlLBknGq96lJBkVIKRv/exec";
 
 // State
 let loginType = 'student';
@@ -877,8 +878,8 @@ async function loadRubrikStatus() {
       return;
     }
 
-    const pctHP1 = Math.round((r.ujianJumlah / 32) * 100);
-    const pctHP2 = Math.round((r.presJumlah  / 32) * 100);
+    const pctHP1 = Math.round((r.ujianJumlah / 40) * 100);
+    const pctHP2 = Math.round((r.presJumlah  / 40) * 100);
 
     cont.innerHTML = `
       <div class="panel" style="padding:16px;margin-bottom:12px;">
@@ -893,7 +894,7 @@ async function loadRubrikStatus() {
         </div>
         <div class="prog-bar"><div class="prog-bar-fill" style="background:linear-gradient(90deg,#3b82f6,#8b5cf6);width:${pctHP1}%;"></div></div>
         <div style="display:flex;justify-content:space-between;margin-top:6px;">
-          <span style="font-size:10px;color:var(--text-muted);">Jumlah: ${r.ujianJumlah}/32</span>
+          <span style="font-size:10px;color:var(--text-muted);">Jumlah: ${r.ujianJumlah}/40</span>
           <span style="font-size:10px;font-weight:800;color:var(--amber);">Cadangan: ${r.cadHP1}/30</span>
         </div>
       </div>
@@ -910,7 +911,7 @@ async function loadRubrikStatus() {
         </div>
         <div class="prog-bar"><div class="prog-bar-fill" style="background:linear-gradient(90deg,var(--cyan),var(--emerald));width:${pctHP2}%;"></div></div>
         <div style="display:flex;justify-content:space-between;margin-top:6px;">
-          <span style="font-size:10px;color:var(--text-muted);">Jumlah: ${r.presJumlah}/32</span>
+          <span style="font-size:10px;color:var(--text-muted);">Jumlah: ${r.presJumlah}/40</span>
           <span style="font-size:10px;font-weight:800;color:var(--amber);">Cadangan: ${r.cadHP2}/20</span>
         </div>
       </div>
@@ -1262,8 +1263,8 @@ function renderRubrikQ(prefix, labels, existing, isP = false) {
       <div class="q-block" style="margin-bottom:8px;">
         <div class="dim-label">${i+1}. ${lbl}</div>
         <div class="rating-group">
-          ${[1,2,3,4].map(v => `<button class="rating-btn ${v <= val ? 'r-'+v : ''}" id="rub-${key}-${v}"
-            onclick="setRubrikScore('${key}',${v})">${v}<br><span style='font-size:8px;'>${v===1?'Lemah':v===2?'Sederhana':v===3?'Baik':'Cemerlang'}</span></button>`).join('')}
+          ${[1,2,3,4,5].map(v => `<button class="rating-btn ${v <= val ? 'r-'+v : ''}" id="rub-${key}-${v}"
+            onclick="setRubrikScore('${key}',${v})">${v}<br><span style='font-size:8px;'>${v===1?'Lemah':v===2?'Sederhana':v===3?'Memuaskan':v===4?'Baik':'Cemerlang'}</span></button>`).join('')}
         </div>
       </div>
     `;
@@ -1276,7 +1277,7 @@ function setRubrikScore(key, val) {
   rubrikScores[key] = val;
   const prefix = key[0];
   const idx    = parseInt(key.slice(1));
-  for (let v = 1; v <= 4; v++) {
+  for (let v = 1; v <= 5; v++) {
     const btn = document.getElementById(`rub-${key}-${v}`);
     if (btn) {
       btn.className = 'rating-btn' + (v <= val ? ' r-'+v : '');
