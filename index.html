@@ -463,7 +463,7 @@ input:focus,textarea:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(
 // =================================================================
 // CONFIG — TUKAR URL INI KEPADA URL GOOGLE APPS SCRIPT ANDA
 // =================================================================
-const API = "https://script.google.com/macros/s/AKfycbxpByTSzO3-9bvM2AY35XWQJeqW76005HmzXMsOiDmU3_l8tSp2vd6slUY2L84m1kIU/exec";
+const API = "https://script.google.com/macros/s/AKfycbxWURK4PCKO-3sCMBQ-5PqCcS2MxiPGQ_VRVBTPLWNvY7-WRlLBknGq96lJBkVIKRv/exec";
 
 // State
 let loginType = 'student';
@@ -985,10 +985,37 @@ async function loadLecturerStudents() {
   document.getElementById('sList').innerHTML = '<div class="alert-info" style="font-size:11px;"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</div>';
   try {
     const r = await apiGet({ action: 'getLecturerStudents', email: lecturerState.email });
+    
+    // Debug — tunjuk dalam console untuk diagnos masalah
+    console.log('=== DEBUG getLecturerStudents ===');
+    console.log('Email dihantar:', lecturerState.email);
+    console.log('Nama pensyarah:', r.debug_nama);
+    console.log('Nilai Penilai dalam sheet:', r.debug_penilai);
+    console.log('Pelajar dijumpai:', (r.data||[]).length);
+    
     if (r.status !== 'success') {
       document.getElementById('sList').innerHTML = '<div class="alert-warn" style="font-size:11px;"><i class="fas fa-exclamation-triangle"></i> Gagal memuatkan senarai pelajar.</div>';
       return;
     }
+    
+    // Kalau tiada pelajar dijumpai, tunjuk info debug
+    if (!r.data || r.data.length === 0) {
+      const penilaiList = r.debug_penilai ? Object.keys(r.debug_penilai).join(', ') : '(kosong)';
+      document.getElementById('sList').innerHTML = `
+        <div class="alert-warn" style="font-size:11px;">
+          <div><i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i><strong>Tiada pelajar ditugaskan kepada anda.</strong></div>
+          <div style="margin-top:8px;font-size:10px;opacity:0.8;">
+            Emel anda: <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;">${lecturerState.email}</code><br>
+            Nama anda: <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;">${r.debug_nama || '—'}</code><br>
+            Nilai Penilai dalam sheet: <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;">${penilaiList}</code>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:#fbbf24;">
+            ⚠️ Pastikan kolum <strong>Penilai</strong> dalam sheet DATA_PELAJAR mengandungi emel atau nama yang sama dengan akaun anda.
+          </div>
+        </div>`;
+      return;
+    }
+
     lecturerState.students = r.data || [];
     renderStudentList(lecturerState.students);
     updateLecturerStats();
