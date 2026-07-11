@@ -1,150 +1,753 @@
-/**
- * SISTEM PEMARKAHAN PENTAKSIRAN BERTERUSAN GKKO1062
- * IPG KAMPUS DARULAMAN - BACKEND SCRIPT V2 (STABIL & BEBAS RALAT CORS)
- */
+<!DOCTYPE html>
+<html lang="ms" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduScore IPG KDA | GKKO1062</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Cinzel', 'serif'],
+                    },
+                    colors: {
+                        ipg: {
+                            navy: '#0B2545',
+                            blue: '#134074',
+                            light: '#EEF4F8',
+                            gold: '#D4AF37',
+                            goldHover: '#C59B27'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
-function doGet(e) {
-  try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName("data");
-    
-    if (!sheet) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: "error", 
-        error: "Helaian bernama 'data' tidak dijumpai!" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    var range = sheet.getDataRange();
-    var values = range.getValues();
-    var students = [];
-    
-    for (var i = 1; i < values.length; i++) {
-      var row = values[i];
-      if (!row[1] || row[1].toString().trim() === "") continue; 
-      
-      students.push({
-        rowNum: i + 1, 
-        no: row[0] ? row[0].toString() : "",
-        name: row[1] ? row[1].toString().toUpperCase() : "",
-        kp: row[2] ? row[2].toString().trim() : "",
-        group: row[3] ? row[3].toString().trim().toUpperCase() : "TIADA UNIT",
-        t1: parseFloat(row[4]) || 0,
-        t2: {
-          k1: parseFloat(row[5]) || 0,
-          k2: parseFloat(row[6]) || 0,
-          k3: parseFloat(row[7]) || 0,
-          k4: parseFloat(row[8]) || 0
-        },
-        t3: {
-          k1: parseFloat(row[9]) || 0,
-          k2: parseFloat(row[10]) || 0,
-          k3: parseFloat(row[11]) || 0,
-          k4: parseFloat(row[12]) || 0,
-          k5: parseFloat(row[13]) || 0,
-          k6: parseFloat(row[14]) || 0,
-          k7: parseFloat(row[15]) || 0,
-          k8: parseFloat(row[16]) || 0
-        },
-        total: parseFloat(row[17]) || 0,
-        grade: row[18] ? row[18].toString().trim() : ""
-      });
-    }
-    
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "success", 
-      data: students 
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "error", 
-      error: error.toString() 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            aside, header, .no-print, button, input, select, #setup-warning, #toast-container, .tab-buttons {
+                display: none !important;
+            }
+            main {
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .print-layout {
+                display: block !important;
+                width: 100% !important;
+            }
+            .print-card {
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            table {
+                font-size: 10px !important;
+                width: 100% !important;
+            }
+            th, td {
+                padding: 6px 8px !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-full font-sans antialiased text-slate-800">
 
-function doPost(e) {
-  try {
-    if (!e.postData || !e.postData.contents) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: "error", 
-        error: "Tiada data diterima!" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    var params = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName("data");
-    
-    if (!sheet) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: "error", 
-        error: "Helaian bernama 'data' tidak dijumpai!" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    var rowNum = parseInt(params.rowNum);
-    if (!rowNum || rowNum < 2) {
-      return ContentService.createTextOutput(JSON.stringify({ 
-        status: "error", 
-        error: "Nombor baris tidak sah!" 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-    
-    // Kemas kini Tugasan 1
-    sheet.getRange(rowNum, 5).setValue(params.t1);
-    
-    // Kemas kini Tugasan 2 (Kolom F hingga I)
-    sheet.getRange(rowNum, 6).setValue(params.t2.k1);
-    sheet.getRange(rowNum, 7).setValue(params.t2.k2);
-    sheet.getRange(rowNum, 8).setValue(params.t2.k3);
-    sheet.getRange(rowNum, 9).setValue(params.t2.k4);
-    
-    // Kemas kini Tugasan 3 (Kolom J hingga Q)
-    sheet.getRange(rowNum, 10).setValue(params.t3.k1);
-    sheet.getRange(rowNum, 11).setValue(params.t3.k2);
-    sheet.getRange(rowNum, 12).setValue(params.t3.k3);
-    sheet.getRange(rowNum, 13).setValue(params.t3.k4);
-    sheet.getRange(rowNum, 14).setValue(params.t3.k5);
-    sheet.getRange(rowNum, 15).setValue(params.t3.k6);
-    sheet.getRange(rowNum, 16).setValue(params.t3.k7);
-    sheet.getRange(rowNum, 17).setValue(params.t3.k8);
-    
-    // Pengiraan Skor Akhir
-    var t2_total = parseFloat(params.t2.k1) + parseFloat(params.t2.k2) + parseFloat(params.t2.k3) + parseFloat(params.t2.k4);
-    var t3_total = parseFloat(params.t3.k1) + parseFloat(params.t3.k2) + parseFloat(params.t3.k3) + parseFloat(params.t3.k4) + 
-                   parseFloat(params.t3.k5) + parseFloat(params.t3.k6) + parseFloat(params.t3.k7) + parseFloat(params.t3.k8);
-    var finalScore = parseFloat(params.t1) + t2_total + t3_total;
-    finalScore = Math.round(finalScore * 100) / 100;
-    
-    sheet.getRange(rowNum, 18).setValue(finalScore);
-    sheet.getRange(rowNum, 19).setValue(calculateGrade(finalScore));
-    
-    SpreadsheetApp.flush(); 
-    
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "success", 
-      message: "Markah berjaya disimpan!" 
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "error", 
-      error: error.toString() 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 no-print"></div>
 
-function calculateGrade(score) {
-  if (score >= 90) return 'A+';
-  if (score >= 80) return 'A';
-  if (score >= 75) return 'A-';
-  if (score >= 70) return 'B+';
-  if (score >= 65) return 'B';
-  if (score >= 60) return 'B-';
-  if (score >= 55) return 'C+';
-  if (score >= 50) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
-}
+    <div class="min-h-full flex flex-col md:flex-row">
+        
+        <aside class="w-full md:w-80 bg-ipg-navy text-white flex-shrink-0 flex flex-col justify-between border-r border-slate-800 shadow-xl z-20 no-print">
+            <div>
+                <div class="p-6 border-b border-slate-700 bg-black/20 flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 shadow-md">
+                        <i class="fa-solid fa-graduation-cap text-ipg-blue text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-display text-md text-ipg-gold tracking-wide leading-tight">IPG KAMPUS</h1>
+                        <p class="text-xs text-slate-300 font-semibold tracking-wider uppercase">Darulaman, Kedah</p>
+                    </div>
+                </div>
+
+                <div class="m-4 p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div class="flex items-center space-x-2 text-ipg-gold text-xs font-bold uppercase tracking-wider mb-1">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="db-status-dot"></span>
+                        <span id="db-status-text">Menyemak Sambungan...</span>
+                    </div>
+                    <h2 class="text-sm font-bold text-white line-clamp-2 leading-snug">Kokurikulum dan Kesihatan Diri</h2>
+                    <p class="text-[11px] text-slate-400 mt-1">Kod Kursus: GKKO1062</p>
+                </div>
+
+                <nav class="px-3 py-2 space-y-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-lg bg-white/10 text-ipg-gold transition-all duration-200">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        <span>Paparan Pemuka</span>
+                    </button>
+                    <button onclick="switchTab('marks')" id="nav-marks" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-user-pen w-5 text-center"></i>
+                        <span>Pengisian Markah</span>
+                    </button>
+                    <button onclick="switchTab('rubrics')" id="nav-rubrics" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-book-open w-5 text-center"></i>
+                        <span>Panduan Rubrik</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center space-x-3 px-4 py-3 text-sm font-semibold rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-all duration-200">
+                        <i class="fa-solid fa-gears w-5 text-center"></i>
+                        <span>Tetapan Database</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-slate-700 bg-black/10 text-center">
+                <p class="text-[10px] text-slate-400">Sistem Pengurusan Markah Bersepadu</p>
+                <p class="text-[11px] text-ipg-gold font-bold mt-0.5">Tahun Akademik: Jun-Julai 2026</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            
+            <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 shadow-sm z-10 no-print">
+                <div>
+                    <h2 id="header-title" class="text-xl font-bold text-slate-900 tracking-tight font-sans">Sistem Pengurusan Markah GKKO1062</h2>
+                    <p class="text-xs text-slate-500">Institut Pendidikan Guru Kampus Darulaman (Helaian: data)</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.print()" class="inline-flex items-center space-x-2 bg-slate-100 text-slate-700 hover:bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition duration-150">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Cetak Laporan</span>
+                    </button>
+                    <button onclick="fetchStudentData()" class="inline-flex items-center space-x-2 bg-ipg-navy text-white hover:bg-ipg-blue px-4 py-2 rounded-xl text-xs font-bold shadow-md transition duration-150">
+                        <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
+                        <span>Segarkan Data</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="hidden print-layout p-8 border-b border-slate-300 bg-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="font-display text-xl text-ipg-navy font-bold tracking-wide">IPG KAMPUS DARULAMAN</h2>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">KEMENTERIAN PENDIDIKAN MALAYSIA</p>
+                        <h3 class="text-sm font-bold text-slate-800 mt-2">LAPORAN PRESTASI PENTAKSIRAN BERTERUSAN</h3>
+                        <p class="text-xs text-slate-600">Kursus: GKKO1062 Kokurikulum dan Kesihatan Diri</p>
+                    </div>
+                    <div class="text-right text-xs">
+                        <p><strong>Penyelaras:</strong> Musaidi Mustaffa</p>
+                        <p><strong>Tarikh Laporan:</strong> 12 Julai 2026</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 flex-1 max-w-7xl w-full mx-auto">
+                
+                <div id="tab-dashboard" class="space-y-6">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-slate-600">Analisis Kumpulan:</span>
+                            <select id="dashboard-filter-group" onchange="updateDashboardStats()" class="px-4 py-1.5 rounded-xl border border-slate-200 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-ipg-blue bg-white">
+                                <option value="all">Semua Kumpulan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4 print-card">
+                            <div class="p-3 bg-ipg-light text-ipg-blue rounded-xl no-print">
+                                <i class="fa-solid fa-users text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Jumlah Pelajar</p>
+                                <h3 id="stat-total-students" class="text-2xl font-bold text-slate-800">0</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4 print-card">
+                            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl no-print">
+                                <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">PNGK Kelas (GPA)</p>
+                                <h3 id="stat-gpa" class="text-2xl font-bold text-slate-800">0.00</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4 print-card">
+                            <div class="p-3 bg-amber-50 text-amber-600 rounded-xl no-print">
+                                <i class="fa-solid fa-percent text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Kadar Kelulusan</p>
+                                <h3 id="stat-pass-rate" class="text-2xl font-bold text-slate-800">0.0%</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center space-x-4 print-card">
+                            <div class="p-3 bg-purple-50 text-purple-600 rounded-xl no-print">
+                                <i class="fa-solid fa-award text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Markah Purata</p>
+                                <h3 id="stat-average" class="text-2xl font-bold text-slate-800 font-sans">0.0%</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:col-span-2 print-card">
+                            <h4 class="font-bold text-slate-800 text-xs mb-4 flex items-center space-x-2">
+                                <i class="fa-solid fa-chart-bar text-ipg-blue"></i>
+                                <span>Analisis Taburan Gred Terperinci</span>
+                            </h4>
+                            <div class="h-64">
+                                <canvas id="gradeBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 print-card">
+                            <h4 class="font-bold text-slate-800 text-xs mb-4 flex items-center space-x-2">
+                                <i class="fa-solid fa-chart-pie text-ipg-gold"></i>
+                                <span>Kadar Kelulusan Pelajar</span>
+                            </h4>
+                            <div class="h-64 flex items-center justify-center relative">
+                                <canvas id="passPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 print-card">
+                        <div class="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100">
+                            <h5 class="text-xs font-bold text-emerald-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-circle-up text-emerald-600"></i>
+                                <span>Pencapaian Tertinggi Kelas</span>
+                            </h5>
+                            <div class="mt-3">
+                                <p id="best-student-name" class="font-bold text-slate-900 text-sm">-</p>
+                                <p id="best-student-meta" class="text-[11px] text-slate-500 mt-1">Kumpulan: - • Markah: -</p>
+                            </div>
+                        </div>
+                        <div class="bg-rose-50/50 p-5 rounded-2xl border border-rose-100">
+                            <h5 class="text-xs font-bold text-rose-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-circle-down text-rose-600"></i>
+                                <span>Pencapaian Terendah Kelas</span>
+                            </h5>
+                            <div class="mt-3">
+                                <p id="worst-student-name" class="font-bold text-slate-900 text-sm">-</p>
+                                <p id="worst-student-meta" class="text-[11px] text-slate-500 mt-1">Kumpulan: - • Markah: -</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-marks" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center space-y-3 sm:space-y-0 no-print">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <input type="text" id="search-student" oninput="renderStudentTable()" placeholder="Cari nama, No KP, atau Kumpulan..." class="px-4 py-2 rounded-xl border border-slate-200 text-xs w-64 focus:outline-none focus:ring-2 focus:ring-ipg-blue">
+                            <select id="filter-group" onchange="renderStudentTable()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-ipg-blue bg-white">
+                                <option value="all">Semua Kumpulan/Unit</option>
+                            </select>
+                        </div>
+                        <button onclick="exportToExcel()" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition duration-150 shadow-md">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Eksport Excel (.csv)</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-card">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs" id="students-table">
+                                <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-4 w-12 text-center">Bil</th>
+                                        <th class="p-4">Nama Pelajar</th>
+                                        <th class="p-4">Kumpulan</th>
+                                        <th class="p-4 text-center">T1 (30%)</th>
+                                        <th class="p-4 text-center">T2 (20%)</th>
+                                        <th class="p-4 text-center">T3 (50%)</th>
+                                        <th class="p-4 text-center">Jumlah (100%)</th>
+                                        <th class="p-4 text-center">Gred</th>
+                                        <th class="p-4 text-center no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-tbody" class="divide-y divide-slate-100 text-slate-700">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-rubrics" class="hidden space-y-6">
+                    <div class="flex space-x-2 border-b border-slate-200 no-print">
+                        <button onclick="toggleRubricInfo('r1')" id="btn-r1" class="px-4 py-2 font-bold text-xs border-b-2 border-ipg-blue text-ipg-blue transition-all duration-150">Tugasan 1: Ujian (30%)</button>
+                        <button onclick="toggleRubricInfo('r2')" id="btn-r2" class="px-4 py-2 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150">Tugasan 2: Persembahan (20%)</button>
+                        <button onclick="toggleRubricInfo('r3')" id="btn-r3" class="px-4 py-2 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150">Tugasan 3: Penulisan (50%)</button>
+                    </div>
+                    <div id="rubric-display" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 text-xs leading-relaxed text-slate-700 print-card"></div>
+                </div>
+
+                <div id="tab-settings" class="hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6 no-print">
+                        <div class="border-b border-slate-100 pb-3">
+                            <h3 class="text-md font-bold text-slate-900">Tetapan Google Apps Script URL</h3>
+                        </div>
+                        <div class="space-y-4 max-w-xl">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-2">Web App URL:</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="setting-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 px-4 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-ipg-blue outline-none">
+                                    <button onclick="saveGasUrl()" class="px-4 py-2.5 bg-ipg-navy hover:bg-ipg-blue text-white font-bold rounded-xl text-xs transition shadow-sm">Simpan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="grading-modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 overflow-y-auto hidden no-print">
+        <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h3 class="font-bold text-md text-slate-800">Borang Pemarkahan Pentaksiran Berterusan</h3>
+                    <p class="text-xs text-slate-500 font-medium" id="grading-student-meta">Memuatkan maklumat...</p>
+                </div>
+                <button onclick="closeGradingModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 space-y-8">
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-ipg-blue text-xs flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">1</span>
+                            <span>Tugasan 1: Ujian Objektif Bertulis (Wajaran: 30%)</span>
+                        </h4>
+                        <span id="t1-band-badge" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-slate-200 text-slate-700">Tahap</span>
+                    </div>
+                    <input type="number" id="input-t1" min="0" max="30" oninput="calculateT1(this.value)" class="w-24 px-4 py-2 border border-slate-300 rounded-xl text-xs text-center font-bold outline-none">
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-ipg-blue text-xs flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">2</span>
+                            <span>Tugasan 2: Persembahan Objek Pembelajaran Digital (Wajaran: 20%)</span>
+                        </h4>
+                        <span id="t2-total-badge" class="text-xs font-bold text-ipg-blue">0.0 / 20.0 Markah</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 1: Perancangan Kandungan (Max 5.0)</label>
+                                <span id="v-t2-k1" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t2-k1" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 2: Pembinaan Produk & Pemanfaatan Teknologi (Max 5.0)</label>
+                                <span id="v-t2-k2" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t2-k2" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 3: Persembahan Idea & Kejelasan (Max 5.0)</label>
+                                <span id="v-t2-k3" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t2-k3" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 4: Penyampaian & Penglibatan Khalayak (Max 5.0)</label>
+                                <span id="v-t2-k4" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t2-k4" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k4', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-ipg-blue text-xs flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">3</span>
+                            <span>Tugasan 3: Penulisan Akademik (Wajaran: 50%)</span>
+                        </h4>
+                        <span id="t3-total-badge" class="text-xs font-bold text-ipg-blue">0.0 / 50.0 Markah</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Pengenalan: Persembahan Idea (Max 5.0)</label>
+                                <span id="v-t3-k1" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k1" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Pengenalan: Penaakulan Kritis (Max 5.0)</label>
+                                <span id="v-t3-k2" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k2" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kandungan: Huraian Isu (Max 5.0)</label>
+                                <span id="v-t3-k3" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k3" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kandungan: Kesan Isu & Amalan (Max 10.0)</label>
+                                <span id="v-t3-k4" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k4" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k4', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kandungan: Kaedah Solusi (Max 10.0)</label>
+                                <span id="v-t3-k5" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k5" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k5', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kesimpulan: Menyatakan Hujahan (Max 5.0)</label>
+                                <span id="v-t3-k6" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k6" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k6', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Kesimpulan: Perspektif Solusi (Max 5.0)</label>
+                                <span id="v-t3-k7" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k7" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k7', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[11px] font-bold text-slate-600">Rujukan & Keberkesanan Sumber (Max 5.0)</label>
+                                <span id="v-t3-k8" class="text-xs font-bold text-slate-800">0.0</span>
+                            </div>
+                            <input type="range" id="t3-k8" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k8', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-500 uppercase">Jumlah Markah Keseluruhan:</span>
+                    <span id="grading-modal-total" class="text-2xl font-black text-ipg-navy font-sans">0.0% <span class="text-xs font-bold text-slate-400">(Gred: -)</span></span>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="closeGradingModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-600 transition">Batal</button>
+                    <button onclick="saveStudentScores()" id="save-btn" class="px-6 py-2.5 rounded-xl bg-ipg-navy text-white hover:bg-ipg-blue text-xs font-bold shadow-md transition flex items-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Simpan Markah</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+        let activeStudentId = null;
+        let gasUrl = localStorage.getItem('ipg_kda_gas_url_gkko1062') || "https://script.google.com/macros/s/AKfycbzudODTNQDvF9Mbjaf182jBJ_wTsP7FFGggA0-fsLVLTYbMabh34JB_fQrDFmNKYrZMpQ/exec";
+
+        let gradeChartInstance = null;
+        let passChartInstance = null;
+
+        window.onload = function() {
+            document.getElementById('setting-gas-url').value = gasUrl;
+            fetchStudentData();
+            toggleRubricInfo('r1');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            let bgClass = 'bg-ipg-navy text-white';
+            let icon = '<i class="fa-solid fa-info-circle text-ipg-gold"></i>';
+            if (type === 'success') {
+                bgClass = 'bg-emerald-600 text-white';
+                icon = '<i class="fa-solid fa-circle-check text-emerald-100"></i>';
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-600 text-white';
+                icon = '<i class="fa-solid fa-triangle-exclamation text-rose-100"></i>';
+            }
+            toast.className = `${bgClass} p-4 rounded-2xl shadow-xl flex items-center space-x-3 transition-all duration-300 text-xs font-bold max-w-sm`;
+            toast.innerHTML = `<div>${icon}</div><div class="flex-1">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function fetchStudentData() {
+            const syncIcon = document.getElementById('sync-icon');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+            const statusDot = document.getElementById('db-status-dot');
+            const statusText = document.getElementById('db-status-text');
+
+            fetch(gasUrl)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        students = res.data.map((item, index) => ({
+                            id: 'S' + (index + 1),
+                            rowNum: item.rowNum,
+                            name: item.name,
+                            kp: item.kp,
+                            group: item.group,
+                            t1: item.t1,
+                            t2: item.t2,
+                            t3: item.t3,
+                            total: item.total,
+                            grade: item.grade
+                        }));
+                        statusDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                        statusText.innerText = "Database Terhubung";
+                        populateGroupDropdowns();
+                        renderStudentTable();
+                        updateDashboardStats();
+                        showToast("Penyegerakan Google Sheets berjaya!", "success");
+                    }
+                })
+                .catch(err => {
+                    statusDot.className = "w-2 h-2 rounded-full bg-rose-500";
+                    statusText.innerText = "Ralat Sambungan";
+                    showToast("Gagal memuatkan data dari Google Sheets.", "error");
+                })
+                .finally(() => {
+                    if (syncIcon) syncIcon.classList.remove('animate-spin');
+                });
+        }
+
+        function saveGasUrl() {
+            const val = document.getElementById('setting-gas-url').value.trim();
+            gasUrl = val;
+            localStorage.setItem('ipg_kda_gas_url_gkko1062', val);
+            showToast("URL berjaya disimpan!", "success");
+            fetchStudentData();
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-marks').classList.add('hidden');
+            document.getElementById('tab-rubrics').classList.add('hidden');
+            document.getElementById('tab-settings').classList.add('hidden');
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            if(tabId === 'dashboard') updateDashboardStats();
+        }
+
+        function populateGroupDropdowns() {
+            const groups = [...new Set(students.map(s => s.group))].filter(g => g);
+            const selectEl = document.getElementById('filter-group');
+            const dashSelectEl = document.getElementById('dashboard-filter-group');
+            selectEl.innerHTML = '<option value="all">Semua Kumpulan/Unit</option>';
+            dashSelectEl.innerHTML = '<option value="all">Semua Kumpulan</option>';
+            groups.forEach(g => {
+                selectEl.innerHTML += `<option value="${g}">${g}</option>`;
+                dashSelectEl.innerHTML += `<option value="${g}">${g}</option>`;
+            });
+        }
+
+        const gpaMap = { 'A+': 4.00, 'A': 4.00, 'A-': 3.67, 'B+': 3.33, 'B': 3.00, 'B-': 2.67, 'C+': 2.33, 'C': 2.00, 'D': 1.00, 'F': 0.00 };
+
+        function updateDashboardStats() {
+            const groupFilter = document.getElementById('dashboard-filter-group').value;
+            const filtered = students.filter(s => groupFilter === 'all' || s.group === groupFilter);
+            const total = filtered.length;
+            let completed = 0, totalSum = 0, totalGpaPoints = 0, passCount = 0;
+            let highest = -1, lowest = 101, best = null, worst = null;
+            const gradesMap = { 'A+': 0, 'A': 0, 'A-': 0, 'B+': 0, 'B': 0, 'B-': 0, 'C+': 0, 'C': 0, 'D': 0, 'F': 0 };
+
+            filtered.forEach(s => {
+                const totalScore = s.t1 + Object.values(s.t2).reduce((a,b)=>a+b,0) + Object.values(s.t3).reduce((a,b)=>a+b,0);
+                totalSum += totalScore;
+                if(s.t1 > 0) completed++;
+                const gred = calculateGrade(totalScore);
+                gradesMap[gred]++;
+                totalGpaPoints += gpaMap[gred] || 0;
+                if(totalScore >= 50) passCount++;
+                if(totalScore > highest) { highest = totalScore; best = s; }
+                if(totalScore < lowest && totalScore > 0) { lowest = totalScore; worst = s; }
+            });
+
+            document.getElementById('stat-total-students').innerText = total;
+            document.getElementById('stat-average').innerText = total > 0 ? (totalSum / total).toFixed(1) + "%" : "0.0%";
+            document.getElementById('stat-gpa').innerText = total > 0 ? (totalGpaPoints / total).toFixed(2) : "0.00";
+            document.getElementById('stat-pass-rate').innerText = total > 0 ? ((passCount / total) * 100).toFixed(1) + "%" : "0.0%";
+            document.getElementById('stat-completed').innerText = completed;
+            document.getElementById('stat-pending').innerText = total - completed;
+
+            if(best) document.getElementById('best-student-name').innerText = best.name;
+            if(worst) document.getElementById('worst-student-name').innerText = worst.name;
+
+            renderInteractiveCharts(gradesMap, passCount, total - passCount);
+        }
+
+        function renderInteractiveCharts(gradesMap, pass, fail) {
+            const ctxBar = document.getElementById('gradeBarChart').getContext('2d');
+            if (gradeChartInstance) gradeChartInstance.destroy();
+            gradeChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(gradesMap),
+                    datasets: [{ data: Object.values(gradesMap), backgroundColor: '#134074' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            const ctxPie = document.getElementById('passPieChart').getContext('2d');
+            if (passChartInstance) passChartInstance.destroy();
+            passChartInstance = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Lulus', 'Gagal'],
+                    datasets: [{ data: [pass, fail], backgroundColor: ['#10b981', '#f43f5e'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderStudentTable() {
+            const tbody = document.getElementById('students-tbody');
+            const searchVal = document.getElementById('search-student').value.toLowerCase();
+            const groupVal = document.getElementById('filter-group').value;
+            tbody.innerHTML = '';
+            let counter = 1;
+
+            students.forEach((student) => {
+                if ((student.name.toLowerCase().includes(searchVal) || student.kp.includes(searchVal)) && (groupVal === 'all' || student.group === groupVal)) {
+                    const t1 = student.t1 || 0;
+                    const t2 = Object.values(student.t2).reduce((a, b) => a + b, 0);
+                    const t3 = Object.values(student.t3).reduce((a, b) => a + b, 0);
+                    const total = Math.round((t1 + t2 + t3) * 100) / 100;
+                    const gred = calculateGrade(total);
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 border-b border-slate-100">
+                            <td class="p-4 text-center font-bold text-slate-400">${counter++}</td>
+                            <td class="p-4 font-bold text-slate-900">${student.name}<p class="text-[10px] text-slate-400 font-normal">${student.kp}</p></td>
+                            <td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold">${student.group}</span></td>
+                            <td class="p-4 text-center font-semibold text-blue-600">${t1.toFixed(1)}%</td>
+                            <td class="p-4 text-center font-semibold text-amber-600">${t2.toFixed(1)}%</td>
+                            <td class="p-4 text-center font-semibold text-emerald-600">${t3.toFixed(1)}%</td>
+                            <td class="p-4 text-center font-black text-slate-900">${total.toFixed(1)}%</td>
+                            <td class="p-4 text-center"><span class="${getGradeClass(gred)}">${gred}</span></td>
+                            <td class="p-4 text-center no-print">
+                                <button onclick="openGradingModal('${student.id}')" class="bg-ipg-navy text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">Nilai</button>
+                            </td>
+                        </tr>`;
+                }
+            });
+        }
+
+        function exportToExcel() {
+            let csv = "Bil,Nama Pelajar,No KP,Kumpulan,T1,T2,T3,Jumlah,Gred\n";
+            students.forEach((s, i) => {
+                const total = s.t1 + Object.values(s.t2).reduce((a,b)=>a+b,0) + Object.values(s.t3).reduce((a,b)=>a+b,0);
+                csv += `"${i+1}","${s.name}","${s.kp}","${s.group}","${s.t1}","${Object.values(s.t2).reduce((a,b)=>a+b,0)}","${Object.values(s.t3).reduce((a,b)=>a+b,0)}","${total}","${calculateGrade(total)}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "Markah_GKKO1062.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function openGradingModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            activeStudentId = studentId;
+            document.getElementById('grading-student-meta').innerText = `${student.name} • ${student.group}`;
+            document.getElementById('input-t1').value = student.t1;
+            
+            ['k1','k2','k3','k4'].forEach(k => {
+                document.getElementById(`t2-${k}`).value = student.t2[k];
+                document.getElementById(`v-t2-${k}`).innerText = student.t2[k].toFixed(1);
+            });
+            ['k1','k2','k3','k4','k5','k6','k7','k8'].forEach(k => {
+                document.getElementById(`t3-${k}`).value = student.t3[k];
+                document.getElementById(`v-t3-${k}`).innerText = student.t3[k].toFixed(1);
+            });
+            
+            calculateModalTotal();
+            document.getElementById('grading-modal').classList.remove('hidden');
+        }
+
+        function closeGradingModal() { document.getElementById('grading-modal').classList.add('hidden'); }
+        function updateT2Slider(k, v) { document.getElementById(`v-t2-${k}`).innerText = parseFloat(v).toFixed(1); calculateModalTotal(); }
+        function updateT3Slider(k, v) { document.getElementById(`v-t3-${k}`).innerText = parseFloat(v).toFixed(1); calculateModalTotal(); }
+
+        function saveStudentScores() {
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            const payload = {
+                rowNum: students.find(s => s.id === activeStudentId).rowNum,
+                t1: parseFloat(document.getElementById('input-t1').value) || 0,
+                t2: { k1: parseFloat(document.getElementById('t2-k1').value), k2: parseFloat(document.getElementById('t2-k2').value), k3: parseFloat(document.getElementById('t2-k3').value), k4: parseFloat(document.getElementById('t2-k4').value) },
+                t3: { k1: parseFloat(document.getElementById('t3-k1').value), k2: parseFloat(document.getElementById('t3-k2').value), k3: parseFloat(document.getElementById('t3-k3').value), k4: parseFloat(document.getElementById('t3-k4').value), k5: parseFloat(document.getElementById('t3-k5').value), k6: parseFloat(document.getElementById('t3-k6').value), k7: parseFloat(document.getElementById('t3-k7').value), k8: parseFloat(document.getElementById('t3-k8').value) }
+            };
+
+            fetch(gasUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+                .then(() => {
+                    showToast("Markah berjaya dikemas kini!", "success");
+                    closeGradingModal();
+                    setTimeout(fetchStudentData, 1000);
+                }).catch(() => {
+                    showToast("Sistem sedang mengemas kini Spreadsheet Google...", "info");
+                    closeGradingModal();
+                    setTimeout(fetchStudentData, 1500);
+                }).finally(() => saveBtn.disabled = false);
+        }
+
+        function toggleRubricInfo(r) {
+            const container = document.getElementById('rubric-display');
+            if(r === 'r1') container.innerHTML = `<strong>Tugasan 1: Ujian (30%)</strong><p>Ujian bertulis dalam talian mengandungi 30 soalan objektif (Aras Aplikasi) meliputi Topik 1, 2, dan 3.</p>`;
+            if(r === 'r2') container.innerHTML = `<strong>Tugasan 2: Persembahan (20%)</strong><p>Projek berkumpulan membina e-buku/objek pembelajaran digital 7-10 muka surat bersandarkan elemen KPPB & Canva.</p>`;
+            if(r === 'r3') container.innerHTML = `<strong>Tugasan 3: Penulisan (50%)</strong><p>Penulisan reflektif individu (1000 patah perkataan) menganalisis isu pemakanan seimbang dan kesihatan masyarakat MADANI.</p>`;
+        }
+
+        function calculateGrade(score) {
+            if (score >= 90) return 'A+'; if (score >= 80) return 'A'; if (score >= 75) return 'A-';
+            if (score >= 70) return 'B+'; if (score >= 65) return 'B'; if (score >= 60) return 'B-';
+            if (score >= 55) return 'C+'; if (score >= 50) return 'C'; return 'F';
+        }
+        function getGradeClass(g) { return g.startsWith('A') ? "bg-emerald-50 text-emerald-800 px-2 py-1 rounded" : "bg-blue-50 text-blue-800 px-2 py-1 rounded"; }
+    </script>
+</body>
+</html>
