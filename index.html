@@ -510,27 +510,30 @@
                         <span id="t2-total-badge" class="text-xs font-bold text-ipg-blue">0.0 / 20.0 Markah</span>
                     </div>
                     
-                    <div class="space-y-4">
+                    <div class="space-y-5">
                         <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 1: Perancangan (Skala Raw: 0.0 - 5.0)</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 1: Perancangan (Maks: 5.0)</label>
                                 <span id="v-t2-k1" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <input type="range" id="t2-k1" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                            <div id="checklist-t2-k1" class="space-y-1.5"></div>
+                            <input type="hidden" id="t2-k1" value="0">
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 2: Pembinaan Produk (Skala Raw: 0.0 - 5.0)</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 2: Pembinaan Produk (Maks: 5.0)</label>
                                 <span id="v-t2-k2" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <input type="range" id="t2-k2" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                            <div id="checklist-t2-k2" class="space-y-1.5"></div>
+                            <input type="hidden" id="t2-k2" value="0">
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 3: Pembentangan (Skala Raw: 0.0 - 10.0)</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 3: Pembentangan (Maks: 10.0)</label>
                                 <span id="v-t2-k3" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <input type="range" id="t2-k3" min="0" max="10" step="0.1" value="0" oninput="updateT2Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                            <div id="checklist-t2-k3" class="space-y-1.5"></div>
+                            <input type="hidden" id="t2-k3" value="0">
                         </div>
                     </div>
                 </div>
@@ -545,29 +548,30 @@
                         <span id="t3-total-badge" class="text-xs font-bold text-ipg-blue">0.0 / 50.0 Markah</span>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Pengenalan (Skala Raw: 0.0 - 10.0)</label>
-                                    <span id="v-t3-k1" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k1" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Pengenalan (Maks: 10.0)</label>
+                                <span id="v-t3-k1" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kandungan (Skala Raw: 0.0 - 25.0)</label>
-                                    <span id="v-t3-k2" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k2" min="0" max="25" step="0.1" value="0" oninput="updateT3Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
+                            <div id="checklist-t3-k1" class="space-y-1.5"></div>
+                            <input type="hidden" id="t3-k1" value="0">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Kandungan (Maks: 25.0)</label>
+                                <span id="v-t3-k2" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kesimpulan (Skala Raw: 0.0 - 15.0)</label>
-                                    <span id="v-t3-k3" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k3" min="0" max="15" step="0.1" value="0" oninput="updateT3Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
+                            <div id="checklist-t3-k2" class="space-y-1.5"></div>
+                            <input type="hidden" id="t3-k2" value="0">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-[11px] font-bold text-slate-600">Kesimpulan & Rujukan (Maks: 15.0)</label>
+                                <span id="v-t3-k3" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
+                            <div id="checklist-t3-k3" class="space-y-1.5"></div>
+                            <input type="hidden" id="t3-k3" value="0">
                         </div>
                     </div>
                 </div>
@@ -599,6 +603,108 @@
         // Global Chart Instances
         let gradeChartInstance = null;
         let passChartInstance = null;
+
+        // ================================================================
+        // KONFIGURASI SENARAI SEMAK RUBRIK (CHECKLIST) - T2 & T3
+        // Setiap kriteria dipecahkan kepada beberapa item boleh-tanda.
+        // Jumlah "points" bagi setiap kriteria MESTI menyamai nilai "max".
+        // Lecturer boleh ubah teks / points di sini tanpa perlu ubah bahagian lain.
+        // ================================================================
+        const RUBRIC_CHECKLIST = {
+            't2-k1': { // Perancangan (Maks 5)
+                max: 5,
+                items: [
+                    { label: "Menunjukkan pengetahuan kandungan kokurikulum yang tepat", points: 2.5 },
+                    { label: "Mengaplikasikan teknologi dalam konteks kehidupan sebenar murid", points: 2.5 }
+                ]
+            },
+            't2-k2': { // Pembinaan Produk (Maks 5) - berdasarkan 3E
+                max: 5,
+                items: [
+                    { label: "Engagement — reka bentuk menarik minat murid", points: 1.7 },
+                    { label: "Enhancement — mempermudah kefahaman kandungan", points: 1.7 },
+                    { label: "Extension — merangsang penglibatan lanjutan murid", points: 1.6 }
+                ]
+            },
+            't2-k3': { // Pembentangan (Maks 10)
+                max: 10,
+                items: [
+                    { label: "Penyampaian idea jelas", points: 2.5 },
+                    { label: "Penyampaian koheren dan tersusun", points: 2.5 },
+                    { label: "Disampaikan dengan yakin", points: 2.5 },
+                    { label: "Meyakinkan khalayak rakan guru", points: 2.5 }
+                ]
+            },
+            't3-k1': { // Pengenalan (Maks 10)
+                max: 10,
+                items: [
+                    { label: "Maksud amalan tidak sihat dinyatakan dengan jelas", points: 3.4 },
+                    { label: "Penilaian prospek positif/negatif dibincangkan", points: 3.3 },
+                    { label: "Analisis cabaran isu dibuat", points: 3.3 }
+                ]
+            },
+            't3-k2': { // Kandungan (Maks 25)
+                max: 25,
+                items: [
+                    { label: "Hujah isu disokong data/bukti yang relevan", points: 8.4 },
+                    { label: "Kesan amalan dinyatakan dengan jelas", points: 8.3 },
+                    { label: "Kaedah/solusi penyelesaian kritis dicadangkan", points: 8.3 }
+                ]
+            },
+            't3-k3': { // Kesimpulan & Rujukan (Maks 15)
+                max: 15,
+                items: [
+                    { label: "Kepentingan kesedaran masyarakat dirumuskan", points: 7.5 },
+                    { label: "Senarai rujukan format APA terkini disertakan", points: 7.5 }
+                ]
+            }
+        };
+
+        // Bina semula checkbox untuk satu kriteria (dipanggil bila modal dibuka)
+        function renderChecklist(critId, presetChecked) {
+            const config = RUBRIC_CHECKLIST[critId];
+            const container = document.getElementById(`checklist-${critId}`);
+            if (!config || !container) return;
+
+            container.innerHTML = config.items.map((item, idx) => `
+                <label class="flex items-start gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-[11px] text-slate-700 cursor-pointer hover:border-ipg-blue transition-colors">
+                    <input type="checkbox"
+                           class="mt-0.5 accent-ipg-blue cursor-pointer"
+                           data-crit="${critId}"
+                           data-idx="${idx}"
+                           data-points="${item.points}"
+                           onchange="onChecklistToggle('${critId}')"
+                           ${presetChecked && presetChecked[idx] ? 'checked' : ''}>
+                    <span class="flex-1">${item.label}</span>
+                    <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">${item.points.toFixed(1)} m</span>
+                </label>
+            `).join('');
+
+            onChecklistToggle(critId, true); // kira nilai awal tanpa recursive-save-loop
+        }
+
+        // Bila mana-mana checkbox ditanda/nyahtanda, kira semula jumlah kriteria itu
+        function onChecklistToggle(critId) {
+            const container = document.getElementById(`checklist-${critId}`);
+            if (!container) return;
+
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            let sum = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) sum += parseFloat(cb.dataset.points) || 0;
+            });
+            sum = Math.round(sum * 10) / 10;
+
+            // critId contoh: 't2-k1' -> group='t2', key='k1'
+            const [group, key] = critId.split('-');
+            document.getElementById(critId).value = sum; // hidden input (dibaca oleh saveStudentScores)
+
+            if (group === 't2') {
+                updateT2Slider(key, sum);
+            } else {
+                updateT3Slider(key, sum);
+            }
+        }
 
         window.onload = function() {
             document.getElementById('setting-gas-url').value = gasUrl;
@@ -1070,7 +1176,15 @@
             document.getElementById('input-t1').value = student.t1;
             calculateT1(student.t1);
 
-            // Set sliders T2
+            // Bina semula checklist T2 & T3 (checkbox mula TIDAK ditanda -
+            // sheet cuma simpan jumlah akhir, bukan item mana yang ditanda,
+            // jadi lecturer perlu tanda semula bila membuka/mengedit markah sedia ada.
+            // Nilai sedia ada dari sheet dipaparkan di hidden input & label supaya
+            // markah asal tidak hilang jika modal ditutup tanpa menanda apa-apa.)
+            ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
+                renderChecklist(critId, null);
+            });
+
             document.getElementById('t2-k1').value = student.t2.k1;
             document.getElementById('t2-k2').value = student.t2.k2;
             document.getElementById('t2-k3').value = student.t2.k3;
@@ -1078,7 +1192,6 @@
             updateT2Slider('k2', student.t2.k2);
             updateT2Slider('k3', student.t2.k3);
 
-            // Set sliders T3
             document.getElementById('t3-k1').value = student.t3.k1;
             document.getElementById('t3-k2').value = student.t3.k2;
             document.getElementById('t3-k3').value = student.t3.k3;
