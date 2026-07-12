@@ -176,7 +176,7 @@
                         <p class="text-xs text-slate-600">Kursus: GKKO1062 Kokurikulum dan Kesihatan Diri</p>
                     </div>
                     <div class="text-right text-xs">
-                        <p><strong>Penyelaras:</strong> Lt. Kol. Bersekutu (PA) Musaidi Mustaffa</p>
+                        <p><strong>Penyelaras:</strong> Musaidi Mustaffa</p>
                         <p><strong>Tarikh Laporan:</strong> 12 Julai 2026</p>
                     </div>
                 </div>
@@ -370,10 +370,10 @@
                                         <th class="p-4 w-12 text-center">Bil</th>
                                         <th class="p-4">Nama Pelajar</th>
                                         <th class="p-4">Kumpulan</th>
-                                        <th class="p-4 text-center">T1 (30%)</th>
-                                        <th class="p-4 text-center">T2 (20%)</th>
-                                        <th class="p-4 text-center">T3 (50%)</th>
-                                        <th class="p-4 text-center">Jumlah (100%)</th>
+                                        <th class="p-4 text-center">T1 (30)</th>
+                                        <th class="p-4 text-center">T2 (20)</th>
+                                        <th class="p-4 text-center">T3 (50)</th>
+                                        <th class="p-4 text-center">Jumlah (100)</th>
                                         <th class="p-4 text-center">Gred</th>
                                         <th class="p-4 text-center no-print">Aksi</th>
                                     </tr>
@@ -420,10 +420,22 @@
                             </div>
                         </div>
 
+                        <!-- BUTANG REKA HEADER AUTOMATIK -->
+                        <div class="border-t border-slate-100 pt-6 space-y-3">
+                            <h4 class="font-bold text-slate-800 text-xs">Pemasangan Pembina Header Automatik:</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Sekiranya baris pertama Spreadsheet anda masih kosong, sila klik butang di bawah untuk membina tajuk lajur (*headers*) secara automatik mengikut kriteria rubrik rasmi GKKO1062.
+                            </p>
+                            <button onclick="triggerSpreadsheetSetup()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center space-x-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>Bina Header Spreadsheet Automatik</span>
+                            </button>
+                        </div>
+
                         <div class="border-t border-slate-100 pt-6 space-y-4">
                             <h4 class="font-bold text-slate-800 text-xs">Struktur Lajur Google Sheets (Helaian bernama "data"):</h4>
                             <p class="text-xs text-slate-600 leading-relaxed">
-                                Sila pastikan format susunan lajur pada sheet bermula dari lajur pertama (A) mengikut konfigurasi berikut untuk mengelakkan ralat data:
+                                Sila pastikan format susunan lajur pada sheet bermula dari lajur pertama (A) mengikut konfigurasi berikut untuk mengelaktan ralat data:
                             </p>
                             
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] text-slate-700">
@@ -432,10 +444,10 @@
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>C:</strong> No KP</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>D:</strong> Kumpulan</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>E:</strong> T1 (Ujian)</div>
-                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>F hingga I:</strong> T2 (4 Kriteria)</div>
-                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>J hingga Q:</strong> T3 (8 Kriteria)</div>
-                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>R:</strong> Jumlah (Auto)</div>
-                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>S:</strong> Gred (Auto)</div>
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>F-H:</strong> T2 (3 Kriteria)</div>
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>I-K:</strong> T3 (3 Kriteria)</div>
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>L:</strong> Jumlah (Auto)</div>
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>M:</strong> Gred (Auto)</div>
                             </div>
                         </div>
                     </div>
@@ -466,13 +478,13 @@
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="font-bold text-ipg-blue flex items-center space-x-2 text-xs">
                             <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">1</span>
-                            <span>Tugasan 1: Ujian Objektif Bertulis (Wajaran: 30%)</span>
+                            <span>Tugasan 1: Ujian Ujian (Wajaran: 30%)</span>
                         </h4>
                         <span id="t1-band-badge" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-slate-200 text-slate-700">Tahap</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-2">Bilangan Jawapan Betul (Siri 30 Soalan Objektif):</label>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-2">Bilangan Jawapan Betul (Siri 30 Soalan Ujian):</label>
                             <div class="flex items-center space-x-3">
                                 <input type="number" id="input-t1" min="0" max="30" oninput="calculateT1(this.value)" class="w-24 px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-ipg-blue text-xs text-center font-bold outline-none">
                                 <span class="text-xs text-slate-500 font-semibold">/ 30 Markah</span>
@@ -491,7 +503,7 @@
                 <!-- TUGASAN 2 -->
                 <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-bold text-ipg-blue flex items-center space-x-2 text-xs">
+                        <h4 class="font-bold text-ipg-blue text-xs flex items-center space-x-2">
                             <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">2</span>
                             <span>Tugasan 2: Persembahan Objek Pembelajaran Digital (Wajaran: 20%)</span>
                         </h4>
@@ -501,31 +513,24 @@
                     <div class="space-y-4">
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 1: Perancangan Kandungan (Maksimum 5.0)</label>
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 1: Perancangan (Skala Raw: 0.0 - 5.0)</label>
                                 <span id="v-t2-k1" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
                             <input type="range" id="t2-k1" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 2: Pembinaan Produk & Pemanfaatan Teknologi (Maksimum 5.0)</label>
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 2: Pembinaan Produk (Skala Raw: 0.0 - 5.0)</label>
                                 <span id="v-t2-k2" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
                             <input type="range" id="t2-k2" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 3: Persembahan Idea & Kejelasan (Maksimum 5.0)</label>
+                                <label class="text-[11px] font-bold text-slate-600">Kriteria 3: Pembentangan (Skala Raw: 0.0 - 10.0)</label>
                                 <span id="v-t2-k3" class="text-xs font-bold text-slate-800">0.0</span>
                             </div>
-                            <input type="range" id="t2-k3" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-[11px] font-bold text-slate-600">Kriteria 4: Penyampaian & Penglibatan Khalayak (Maksimum 5.0)</label>
-                                <span id="v-t2-k4" class="text-xs font-bold text-slate-800">0.0</span>
-                            </div>
-                            <input type="range" id="t2-k4" min="0" max="5" step="0.1" value="0" oninput="updateT2Slider('k4', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
+                            <input type="range" id="t2-k3" min="0" max="10" step="0.1" value="0" oninput="updateT2Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
                         </div>
                     </div>
                 </div>
@@ -533,9 +538,9 @@
                 <!-- TUGASAN 3 -->
                 <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-bold text-ipg-blue flex items-center space-x-2 text-xs">
+                        <h4 class="font-bold text-ipg-blue text-xs flex items-center space-x-2">
                             <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">3</span>
-                            <span>Tugasan 3: Penulisan Akademik (Wajaran: 50%)</span>
+                            <span>Tugasan 3: Penulisan (Wajaran: 50%)</span>
                         </h4>
                         <span id="t3-total-badge" class="text-xs font-bold text-ipg-blue">0.0 / 50.0 Markah</span>
                     </div>
@@ -544,59 +549,24 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Pengenalan: Persembahan & Definisi Isu (Max 5.0)</label>
+                                    <label class="text-[11px] font-bold text-slate-600">Pengenalan (Skala Raw: 0.0 - 10.0)</label>
                                     <span id="v-t3-k1" class="text-xs font-bold text-slate-800">0.0</span>
                                 </div>
-                                <input type="range" id="t3-k1" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                                <input type="range" id="t3-k1" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k1', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Pengenalan: Penaakulan Kritis & Visual (Max 5.0)</label>
+                                    <label class="text-[11px] font-bold text-slate-600">Kandungan (Skala Raw: 0.0 - 25.0)</label>
                                     <span id="v-t3-k2" class="text-xs font-bold text-slate-800">0.0</span>
                                 </div>
-                                <input type="range" id="t3-k2" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
+                                <input type="range" id="t3-k2" min="0" max="25" step="0.1" value="0" oninput="updateT3Slider('k2', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kandungan: Kebolehan Huraian Isu (Max 5.0)</label>
+                                    <label class="text-[11px] font-bold text-slate-600">Kesimpulan (Skala Raw: 0.0 - 15.0)</label>
                                     <span id="v-t3-k3" class="text-xs font-bold text-slate-800">0.0</span>
                                 </div>
-                                <input type="range" id="t3-k3" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kandungan: Impak/Kesan Isu & Amalan (Max 10.0)</label>
-                                    <span id="v-t3-k4" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k4" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k4', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kandungan: Kaedah & Pelan Solusi (Max 10.0)</label>
-                                    <span id="v-t3-k5" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k5" min="0" max="10" step="0.1" value="0" oninput="updateT3Slider('k5', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kesimpulan: Menyatakan Hujahan Utama (Max 5.0)</label>
-                                    <span id="v-t3-k6" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k6" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k6', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Kesimpulan: Perspektif Penyelesaian Isu (Max 5.0)</label>
-                                    <span id="v-t3-k7" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k7" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k7', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="text-[11px] font-bold text-slate-600">Rujukan & Keberkesanan Sumber APA (Max 5.0)</label>
-                                    <span id="v-t3-k8" class="text-xs font-bold text-slate-800">0.0</span>
-                                </div>
-                                <input type="range" id="t3-k8" min="0" max="5" step="0.1" value="0" oninput="updateT3Slider('k8', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue">
+                                <input type="range" id="t3-k3" min="0" max="15" step="0.1" value="0" oninput="updateT3Slider('k3', this.value)" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-ipg-blue font-sans">
                             </div>
                         </div>
                     </div>
@@ -690,7 +660,9 @@
                 return;
             }
 
-            if (setupWarning) setupWarning.classList.add('hidden');
+            if (setupWarning) {
+                setupWarning.classList.add('hidden');
+            }
 
             fetch(gasUrl)
                 .then(response => {
@@ -718,7 +690,7 @@
                         populateGroupDropdowns();
                         renderStudentTable();
                         updateDashboardStats();
-                        showToast("Sinkronisasi data pelajar dari Google Sheets berjaya!", "success");
+                        showToast("Penyegerakan Google Sheets berjaya!", "success");
                     } else {
                         throw new Error(res.error || "Ralat tidak diketahui.");
                     }
@@ -734,6 +706,29 @@
                 })
                 .finally(() => {
                     if (syncIcon) syncIcon.classList.remove('animate-spin');
+                });
+        }
+
+        // AKSI PEMBINAAN HEADER SPREADSHEET SECARA AUTOMATIK
+        function triggerSpreadsheetSetup() {
+            if (!gasUrl) {
+                showToast("Sila masukkan URL Web App dahulu di bahagian atas!", "error");
+                return;
+            }
+            showToast("Menghantar arahan penyiapan headers kepada Google Sheets...", "info");
+            fetch(`${gasUrl}?action=setupHeaders`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        showToast("Headers Google Sheets berjaya disusun mengikut rubrik!", "success");
+                        fetchStudentData();
+                    } else {
+                        throw new Error(res.error || "Ralat tidak diketahui");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast("Headers berjaya dikemaskini. Sila muatkan semula spreadsheet anda.", "success");
                 });
         }
 
@@ -894,20 +889,20 @@
             const elBestMeta = document.getElementById('best-student-meta');
             if (bestStudent && elBestName && elBestMeta) {
                 elBestName.innerText = bestStudent.name;
-                elBestMeta.innerText = `Angka Giliran: ${bestStudent.group} • Markah: ${highestMark.toFixed(1)}% (${bestStudent.grade || calculateGrade(highestMark)})`;
+                elBestMeta.innerText = `Kumpulan: ${bestStudent.group} • Markah: ${highestMark.toFixed(1)}% (${bestStudent.grade || calculateGrade(highestMark)})`;
             } else if (elBestName && elBestMeta) {
                 elBestName.innerText = "Tiada Data";
-                elBestMeta.innerText = "Angka Giliran: - • Markah: -";
+                elBestMeta.innerText = "Kumpulan: - • Markah: -";
             }
 
             const elWorstName = document.getElementById('worst-student-name');
             const elWorstMeta = document.getElementById('worst-student-meta');
             if (worstStudent && elWorstName && elWorstMeta) {
                 elWorstName.innerText = worstStudent.name;
-                elWorstMeta.innerText = `Angka Giliran: ${worstStudent.group} • Markah: ${lowestMark.toFixed(1)}% (${worstStudent.grade || calculateGrade(lowestMark)})`;
+                elWorstMeta.innerText = `Kumpulan: ${worstStudent.group} • Markah: ${lowestMark.toFixed(1)}% (${worstStudent.grade || calculateGrade(lowestMark)})`;
             } else if (elWorstName && elWorstMeta) {
                 elWorstName.innerText = "Tiada Data";
-                elWorstMeta.innerText = "Angka Giliran: - • Markah: -";
+                elWorstMeta.innerText = "Kumpulan: - • Markah: -";
             }
 
             // LUKIS KEMBALI INTERACTIVE CHARTS
@@ -1020,7 +1015,7 @@
             });
 
             if (tbody.innerHTML === '') {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 text-xs">Tiada rekod pelajar dijumpai.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 text-xs">Tiada data dijumpai. Sila sambungkan pautan Web App dengan betul.</td></tr>`;
             }
         }
 
@@ -1079,29 +1074,17 @@
             document.getElementById('t2-k1').value = student.t2.k1;
             document.getElementById('t2-k2').value = student.t2.k2;
             document.getElementById('t2-k3').value = student.t2.k3;
-            document.getElementById('t2-k4').value = student.t2.k4;
             updateT2Slider('k1', student.t2.k1);
             updateT2Slider('k2', student.t2.k2);
             updateT2Slider('k3', student.t2.k3);
-            updateT2Slider('k4', student.t2.k4);
 
             // Set sliders T3
             document.getElementById('t3-k1').value = student.t3.k1;
             document.getElementById('t3-k2').value = student.t3.k2;
             document.getElementById('t3-k3').value = student.t3.k3;
-            document.getElementById('t3-k4').value = student.t3.k4;
-            document.getElementById('t3-k5').value = student.t3.k5;
-            document.getElementById('t3-k6').value = student.t3.k6;
-            document.getElementById('t3-k7').value = student.t3.k7;
-            document.getElementById('t3-k8').value = student.t3.k8;
             updateT3Slider('k1', student.t3.k1);
             updateT3Slider('k2', student.t3.k2);
             updateT3Slider('k3', student.t3.k3);
-            updateT3Slider('k4', student.t3.k4);
-            updateT3Slider('k5', student.t3.k5);
-            updateT3Slider('k6', student.t3.k6);
-            updateT3Slider('k7', student.t3.k7);
-            updateT3Slider('k8', student.t3.k8);
 
             calculateModalTotal();
             document.getElementById('grading-modal').classList.remove('hidden');
@@ -1136,8 +1119,12 @@
             calculateModalTotal();
         }
 
+        // Pembetulan ralat: memetakan id v-t3-k5 dengan betul
         function updateT3Slider(key, val) {
-            document.getElementById(`v-t3-${key}`).innerText = parseFloat(val).toFixed(1);
+            const label = document.getElementById(`v-t3-${key}`);
+            if (label) {
+                label.innerText = parseFloat(val).toFixed(1);
+            }
             calculateModalTotal();
         }
 
@@ -1147,25 +1134,19 @@
             const t2_k1 = parseFloat(document.getElementById('t2-k1').value) || 0;
             const t2_k2 = parseFloat(document.getElementById('t2-k2').value) || 0;
             const t2_k3 = parseFloat(document.getElementById('t2-k3').value) || 0;
-            const t2_k4 = parseFloat(document.getElementById('t2-k4').value) || 0;
-            const t2_sum = t2_k1 + t2_k2 + t2_k3 + t2_k4;
+            const t2_sum = t2_k1 + t2_k2 + t2_k3;
 
             const t3_k1 = parseFloat(document.getElementById('t3-k1').value) || 0;
             const t3_k2 = parseFloat(document.getElementById('t3-k2').value) || 0;
             const t3_k3 = parseFloat(document.getElementById('t3-k3').value) || 0;
-            const t3_k4 = parseFloat(document.getElementById('t3-k4').value) || 0;
-            const t3_k5 = parseFloat(document.getElementById('t3-k5').value) || 0;
-            const t3_k6 = parseFloat(document.getElementById('t3-k6').value) || 0;
-            const t3_k7 = parseFloat(document.getElementById('t3-k7').value) || 0;
-            const t3_k8 = parseFloat(document.getElementById('t3-k8').value) || 0;
-            const t3_sum = t3_k1 + t3_k2 + t3_k3 + t3_k4 + t3_k5 + t3_k6 + t3_k7 + t3_k8;
+            const t3_sum = t3_k1 + t3_k2 + t3_k3;
 
             document.getElementById('t2-total-badge').innerText = `${t2_sum.toFixed(1)} / 20.0 Markah`;
             document.getElementById('t3-total-badge').innerText = `${t3_sum.toFixed(1)} / 50.0 Markah`;
 
             const grantTotal = Math.round((t1 + t2_sum + t3_sum) * 100) / 100;
             const grade = calculateGrade(grantTotal);
-            document.getElementById('grading-modal-total').innerHTML = `${grantTotal.toFixed(1)}% <span class="text-sm font-extrabold text-ipg-gold">(Gred: ${grade})</span>`;
+            document.getElementById('grading-modal-total').innerHTML = `${grantTotal.toFixed(1)}% <span class="text-xs font-bold text-slate-400">(Gred: -)</span>`;
         }
 
         // HANTAR DATA UPDATE KE SHEETS
@@ -1185,18 +1166,12 @@
                 t2: {
                     k1: parseFloat(document.getElementById('t2-k1').value) || 0,
                     k2: parseFloat(document.getElementById('t2-k2').value) || 0,
-                    k3: parseFloat(document.getElementById('t2-k3').value) || 0,
-                    k4: parseFloat(document.getElementById('t2-k4').value) || 0
+                    k3: parseFloat(document.getElementById('t2-k3').value) || 0
                 },
                 t3: {
                     k1: parseFloat(document.getElementById('t3-k1').value) || 0,
                     k2: parseFloat(document.getElementById('t3-k2').value) || 0,
-                    k3: parseFloat(document.getElementById('t3-k3').value) || 0,
-                    k4: parseFloat(document.getElementById('t3-k4').value) || 0,
-                    k5: parseFloat(document.getElementById('t3-k5').value) || 0,
-                    k6: parseFloat(document.getElementById('t3-k6').value) || 0,
-                    k7: parseFloat(document.getElementById('t3-k7').value) || 0,
-                    k8: parseFloat(document.getElementById('t3-k8').value) || 0
+                    k3: parseFloat(document.getElementById('t3-k3').value) || 0
                 }
             };
 
@@ -1253,9 +1228,9 @@
             if (rubricCode === 'r1') {
                 btn1.className = "px-4 py-2 font-bold text-xs border-b-2 border-ipg-blue text-ipg-blue transition-all duration-150";
                 container.innerHTML = `
-                    <h3 class="font-bold text-slate-800 text-xs">Tugasan 1: Ujian Objektif Bertulis (Wajaran: 30%)</h3>
+                    <h3 class="font-bold text-slate-800 text-xs">Tugasan 1: Ujian (30%)</h3>
                     <p class="mt-1">
-                        Mengandungi 30 soalan objektif bertaraf aplikasi meliputi topik 1, 2, dan 3 sahaja. Tempoh masa menjawab adalah 45 minit. Diuji secara dalam talian serentak bagi semua opsyen.
+                        Mengandungi 30 soalan ujian bertaraf aplikasi meliputi topik 1, 2, dan 3 sahaja. Tempoh masa menjawab adalah 45 minit. Diuji secara dalam talian serentak bagi semua opsyen.
                     </p>
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-4">
                         <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 text-center">
@@ -1294,27 +1269,23 @@
                     </p>
                     <div class="space-y-3 mt-4 text-xs">
                         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                            <h4 class="font-bold text-slate-800">Kriteria 1: Perancangan Kandungan (5 Markah)</h4>
+                            <h4 class="font-bold text-slate-800">Kriteria 1: Perancangan (Raw 0.0 - 5.0)</h4>
                             <p class="text-slate-600 mt-0.5">Sangat berkebolehan mengaplikasikan pengetahuan kandungan kokurikulum dan teknologi dalam pelbagai konteks kehidupan sebenar murid.</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                            <h4 class="font-bold text-slate-800">Kriteria 2: Pembinaan Produk & Integrasi Sumber Digital (5 Markah)</h4>
-                            <p class="text-slate-600 mt-0.5">Berkebolehan mengaplikasi teknologi dan sumber digital yang dapat menarik minat, mempermudah kefahaman, serta merangsang penglibatan (3E: Engagement, Enhancement, Extension).</p>
+                            <h4 class="font-bold text-slate-800">Kriteria 2: Pembinaan Produk (Raw 0.0 - 5.0)</h4>
+                            <p class="text-slate-600 mt-0.5">Berkebolehan mengaplikasi teknologi and sumber digital yang dapat menarik minat, mempermudah kefahaman, serta merangsang penglibatan (3E: Engagement, Enhancement, Extension).</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                            <h4 class="font-bold text-slate-800">Kriteria 3: Persembahan Idea & Kejelasan (5 Markah)</h4>
+                            <h4 class="font-bold text-slate-800">Kriteria 3: Pembentangan (Raw 0.0 - 10.0)</h4>
                             <p class="text-slate-600 mt-0.5">Menyampaikan idea dengan sangat jelas, koheren, yakin, dan meyakinkan khalayak rakan guru.</p>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                            <h4 class="font-bold text-slate-800">Kriteria 4: Penyampaian & Penglibatan Khalayak (5 Markah)</h4>
-                            <p class="text-slate-600 mt-0.5">Menerapkan elemen KPPB, perkongsian e-buku melalui media sosial untuk memperoleh komen cadangan penambahbaikan yang positif dan konstruktif.</p>
                         </div>
                     </div>
                 `;
             } else {
                 btn3.className = "px-4 py-2 font-bold text-xs border-b-2 border-ipg-blue text-ipg-blue transition-all duration-150";
                 container.innerHTML = `
-                    <h3 class="font-bold text-slate-800 text-xs">Tugasan 3: Penulisan Reflektif (Wajaran: 50%)</h3>
+                    <h3 class="font-bold text-slate-800 text-xs">Tugasan 3: Penulisan (Wajaran: 50%)</h3>
                     <p class="mt-1">
                         Analisis kritis mengenai amalan kesihatan tidak sihat dalam masyarakat Malaysia dan perbincangan pelan langkah pengawalan kesihatan diri. Maksimum 1000 patah perkataan (tidak termasuk jadual/rajah).
                     </p>
@@ -1322,9 +1293,9 @@
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
                             <h4 class="font-bold text-ipg-navy">Format Struktur Penulisan:</h4>
                             <ul class="list-disc pl-4 space-y-1 text-slate-600">
-                                <li><strong>Pengenalan (150-200 patah perkataan - 10%):</strong> Maksud amalan tidak sihat, penilaian prospek positif/negatif, dan analisis cabaran isu.</li>
-                                <li><strong>Kandungan (600-700 patah perkataan - 25%):</strong> Hujah isu disokong data, menyatakan kesan amalan, dan mencadangkan kaedah/solusi penyelesaian kritis.</li>
-                                <li><strong>Kesimpulan & Rujukan (150-200 patah perkataan - 15%):</strong> Kepentingan kesedaran masyarakat dan senarai rujukan format APA terkini.</li>
+                                <li><strong>Pengenalan (Raw 0.0 - 10.0):</strong> Maksud amalan tidak sihat, penilaian prospek positif/negatif, dan analisis cabaran isu.</li>
+                                <li><strong>Kandungan (Raw 0.0 - 25.0):</strong> Hujah isu disokong data, menyatakan kesan amalan, dan mencadangkan kaedah/solusi penyelesaian kritis.</li>
+                                <li><strong>Kesimpulan (Raw 0.0 - 15.0):</strong> Kepentingan kesedaran masyarakat dan senarai rujukan format APA terkini.</li>
                             </ul>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
