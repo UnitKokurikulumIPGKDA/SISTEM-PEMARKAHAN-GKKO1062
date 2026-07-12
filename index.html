@@ -605,100 +605,290 @@
         let passChartInstance = null;
 
         // ================================================================
-        // KONFIGURASI SENARAI SEMAK RUBRIK (CHECKLIST) - T2 & T3
-        // Setiap kriteria dipecahkan kepada beberapa item boleh-tanda.
-        // Jumlah "points" bagi setiap kriteria MESTI menyamai nilai "max".
-        // Lecturer boleh ubah teks / points di sini tanpa perlu ubah bahagian lain.
+        // RUBRIK RASMI GKKO1062 (Sumber: RUBRIK_GKKO1162_2026_MUSAIDI.pdf)
+        // Setiap kriteria (t2-k1, t2-k2, ... t3-k3) terdiri daripada satu atau
+        // lebih SUB-KRITERIA. Setiap sub-kriteria ada 5 TAHAP/BAND markah
+        // (Amat Cemerlang / Cemerlang / Kepujian / Sederhana / Lemah) dengan
+        // julat markah rasmi.
+        //
+        // CARA GUNA: Klik band -> markah auto diisi ke penjuru tertinggi julat
+        // band tu (contoh: Kepujian 3.0-3.7 -> auto isi 3.7), tapi pensyarah
+        // BOLEH terus edit angka dalam kotak input mengikut budi bicara sendiri
+        // (cth tukar kepada 3.0 atau 3.2) - markah TIDAK dikunci pada band.
+        //
+        // Jumlah "max" bagi semua sub-kriteria dalam satu kriteria MESTI
+        // menyamai jumlah markah kriteria itu (5 / 5 / 10 / 10 / 25 / 15).
         // ================================================================
-        const RUBRIC_CHECKLIST = {
-            't2-k1': { // Perancangan (Maks 5)
+        const RUBRIK_T2_T3 = {
+            't2-k1': { // Perancangan (5%) - Kumpulan
                 max: 5,
-                items: [
-                    { label: "Menunjukkan pengetahuan kandungan kokurikulum yang tepat", points: 2.5 },
-                    { label: "Mengaplikasikan teknologi dalam konteks kehidupan sebenar murid", points: 2.5 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Pemindahan pembelajaran (A3, HP5, KMK1) — Mengaplikasi pengetahuan/kemahiran komunikasi',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Sangat berkebolehan mengaplikasikan pengetahuan kandungan (kokurikulum & kemahiran belajar) dan pengetahuan teknologi dalam pelbagai konteks secara amat terperinci dan sangat jelas.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Berkebolehan mengaplikasikan pengetahuan kandungan (kokurikulum & kemahiran belajar) dan pengetahuan teknologi dalam pelbagai konteks secara terperinci dan jelas.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Kurang berkebolehan mengaplikasikan pengetahuan kandungan (kokurikulum & kemahiran belajar) dan pengetahuan teknologi dalam pelbagai konteks.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Lemah dalam mengaplikasikan pengetahuan kandungan (kokurikulum & kemahiran belajar) dan pengetahuan teknologi dalam konteks yang terhad.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tidak berkebolehan mengaplikasikan pengetahuan kandungan (kokurikulum & kemahiran belajar) dan pengetahuan teknologi menggunakan kemahiran berfikir.' }
+                        ]
+                    }
                 ]
             },
-            't2-k2': { // Pembinaan Produk (Maks 5) - berdasarkan 3E
+            't2-k2': { // Pembinaan Produk (5%) - Kumpulan
                 max: 5,
-                items: [
-                    { label: "Engagement — reka bentuk menarik minat murid", points: 1.7 },
-                    { label: "Enhancement — mempermudah kefahaman kandungan", points: 1.7 },
-                    { label: "Extension — merangsang penglibatan lanjutan murid", points: 1.6 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Mengaplikasi teknologi & sumber digital untuk pembelajaran bermakna (A3, HP5, KMK1)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Sangat berkebolehan mengaplikasikan teknologi dan sumber digital untuk aktiviti pembelajaran bermakna dalam pelbagai konteks secara terperinci dan jelas.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Berkebolehan mengaplikasikan teknologi dan sumber digital untuk aktiviti pembelajaran bermakna dalam pelbagai konteks secara jelas.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Kurang berkebolehan mengaplikasikan teknologi dan sumber digital untuk aktiviti pembelajaran bermakna dalam pelbagai konteks.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Lemah dalam mengaplikasikan teknologi dan sumber digital untuk aktiviti pembelajaran bermakna dalam konteks yang terhad.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tidak berkebolehan mengaplikasikan teknologi dan sumber digital untuk aktiviti pembelajaran bermakna.' }
+                        ]
+                    }
                 ]
             },
-            't2-k3': { // Pembentangan (Maks 10)
+            't2-k3': { // Pembentangan (10%) - Kumpulan
                 max: 10,
-                items: [
-                    { label: "Penyampaian idea jelas", points: 2.5 },
-                    { label: "Penyampaian koheren dan tersusun", points: 2.5 },
-                    { label: "Disampaikan dengan yakin", points: 2.5 },
-                    { label: "Meyakinkan khalayak rakan guru", points: 2.5 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Persembahan Idea (HP5, KMK1)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Menyampaikan idea dengan sangat jelas, yakin, koheren dan meyakinkan.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Menyampaikan idea dengan jelas, yakin, koheren dan meyakinkan.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Menyampaikan idea dengan baik, yakin, koheren dan meyakinkan namun memerlukan sedikit penambahbaikan.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Menyampaikan idea dengan agak jelas, koheren, dan meyakinkan tetapi memerlukan penambahbaikan.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tidak boleh menyampaikan idea dengan jelas, koheren, dan meyakinkan.' }
+                        ]
+                    },
+                    {
+                        id: 's2',
+                        label: 'Penyampaian kandungan melalui pemanfaatan teknologi & sumber digital (HP5, KMK1)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Boleh menyampaikan idea melalui pemanfaatan teknologi dan sumber digital pada tahap extension (contoh: memperoleh followers dan subscribers).' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Boleh menyampaikan idea melalui pemanfaatan teknologi dan sumber digital pada tahap extension (mendapat maklum balas daripada khalayak) tetapi memerlukan penambahbaikan.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Boleh menyampaikan idea melalui pemanfaatan teknologi dan sumber digital pada tahap enhancement (memudahkan pemahaman khalayak).' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Boleh menyampaikan idea melalui pemanfaatan teknologi dan sumber digital pada tahap engagement (menarik perhatian/minat khalayak) tetapi memerlukan penambahbaikan.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tidak boleh menyampaikan idea melalui pemanfaatan teknologi dan sumber digital.' }
+                        ]
+                    }
                 ]
             },
-            't3-k1': { // Pengenalan (Maks 10)
+            't3-k1': { // Pengenalan (10%)
                 max: 10,
-                items: [
-                    { label: "Maksud amalan tidak sihat dinyatakan dengan jelas", points: 3.4 },
-                    { label: "Penilaian prospek positif/negatif dibincangkan", points: 3.3 },
-                    { label: "Analisis cabaran isu dibuat", points: 3.3 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Persembahan idea / Pengenalan, pemilihan & penilaian isu (C5, HP2)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Huraian fakta sangat jelas, terperinci dan spesifik. Idea disampaikan dengan sangat jelas, yakin, koheren dan meyakinkan. Contoh sangat relevan, data menyokong hujah dengan cemerlang.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Huraian fakta jelas dan terperinci. Idea disampaikan dengan jelas, yakin, koheren dan meyakinkan. Contoh relevan, data menyokong hujah dengan baik.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Huraian fakta jelas namun perlu sedikit penambahbaikan. Idea disampaikan dengan baik namun perlu penambahbaikan. Contoh relevan, data menyokong hujah pada tahap memuaskan.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Huraian fakta agak jelas dan perlu penambahbaikan. Idea kurang jelas, kurang koheren, kurang yakin. Contoh agak relevan, data pada tahap sederhana.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tiada huraian fakta. Tidak dapat menyampaikan idea dengan jelas, koheren, yakin dan meyakinkan. Tiada contoh relevan atau data menyokong hujah.' }
+                        ]
+                    },
+                    {
+                        id: 's2',
+                        label: 'Penaakulan kritis & analitikal melalui visual/grafik/numerik (KKG3)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Dapat mengumpul, menyisih, menyimpan dan memproses maklumat dari pelbagai sumber digital mengikut keperluan konteks secara optimum dan cemerlang.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Dapat mengumpul dan menyisih maklumat dari pelbagai sumber digital mengikut keperluan konteks dengan baik.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Dapat mengumpul dan menyisih maklumat dari pelbagai sumber digital dengan baik.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Dapat mengumpul maklumat dan sumber digital secara sederhana.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Dapat mengumpul maklumat dan sumber digital secara terhad.' }
+                        ]
+                    }
                 ]
             },
-            't3-k2': { // Kandungan (Maks 25)
+            't3-k2': { // Kandungan (25%)
                 max: 25,
-                items: [
-                    { label: "Hujah isu disokong data/bukti yang relevan", points: 8.4 },
-                    { label: "Kesan amalan dinyatakan dengan jelas", points: 8.3 },
-                    { label: "Kaedah/solusi penyelesaian kritis dicadangkan", points: 8.3 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Kebolehan membuat huraian isu (KKG3)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Dapat menghirarki isu mengikut keperluan konteks secara optimum dan cemerlang.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Dapat menghirarki isu mengikut konteks dengan baik.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Dapat menghirarki isu dengan baik.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Dapat menghirarki isu secara sederhana.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Dapat menghirarki isu secara terhad.' }
+                        ]
+                    },
+                    {
+                        id: 's2',
+                        label: 'Menyatakan kesan isu dan amalan (C5, HP2)',
+                        max: 10,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 9.0, max: 10.0, desc: 'Kesediaan dan minat yang amat tinggi dalam menangani masalah dunia sebenar dan masalah global.' },
+                            { name: 'Cemerlang', min: 7.5, max: 8.9, desc: 'Kesediaan dan minat yang tinggi dalam menangani masalah dunia sebenar.' },
+                            { name: 'Kepujian', min: 6.0, max: 7.4, desc: 'Mempunyai kesediaan dan minat yang sederhana dalam menangani masalah dunia sebenar.' },
+                            { name: 'Sederhana', min: 5.0, max: 5.9, desc: 'Kurang bersedia dan kurang minat dalam menangani masalah dunia sebenar.' },
+                            { name: 'Lemah', min: 0.0, max: 4.9, desc: 'Tidak bersedia dan tidak berminat dalam menangani masalah dunia sebenar.' }
+                        ]
+                    },
+                    {
+                        id: 's3',
+                        label: 'Penyelesaian Masalah — Menyatakan kaedah penyelesaian (C5, HP2)',
+                        max: 10,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 9.0, max: 10.0, desc: 'Membentuk perspektif sendiri dengan sangat baik untuk merungkai dan menganalisis sesuatu isu.' },
+                            { name: 'Cemerlang', min: 7.5, max: 8.9, desc: 'Membentuk perspektif sendiri dengan baik untuk menganalisis sesuatu isu.' },
+                            { name: 'Kepujian', min: 6.0, max: 7.4, desc: 'Dapat membentuk perspektif sendiri untuk menganalisis sesuatu isu.' },
+                            { name: 'Sederhana', min: 5.0, max: 5.9, desc: 'Lemah dalam membentuk perspektif sendiri untuk menganalisis sesuatu isu.' },
+                            { name: 'Lemah', min: 0.0, max: 4.9, desc: 'Sangat lemah dalam membentuk perspektif sendiri untuk menganalisis sesuatu isu.' }
+                        ]
+                    }
                 ]
             },
-            't3-k3': { // Kesimpulan & Rujukan (Maks 15)
+            't3-k3': { // Kesimpulan (15%)
                 max: 15,
-                items: [
-                    { label: "Kepentingan kesedaran masyarakat dirumuskan", points: 7.5 },
-                    { label: "Senarai rujukan format APA terkini disertakan", points: 7.5 }
+                subcriteria: [
+                    {
+                        id: 's1',
+                        label: 'Menyatakan hujahan (C5, HP2)',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Dapat mengumpul, menyisih, menyimpan secara optimum dan cemerlang.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Dapat mengumpul dan menyisih dengan baik.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Dapat mengumpul dan menyisih dengan agak baik.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Dapat mengumpul maklumat secara sederhana.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Dapat mengumpul maklumat secara terhad.' }
+                        ]
+                    },
+                    {
+                        id: 's2',
+                        label: 'Penyelesaian Masalah',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Membentuk perspektif sendiri dengan sangat baik untuk merungkai dan menganalisis sesuatu isu.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Membentuk perspektif sendiri dengan baik untuk menganalisis sesuatu isu.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Dapat membentuk perspektif sendiri untuk menganalisis sesuatu isu.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Lemah dalam membentuk perspektif sendiri untuk menganalisis sesuatu isu.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Sangat lemah dalam membentuk perspektif sendiri untuk menganalisis sesuatu isu.' }
+                        ]
+                    },
+                    {
+                        id: 's3',
+                        label: 'Sumber',
+                        max: 5,
+                        bands: [
+                            { name: 'Amat Cemerlang', min: 4.5, max: 5.0, desc: 'Sumber yang diberikan sangat tepat dan mempunyai kebolehpercayaan yang sangat tinggi.' },
+                            { name: 'Cemerlang', min: 3.8, max: 4.4, desc: 'Sumber yang diberikan tepat dan mempunyai kebolehpercayaan yang tinggi.' },
+                            { name: 'Kepujian', min: 3.0, max: 3.7, desc: 'Sumber yang diberikan agak tepat dan mempunyai kebolehpercayaan yang agak tinggi.' },
+                            { name: 'Sederhana', min: 2.5, max: 2.9, desc: 'Sumber yang diberikan kurang tepat dan mempunyai kebolehpercayaan pada tahap sederhana.' },
+                            { name: 'Lemah', min: 0.0, max: 2.4, desc: 'Tiada sumber disediakan.' }
+                        ]
+                    }
                 ]
             }
         };
 
-        // Bina semula checkbox untuk satu kriteria (dipanggil bila modal dibuka)
-        function renderChecklist(critId, presetChecked) {
-            const config = RUBRIC_CHECKLIST[critId];
+        // Bina semula UI sub-kriteria + band untuk satu kriteria (dipanggil bila modal dibuka)
+        // Kotak markah bermula pada 0 - lecturer klik band (auto-isi) ATAU taip terus markah.
+        function renderRubricCriterion(critId) {
+            const config = RUBRIK_T2_T3[critId];
             const container = document.getElementById(`checklist-${critId}`);
             if (!config || !container) return;
 
-            container.innerHTML = config.items.map((item, idx) => `
-                <label class="flex items-start gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-[11px] text-slate-700 cursor-pointer hover:border-ipg-blue transition-colors">
-                    <input type="checkbox"
-                           class="mt-0.5 accent-ipg-blue cursor-pointer"
-                           data-crit="${critId}"
-                           data-idx="${idx}"
-                           data-points="${item.points}"
-                           onchange="onChecklistToggle('${critId}')"
-                           ${presetChecked && presetChecked[idx] ? 'checked' : ''}>
-                    <span class="flex-1">${item.label}</span>
-                    <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">${item.points.toFixed(1)} m</span>
-                </label>
+            container.innerHTML = config.subcriteria.map(sub => `
+                <div class="border border-slate-200 rounded-lg p-3 bg-white space-y-2">
+                    <div class="flex justify-between items-start gap-2">
+                        <p class="text-[11px] font-semibold text-slate-700 flex-1 leading-snug">${sub.label}</p>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <input type="number" step="0.1" min="0" max="${sub.max}" value="0"
+                                   id="sub-${critId}-${sub.id}"
+                                   oninput="clampSubInput('${critId}','${sub.id}',${sub.max}); onSubMarkInput('${critId}')"
+                                   class="w-16 px-2 py-1 border border-slate-300 rounded text-xs text-center font-bold focus:ring-2 focus:ring-ipg-blue outline-none">
+                            <span class="text-[10px] text-slate-400 font-semibold">/ ${sub.max.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${sub.bands.map((b, bIdx) => `
+                            <button type="button"
+                                    onclick="selectBand('${critId}','${sub.id}',${bIdx})"
+                                    data-crit="${critId}" data-sub="${sub.id}" data-band="${bIdx}"
+                                    class="band-btn px-2 py-1 rounded-md text-[9px] font-bold border border-slate-200 text-slate-500 hover:border-ipg-blue hover:text-ipg-blue transition-colors">
+                                ${b.name} (${b.min.toFixed(1)}-${b.max.toFixed(1)})
+                            </button>
+                        `).join('')}
+                    </div>
+                    <p id="desc-${critId}-${sub.id}" class="text-[10px] text-slate-500 italic leading-snug hidden"></p>
+                </div>
             `).join('');
-
-            onChecklistToggle(critId, true); // kira nilai awal tanpa recursive-save-loop
         }
 
-        // Bila mana-mana checkbox ditanda/nyahtanda, kira semula jumlah kriteria itu
-        function onChecklistToggle(critId) {
-            const container = document.getElementById(`checklist-${critId}`);
-            if (!container) return;
+        // Pastikan markah manual tidak melebihi had sub-kriteria
+        function clampSubInput(critId, subId, maxVal) {
+            const el = document.getElementById(`sub-${critId}-${subId}`);
+            if (!el) return;
+            let v = parseFloat(el.value);
+            if (isNaN(v) || v < 0) v = 0;
+            if (v > maxVal) v = maxVal;
+            el.value = v;
+        }
 
-            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-            let sum = 0;
-            checkboxes.forEach(cb => {
-                if (cb.checked) sum += parseFloat(cb.dataset.points) || 0;
+        // Bila lecturer klik satu band: highlight butang, auto-isi markah (penjuru tertinggi
+        // julat band), papar deskriptor penuh - TAPI markah dalam kotak input boleh terus diedit.
+        function selectBand(critId, subId, bandIdx) {
+            const config = RUBRIK_T2_T3[critId];
+            const sub = config.subcriteria.find(s => s.id === subId);
+            if (!sub) return;
+            const band = sub.bands[bandIdx];
+
+            document.querySelectorAll(`.band-btn[data-crit="${critId}"][data-sub="${subId}"]`).forEach(btn => {
+                btn.classList.remove('bg-ipg-navy', 'text-white', 'border-ipg-navy');
+                btn.classList.add('border-slate-200', 'text-slate-500');
             });
-            sum = Math.round(sum * 10) / 10;
+            const selectedBtn = document.querySelector(`.band-btn[data-crit="${critId}"][data-sub="${subId}"][data-band="${bandIdx}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('bg-ipg-navy', 'text-white', 'border-ipg-navy');
+                selectedBtn.classList.remove('border-slate-200', 'text-slate-500');
+            }
 
-            // critId contoh: 't2-k1' -> group='t2', key='k1'
-            const [group, key] = critId.split('-');
+            const input = document.getElementById(`sub-${critId}-${subId}`);
+            if (input) input.value = band.max.toFixed(1);
+
+            const descEl = document.getElementById(`desc-${critId}-${subId}`);
+            if (descEl) {
+                descEl.innerText = band.desc;
+                descEl.classList.remove('hidden');
+            }
+
+            onSubMarkInput(critId);
+        }
+
+        // Jumlahkan semua sub-kriteria bagi satu kriteria (t2-k1, t2-k2, ...) dan kemas kini badge/jumlah
+        function onSubMarkInput(critId) {
+            const config = RUBRIK_T2_T3[critId];
+            if (!config) return;
+
+            let sum = 0;
+            config.subcriteria.forEach(sub => {
+                const el = document.getElementById(`sub-${critId}-${sub.id}`);
+                let v = parseFloat(el ? el.value : 0) || 0;
+                if (v < 0) v = 0;
+                if (v > sub.max) v = sub.max;
+                sum += v;
+            });
+            sum = Math.round(sum * 100) / 100;
+            if (sum > config.max) sum = config.max;
+
             document.getElementById(critId).value = sum; // hidden input (dibaca oleh saveStudentScores)
 
+            const [group, key] = critId.split('-');
             if (group === 't2') {
                 updateT2Slider(key, sum);
             } else {
@@ -1182,7 +1372,7 @@
             // Nilai sedia ada dari sheet dipaparkan di hidden input & label supaya
             // markah asal tidak hilang jika modal ditutup tanpa menanda apa-apa.)
             ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
-                renderChecklist(critId, null);
+                renderRubricCriterion(critId);
             });
 
             document.getElementById('t2-k1').value = student.t2.k1;
