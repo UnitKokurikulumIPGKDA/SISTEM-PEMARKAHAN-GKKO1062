@@ -189,8 +189,8 @@
                         <p class="text-xs text-slate-600">Kursus: GKKO1062 Kokurikulum dan Kesihatan Diri</p>
                     </div>
                     <div class="text-right text-xs">
-                        <p><strong>Pensyarah:</strong> HANIFF FAIZAL BIN CHEK ANI </p>
-                        <p><strong>Tarikh Laporan:</strong> Julai 2026</p>
+                        <p><strong>Penyelaras:</strong> Musaidi Mustaffa</p>
+                        <p><strong>Tarikh Laporan:</strong> 12 Julai 2026</p>
                     </div>
                 </div>
             </div>
@@ -455,12 +455,13 @@
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>A:</strong> No</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>B:</strong> Nama Pelajar</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>C:</strong> No KP</div>
-                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>D:</strong> Kumpulan</div>
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>D:</strong> Angka Giliran</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>E:</strong> T1 (Ujian)</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>F-H:</strong> T2 (3 Kriteria)</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>I-K:</strong> T3 (3 Kriteria)</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>L:</strong> Jumlah (Auto)</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>M:</strong> Gred (Auto)</div>
+                                <div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200"><strong>N-S:</strong> Komen (6 Kriteria)</div>
                             </div>
                         </div>
                     </div>
@@ -535,6 +536,7 @@
                             </div>
                             <div id="checklist-t2-k1" class="space-y-1.5"></div>
                             <input type="hidden" id="t2-k1" value="0">
+                            <textarea id="comment-t2-k1" rows="2" placeholder="Komen pensyarah untuk kriteria Perancangan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-2">
@@ -543,6 +545,7 @@
                             </div>
                             <div id="checklist-t2-k2" class="space-y-1.5"></div>
                             <input type="hidden" id="t2-k2" value="0">
+                            <textarea id="comment-t2-k2" rows="2" placeholder="Komen pensyarah untuk kriteria Pembinaan Produk (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-2">
@@ -551,6 +554,7 @@
                             </div>
                             <div id="checklist-t2-k3" class="space-y-1.5"></div>
                             <input type="hidden" id="t2-k3" value="0">
+                            <textarea id="comment-t2-k3" rows="2" placeholder="Komen pensyarah untuk kriteria Pembentangan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                     </div>
                 </div>
@@ -573,6 +577,7 @@
                             </div>
                             <div id="checklist-t3-k1" class="space-y-1.5"></div>
                             <input type="hidden" id="t3-k1" value="0">
+                            <textarea id="comment-t3-k1" rows="2" placeholder="Komen pensyarah untuk kriteria Pengenalan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-2">
@@ -581,6 +586,7 @@
                             </div>
                             <div id="checklist-t3-k2" class="space-y-1.5"></div>
                             <input type="hidden" id="t3-k2" value="0">
+                            <textarea id="comment-t3-k2" rows="2" placeholder="Komen pensyarah untuk kriteria Kandungan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-2">
@@ -589,6 +595,7 @@
                             </div>
                             <div id="checklist-t3-k3" class="space-y-1.5"></div>
                             <input type="hidden" id="t3-k3" value="0">
+                            <textarea id="comment-t3-k3" rows="2" placeholder="Komen pensyarah untuk kriteria Kesimpulan & Rujukan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
                         </div>
                     </div>
                 </div>
@@ -818,18 +825,21 @@
         };
 
         // Bina semula UI sub-kriteria + band untuk satu kriteria (dipanggil bila modal dibuka)
-        // Kotak markah bermula pada 0 - lecturer klik band (auto-isi) ATAU taip terus markah.
-        function renderRubricCriterion(critId) {
+        // presetSubMarks: objek { 's1': 4.2, 's2': 3.0, ... } drpd data sheet sedia ada (jika ada)
+        function renderRubricCriterion(critId, presetSubMarks) {
             const config = RUBRIK_T2_T3[critId];
             const container = document.getElementById(`checklist-${critId}`);
             if (!config || !container) return;
+            presetSubMarks = presetSubMarks || {};
 
-            container.innerHTML = config.subcriteria.map(sub => `
+            container.innerHTML = config.subcriteria.map(sub => {
+                const presetVal = parseFloat(presetSubMarks[sub.id]) || 0;
+                return `
                 <div class="border border-slate-200 rounded-lg p-3 bg-white space-y-2">
                     <div class="flex justify-between items-start gap-2">
                         <p class="text-[11px] font-semibold text-slate-700 flex-1 leading-snug">${sub.label}</p>
                         <div class="flex items-center gap-1 shrink-0">
-                            <input type="number" step="0.1" min="0" max="${sub.max}" value="0"
+                            <input type="number" step="0.1" min="0" max="${sub.max}" value="${presetVal.toFixed(1)}"
                                    id="sub-${critId}-${sub.id}"
                                    oninput="onSubMarkInput('${critId}')"
                                    onblur="clampSubInput('${critId}','${sub.id}',${sub.max}); onSubMarkInput('${critId}')"
@@ -842,14 +852,20 @@
                             <button type="button"
                                     onclick="selectBand('${critId}','${sub.id}',${bIdx})"
                                     data-crit="${critId}" data-sub="${sub.id}" data-band="${bIdx}"
-                                    class="band-btn px-2 py-1 rounded-md text-[9px] font-bold border border-slate-200 text-slate-500 hover:border-ipg-blue hover:text-ipg-blue transition-colors">
+                                    class="band-btn px-2 py-1 rounded-md text-[9px] font-bold border ${(presetVal >= b.min && presetVal <= b.max) ? 'bg-ipg-navy text-white border-ipg-navy' : 'border-slate-200 text-slate-500'} hover:border-ipg-blue hover:text-ipg-blue transition-colors">
                                 ${b.name} (${b.min.toFixed(1)}-${b.max.toFixed(1)})
                             </button>
                         `).join('')}
                     </div>
-                    <p id="desc-${critId}-${sub.id}" class="text-[10px] text-slate-500 italic leading-snug hidden"></p>
+                    <p id="desc-${critId}-${sub.id}" class="text-[10px] text-slate-500 italic leading-snug ${presetVal > 0 ? '' : 'hidden'}">${(() => {
+                        const matchedBand = sub.bands.find(b => presetVal >= b.min && presetVal <= b.max);
+                        return matchedBand ? matchedBand.desc : '';
+                    })()}</p>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+
+            onSubMarkInput(critId);
         }
 
         // Pastikan markah manual tidak melebihi had sub-kriteria
@@ -992,12 +1008,15 @@
                         students = res.data.map((item, index) => ({
                             id: 'S' + (index + 1),
                             rowNum: item.rowNum,
+                            no: item.no,
                             name: item.name,
                             kp: item.kp,
                             group: item.group || "TIADA UNIT",
                             t1: item.t1,
                             t2: item.t2,
                             t3: item.t3,
+                            comments: item.comments || { t2k1: "", t2k2: "", t2k3: "", t3k1: "", t3k2: "", t3k3: "" },
+                            subMarks: item.subMarks || {},
                             total: item.total,
                             grade: item.grade
                         }));
@@ -1394,28 +1413,40 @@
             document.getElementById('input-t1').value = student.t1;
             calculateT1(student.t1);
 
-            // Bina semula checklist T2 & T3 (checkbox mula TIDAK ditanda -
-            // sheet cuma simpan jumlah akhir, bukan item mana yang ditanda,
-            // jadi lecturer perlu tanda semula bila membuka/mengedit markah sedia ada.
-            // Nilai sedia ada dari sheet dipaparkan di hidden input & label supaya
-            // markah asal tidak hilang jika modal ditutup tanpa menanda apa-apa.)
+            // Bina semula UI sub-kriteria T2 & T3, prefill dgn markah sedia ada (subMarks)
+            // drpd lajur T-AE dalam sheet supaya setiap kotak raw boleh terus diedit.
+            const sm = student.subMarks || {};
             ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
-                renderRubricCriterion(critId);
+                const config = RUBRIK_T2_T3[critId];
+                const presetForCrit = {};
+                config.subcriteria.forEach(sub => {
+                    presetForCrit[sub.id] = sm[`${critId}-${sub.id}`] || 0;
+                });
+                renderRubricCriterion(critId, presetForCrit);
             });
 
-            document.getElementById('t2-k1').value = student.t2.k1;
-            document.getElementById('t2-k2').value = student.t2.k2;
-            document.getElementById('t2-k3').value = student.t2.k3;
-            updateT2Slider('k1', student.t2.k1);
-            updateT2Slider('k2', student.t2.k2);
-            updateT2Slider('k3', student.t2.k3);
+            // FAILSAFE: rekod LAMA (sebelum lajur pecahan T-AE wujud) tiada data subMarks,
+            // jadi jumlah terkira drpd sub-kriteria akan jadi 0. Dalam kes itu, kekalkan
+            // sahaja jumlah agregat asal drpd lajur F-K supaya markah lama tidak hilang.
+            [['t2-k1', student.t2.k1], ['t2-k2', student.t2.k2], ['t2-k3', student.t2.k3],
+             ['t3-k1', student.t3.k1], ['t3-k2', student.t3.k2], ['t3-k3', student.t3.k3]].forEach(([critId, legacyVal]) => {
+                const currentHidden = parseFloat(document.getElementById(critId).value) || 0;
+                if (currentHidden === 0 && parseFloat(legacyVal) > 0) {
+                    document.getElementById(critId).value = legacyVal;
+                    const [group, key] = critId.split('-');
+                    if (group === 't2') updateT2Slider(key, legacyVal);
+                    else updateT3Slider(key, legacyVal);
+                }
+            });
 
-            document.getElementById('t3-k1').value = student.t3.k1;
-            document.getElementById('t3-k2').value = student.t3.k2;
-            document.getElementById('t3-k3').value = student.t3.k3;
-            updateT3Slider('k1', student.t3.k1);
-            updateT3Slider('k2', student.t3.k2);
-            updateT3Slider('k3', student.t3.k3);
+            // Papar komen sedia ada (jika ada) bagi setiap kriteria
+            const c = student.comments || {};
+            document.getElementById('comment-t2-k1').value = c.t2k1 || "";
+            document.getElementById('comment-t2-k2').value = c.t2k2 || "";
+            document.getElementById('comment-t2-k3').value = c.t2k3 || "";
+            document.getElementById('comment-t3-k1').value = c.t3k1 || "";
+            document.getElementById('comment-t3-k2').value = c.t3k2 || "";
+            document.getElementById('comment-t3-k3').value = c.t3k3 || "";
 
             calculateModalTotal();
             document.getElementById('grading-modal').classList.remove('hidden');
@@ -1491,6 +1522,17 @@
             saveBtn.disabled = true;
             saveBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menghantar...</span>`;
 
+            // Kumpulkan SETIAP markah sub-kriteria individu (lajur T-AE) supaya
+            // ia boleh dimuat semula & diedit bila modal dibuka semula pada masa hadapan.
+            const subMarksPayload = {};
+            ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
+                const config = RUBRIK_T2_T3[critId];
+                config.subcriteria.forEach(sub => {
+                    const el = document.getElementById(`sub-${critId}-${sub.id}`);
+                    subMarksPayload[`${critId}-${sub.id}`] = parseFloat(el ? el.value : 0) || 0;
+                });
+            });
+
             const payload = {
                 rowNum: student.rowNum,
                 t1: parseFloat(document.getElementById('input-t1').value) || 0,
@@ -1503,7 +1545,16 @@
                     k1: parseFloat(document.getElementById('t3-k1').value) || 0,
                     k2: parseFloat(document.getElementById('t3-k2').value) || 0,
                     k3: parseFloat(document.getElementById('t3-k3').value) || 0
-                }
+                },
+                comments: {
+                    t2k1: document.getElementById('comment-t2-k1').value.trim(),
+                    t2k2: document.getElementById('comment-t2-k2').value.trim(),
+                    t2k3: document.getElementById('comment-t2-k3').value.trim(),
+                    t3k1: document.getElementById('comment-t3-k1').value.trim(),
+                    t3k2: document.getElementById('comment-t3-k2').value.trim(),
+                    t3k3: document.getElementById('comment-t3-k3').value.trim()
+                },
+                subMarks: subMarksPayload
             };
 
             if (!gasUrl) {
@@ -1522,11 +1573,13 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                showToast("Markah dikemas kini & dihantar ke Google Sheets secara langsung!", "success");
+                showToast("Markah & komen dikemas kini & dihantar ke Google Sheets secara langsung!", "success");
                 
                 student.t1 = payload.t1;
                 student.t2 = payload.t2;
                 student.t3 = payload.t3;
+                student.comments = payload.comments;
+                student.subMarks = payload.subMarks;
                 
                 renderStudentTable();
                 updateDashboardStats();
@@ -1688,6 +1741,33 @@
             const grandTotal = Math.round((t1 + t2Total + t3Total) * 100) / 100;
             const grade = student.grade || calculateGrade(grandTotal);
             const today = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
+            const cm = student.comments || {};
+            const sm = student.subMarks || {};
+            const escapeHtml = (str) => (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // Jana baris pecahan sub-kriteria + baris jumlah kriteria (data-driven drpd RUBRIK_T2_T3)
+            function printCriterionRows(critId, headerLabel, aggregateVal, commentVal) {
+                const config = RUBRIK_T2_T3[critId];
+                let rows = '';
+                if (config.subcriteria.length > 1) {
+                    config.subcriteria.forEach(sub => {
+                        const v = parseFloat(sm[`${critId}-${sub.id}`]) || 0;
+                        rows += `
+                            <tr style="border-bottom:1px solid #e2e8f0;">
+                                <td style="padding:5px 10px 5px 32px;color:#475569;font-size:10px;">${escapeHtml(sub.label)}</td>
+                                <td style="padding:5px 10px;text-align:center;color:#475569;font-size:10px;">${v.toFixed(1)} / ${sub.max.toFixed(1)}</td>
+                                <td></td>
+                            </tr>`;
+                    });
+                }
+                rows += `
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:8px 10px 8px 24px;font-weight:700;">${headerLabel}</td>
+                        <td style="padding:8px 10px;text-align:center;font-weight:700;">${aggregateVal.toFixed(1)} / ${config.max.toFixed(1)}</td>
+                        <td style="padding:8px 10px;color:#64748b;font-style:italic;">${escapeHtml(commentVal)}</td>
+                    </tr>`;
+                return rows;
+            }
 
             const reportHtml = `
                 <div style="max-width:800px;margin:0 auto;font-family:'Plus Jakarta Sans',sans-serif;">
@@ -1728,21 +1808,9 @@
                             <tr style="border-bottom:1px solid #e2e8f0;background:#f8fafc;">
                                 <td colspan="3" style="padding:6px 10px;font-weight:700;color:#134074;">Tugasan 2: Persembahan OPD (20%)</td>
                             </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Perancangan</td>
-                                <td style="padding:6px 10px;text-align:center;">${t2k1.toFixed(1)} / 5.0</td>
-                                <td></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Pembinaan Produk</td>
-                                <td style="padding:6px 10px;text-align:center;">${t2k2.toFixed(1)} / 5.0</td>
-                                <td></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Pembentangan</td>
-                                <td style="padding:6px 10px;text-align:center;">${t2k3.toFixed(1)} / 10.0</td>
-                                <td></td>
-                            </tr>
+                            ${printCriterionRows('t2-k1', 'Perancangan', t2k1, cm.t2k1)}
+                            ${printCriterionRows('t2-k2', 'Pembinaan Produk', t2k2, cm.t2k2)}
+                            ${printCriterionRows('t2-k3', 'Pembentangan', t2k3, cm.t2k3)}
                             <tr style="border-bottom:1px solid #e2e8f0;">
                                 <td style="padding:8px 10px;font-weight:700;">Jumlah Tugasan 2</td>
                                 <td style="padding:8px 10px;text-align:center;font-weight:700;">${t2Total.toFixed(1)} / 20.0</td>
@@ -1751,21 +1819,9 @@
                             <tr style="border-bottom:1px solid #e2e8f0;background:#f8fafc;">
                                 <td colspan="3" style="padding:6px 10px;font-weight:700;color:#134074;">Tugasan 3: Penulisan (50%)</td>
                             </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Pengenalan</td>
-                                <td style="padding:6px 10px;text-align:center;">${t3k1.toFixed(1)} / 10.0</td>
-                                <td></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Kandungan</td>
-                                <td style="padding:6px 10px;text-align:center;">${t3k2.toFixed(1)} / 25.0</td>
-                                <td></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e2e8f0;">
-                                <td style="padding:6px 10px 6px 24px;">Kesimpulan</td>
-                                <td style="padding:6px 10px;text-align:center;">${t3k3.toFixed(1)} / 15.0</td>
-                                <td></td>
-                            </tr>
+                            ${printCriterionRows('t3-k1', 'Pengenalan', t3k1, cm.t3k1)}
+                            ${printCriterionRows('t3-k2', 'Kandungan', t3k2, cm.t3k2)}
+                            ${printCriterionRows('t3-k3', 'Kesimpulan', t3k3, cm.t3k3)}
                             <tr style="border-bottom:1px solid #e2e8f0;">
                                 <td style="padding:8px 10px;font-weight:700;">Jumlah Tugasan 3</td>
                                 <td style="padding:8px 10px;text-align:center;font-weight:700;">${t3Total.toFixed(1)} / 50.0</td>
