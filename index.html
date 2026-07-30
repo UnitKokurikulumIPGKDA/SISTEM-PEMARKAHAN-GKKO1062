@@ -37,65 +37,28 @@
         }
     </script>
     <style>
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* GAYA PRINT-FRIENDLY KHAS */
         @media print {
-            body {
-                background: white !important;
-                color: black !important;
-            }
-            aside, header, .no-print, button, input, select, #setup-warning, #toast-container, .tab-buttons {
-                display: none !important;
-            }
-            main {
-                width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .print-layout {
-                display: block !important;
-                width: 100% !important;
-            }
-            .print-card {
-                border: 1px solid #cbd5e1 !important;
-                box-shadow: none !important;
-                page-break-inside: avoid;
-            }
-            table {
-                font-size: 10px !important;
-                width: 100% !important;
-            }
-            th, td {
-                padding: 6px 8px !important;
-                border-bottom: 1px solid #cbd5e1 !important;
-            }
-            /* MOD CETAK SEORANG-DEMI-SEORANG */
-            body.printing-single #app-print-area {
-                display: none !important;
-            }
-            body.printing-single #print-student-report {
-                display: block !important;
-            }
+            body { background: white !important; color: black !important; }
+            aside, header, .no-print, button, input, select, #setup-warning, #toast-container, .tab-buttons { display: none !important; }
+            main { width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .print-layout { display: block !important; width: 100% !important; }
+            .print-card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; page-break-inside: avoid; }
+            table { font-size: 10px !important; width: 100% !important; }
+            th, td { padding: 6px 8px !important; border-bottom: 1px solid #cbd5e1 !important; }
+            body.printing-single #app-print-area { display: none !important; }
+            body.printing-single #print-student-report { display: block !important; }
         }
-        #print-student-report {
-            padding: 32px;
-            background: white;
-            color: #0f172a;
-        }
+        #print-student-report { padding: 32px; background: white; color: #0f172a; }
+        
+        /* Animasi Togol Switch Khas */
+        .toggle-checkbox:checked { right: 0; border-color: #134074; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #134074; }
     </style>
 </head>
 <body class="h-full font-sans antialiased text-slate-800">
@@ -200,7 +163,6 @@
                 <!-- 1. TAB DASHBOARD -->
                 <div id="tab-dashboard" class="space-y-6">
                     
-                    <!-- Penapis Kelas Khas Dasbor (Supaya statistik berubah dinamik) -->
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 no-print">
                         <div class="flex items-center space-x-2">
                             <span class="text-xs font-bold text-slate-600">Analisis Kumpulan:</span>
@@ -260,9 +222,7 @@
                         </div>
                     </div>
 
-                    <!-- SEKSYEN ANALISIS GRAF TABURAN VISUAL -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Graf Taburan Gred (Bar Chart) -->
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:col-span-2 print-card">
                             <h4 class="font-bold text-slate-800 text-xs mb-4 flex items-center space-x-2">
                                 <i class="fa-solid fa-chart-bar text-ipg-blue"></i>
@@ -273,7 +233,6 @@
                             </div>
                         </div>
 
-                        <!-- Graf Kadar Lulus Gagal (Doughnut) -->
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 print-card">
                             <h4 class="font-bold text-slate-800 text-xs mb-4 flex items-center space-x-2">
                                 <i class="fa-solid fa-chart-pie text-ipg-gold"></i>
@@ -285,9 +244,7 @@
                         </div>
                     </div>
 
-                    <!-- Rekod Pencapaian Tertinggi dan Terendah -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 print-card">
-                        <!-- Pencapaian Tertinggi -->
                         <div class="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100">
                             <h5 class="text-xs font-bold text-emerald-800 flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-up text-emerald-600"></i>
@@ -298,7 +255,6 @@
                                 <p id="best-student-meta" class="text-[11px] text-slate-500 mt-1">Kumpulan: - • Markah: -</p>
                             </div>
                         </div>
-                        <!-- Pencapaian Terendah -->
                         <div class="bg-rose-50/50 p-5 rounded-2xl border border-rose-100">
                             <h5 class="text-xs font-bold text-rose-800 flex items-center space-x-2">
                                 <i class="fa-solid fa-circle-down text-rose-600"></i>
@@ -311,14 +267,12 @@
                         </div>
                     </div>
 
-                    <!-- Selesai / Belum Selesai status elements (SILA KEKALKAN - PENTING) -->
                     <div class="hidden">
                         <span id="stat-completed">0</span>
                         <span id="stat-pending">0</span>
                         <i id="stat-pending-icon"></i>
                     </div>
 
-                    <!-- Struktur Pentaksiran Berterusan -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden print-card">
                         <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h4 class="font-bold text-slate-800 text-xs">Pecahan Wajaran Tugasan Pentaksiran Berterusan</h4>
@@ -406,7 +360,6 @@
                         <button onclick="toggleRubricInfo('r2')" id="btn-r2" class="px-4 py-2 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150">Tugasan 2: Persembahan (20%)</button>
                         <button onclick="toggleRubricInfo('r3')" id="btn-r3" class="px-4 py-2 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all duration-150">Tugasan 3: Penulisan (50%)</button>
                     </div>
-
                     <div id="rubric-display" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4 text-xs leading-relaxed text-slate-700 print-card">
                         <!-- Dynamic Content Inject -->
                     </div>
@@ -433,7 +386,6 @@
                             </div>
                         </div>
 
-                        <!-- BUTANG REKA HEADER AUTOMATIK -->
                         <div class="border-t border-slate-100 pt-6 space-y-3">
                             <h4 class="font-bold text-slate-800 text-xs">Pemasangan Pembina Header Automatik:</h4>
                             <p class="text-xs text-slate-600 leading-relaxed">
@@ -450,7 +402,6 @@
                             <p class="text-xs text-slate-600 leading-relaxed">
                                 Sila pastikan format susunan lajur pada sheet bermula dari lajur pertama (A) mengikut konfigurasi berikut untuk mengelaktan ralat data:
                             </p>
-                            
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] text-slate-700">
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>A:</strong> No</div>
                                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200"><strong>B:</strong> Nama Pelajar</div>
@@ -472,7 +423,7 @@
         </main>
     </div>
 
-    <!-- LAPORAN CETAKAN INDIVIDU PELAJAR (hanya dipaparkan semasa cetak seorang) -->
+    <!-- LAPORAN CETAKAN INDIVIDU PELAJAR -->
     <div id="print-student-report" class="hidden"></div>
 
     <!-- MODAL PEMARKAHAN PELAJAR -->
@@ -496,7 +447,7 @@
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="font-bold text-ipg-blue flex items-center space-x-2 text-xs">
                             <span class="w-6 h-6 rounded-full bg-ipg-navy text-white text-xs flex items-center justify-center font-sans">1</span>
-                            <span>Tugasan 1: Ujian Ujian (Wajaran: 30%)</span>
+                            <span>Tugasan 1: Ujian (Wajaran: 30%)</span>
                         </h4>
                         <span id="t1-band-badge" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-slate-200 text-slate-700">Tahap</span>
                     </div>
@@ -555,6 +506,24 @@
                             <div id="checklist-t2-k3" class="space-y-1.5"></div>
                             <input type="hidden" id="t2-k3" value="0">
                             <textarea id="comment-t2-k3" rows="2" placeholder="Komen pensyarah untuk kriteria Pembentangan (pilihan)..." class="w-full mt-2 px-3 py-2 border border-slate-200 rounded-lg text-[11px] focus:ring-2 focus:ring-ipg-blue outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- NEW: TOGOL SEGERAK KUMPULAN -->
+                    <div class="mt-6 p-4 bg-ipg-light/50 border border-ipg-blue/20 rounded-xl flex items-center justify-between shadow-inner">
+                        <div>
+                            <h4 class="text-xs font-bold text-ipg-navy flex items-center gap-1.5">
+                                <i class="fa-solid fa-users-gear"></i>
+                                Segerak Markah Kumpulan (Tugasan 2 Sahaja)
+                            </h4>
+                            <p class="text-[10px] text-slate-500 mt-1 max-w-sm">Markah dan komen Tugasan 2 (Persembahan) akan disalin kepada semua ahli kumpulan (<span id="sync-group-name" class="font-bold text-ipg-blue"></span>) secara automatik.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-slate-400" id="sync-status-text">OFF</span>
+                            <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" name="toggle" id="sync-group-t2" onchange="toggleSyncText(this.checked)" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-slate-300 transition-all duration-300 z-10"/>
+                                <label for="sync-group-t2" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -632,23 +601,8 @@
         let gradeChartInstance = null;
         let passChartInstance = null;
 
-        // ================================================================
-        // RUBRIK RASMI GKKO1062 (Sumber: RUBRIK_GKKO1162_2026_MUSAIDI.pdf)
-        // Setiap kriteria (t2-k1, t2-k2, ... t3-k3) terdiri daripada satu atau
-        // lebih SUB-KRITERIA. Setiap sub-kriteria ada 5 TAHAP/BAND markah
-        // (Amat Cemerlang / Cemerlang / Kepujian / Sederhana / Lemah) dengan
-        // julat markah rasmi.
-        //
-        // CARA GUNA: Klik band -> markah auto diisi ke penjuru tertinggi julat
-        // band tu (contoh: Kepujian 3.0-3.7 -> auto isi 3.7), tapi pensyarah
-        // BOLEH terus edit angka dalam kotak input mengikut budi bicara sendiri
-        // (cth tukar kepada 3.0 atau 3.2) - markah TIDAK dikunci pada band.
-        //
-        // Jumlah "max" bagi semua sub-kriteria dalam satu kriteria MESTI
-        // menyamai jumlah markah kriteria itu (5 / 5 / 10 / 10 / 25 / 15).
-        // ================================================================
         const RUBRIK_T2_T3 = {
-            't2-k1': { // Perancangan (5%) - Kumpulan
+            't2-k1': {
                 max: 5,
                 subcriteria: [
                     {
@@ -665,7 +619,7 @@
                     }
                 ]
             },
-            't2-k2': { // Pembinaan Produk (5%) - Kumpulan
+            't2-k2': {
                 max: 5,
                 subcriteria: [
                     {
@@ -682,7 +636,7 @@
                     }
                 ]
             },
-            't2-k3': { // Pembentangan (10%) - Kumpulan
+            't2-k3': {
                 max: 10,
                 subcriteria: [
                     {
@@ -711,7 +665,7 @@
                     }
                 ]
             },
-            't3-k1': { // Pengenalan (10%)
+            't3-k1': {
                 max: 10,
                 subcriteria: [
                     {
@@ -740,7 +694,7 @@
                     }
                 ]
             },
-            't3-k2': { // Kandungan (25%)
+            't3-k2': {
                 max: 25,
                 subcriteria: [
                     {
@@ -781,7 +735,7 @@
                     }
                 ]
             },
-            't3-k3': { // Kesimpulan (15%)
+            't3-k3': {
                 max: 15,
                 subcriteria: [
                     {
@@ -824,8 +778,6 @@
             }
         };
 
-        // Bina semula UI sub-kriteria + band untuk satu kriteria (dipanggil bila modal dibuka)
-        // presetSubMarks: objek { 's1': 4.2, 's2': 3.0, ... } drpd data sheet sedia ada (jika ada)
         function renderRubricCriterion(critId, presetSubMarks) {
             const config = RUBRIK_T2_T3[critId];
             const container = document.getElementById(`checklist-${critId}`);
@@ -835,7 +787,7 @@
             container.innerHTML = config.subcriteria.map(sub => {
                 const presetVal = parseFloat(presetSubMarks[sub.id]) || 0;
                 return `
-                <div class="border border-slate-200 rounded-lg p-3 bg-white space-y-2">
+                <div class="border border-slate-200 rounded-lg p-3 bg-white space-y-2 transition-all hover:border-slate-300">
                     <div class="flex justify-between items-start gap-2">
                         <p class="text-[11px] font-semibold text-slate-700 flex-1 leading-snug">${sub.label}</p>
                         <div class="flex items-center gap-1 shrink-0">
@@ -843,7 +795,7 @@
                                    id="sub-${critId}-${sub.id}"
                                    oninput="onSubMarkInput('${critId}')"
                                    onblur="clampSubInput('${critId}','${sub.id}',${sub.max}); onSubMarkInput('${critId}')"
-                                   class="w-16 px-2 py-1 border border-slate-300 rounded text-xs text-center font-bold focus:ring-2 focus:ring-ipg-blue outline-none">
+                                   class="w-16 px-2 py-1 border border-slate-300 rounded text-xs text-center font-bold focus:ring-2 focus:ring-ipg-blue outline-none transition-shadow">
                             <span class="text-[10px] text-slate-400 font-semibold">/ ${sub.max.toFixed(1)}</span>
                         </div>
                     </div>
@@ -868,7 +820,6 @@
             onSubMarkInput(critId);
         }
 
-        // Pastikan markah manual tidak melebihi had sub-kriteria
         function clampSubInput(critId, subId, maxVal) {
             const el = document.getElementById(`sub-${critId}-${subId}`);
             if (!el) return;
@@ -878,8 +829,6 @@
             el.value = v;
         }
 
-        // Bila lecturer klik satu band: highlight butang, auto-isi markah (penjuru tertinggi
-        // julat band), papar deskriptor penuh - TAPI markah dalam kotak input boleh terus diedit.
         function selectBand(critId, subId, bandIdx) {
             const config = RUBRIK_T2_T3[critId];
             const sub = config.subcriteria.find(s => s.id === subId);
@@ -908,7 +857,6 @@
             onSubMarkInput(critId);
         }
 
-        // Jumlahkan semua sub-kriteria bagi satu kriteria (t2-k1, t2-k2, ...) dan kemas kini badge/jumlah
         function onSubMarkInput(critId) {
             const config = RUBRIK_T2_T3[critId];
             if (!config) return;
@@ -924,7 +872,7 @@
             sum = Math.round(sum * 100) / 100;
             if (sum > config.max) sum = config.max;
 
-            document.getElementById(critId).value = sum; // hidden input (dibaca oleh saveStudentScores)
+            document.getElementById(critId).value = sum;
 
             const [group, key] = critId.split('-');
             if (group === 't2') {
@@ -940,7 +888,6 @@
             toggleRubricInfo('r1');
         }
 
-        // SISTEM TOAST NOTIFICATION
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -973,7 +920,6 @@
             }, 4000);
         }
 
-        // AMBIL DATA DARI WEB APP GOOGLE SCRIPT
         function fetchStudentData() {
             const syncIcon = document.getElementById('sync-icon');
             if (syncIcon) syncIcon.classList.add('animate-spin');
@@ -994,13 +940,11 @@
                 return;
             }
 
-            if (setupWarning) {
-                setupWarning.classList.add('hidden');
-            }
+            if (setupWarning) setupWarning.classList.add('hidden');
 
             fetch(gasUrl)
                 .then(response => {
-                    if (!response.ok) throw new Error("Maklum balas server ralat!");
+                    if (!response.ok) throw new Error("Maklum balas pelayan ralat!");
                     return response.json();
                 })
                 .then(res => {
@@ -1046,7 +990,6 @@
                 });
         }
 
-        // AKSI PEMBINAAN HEADER SPREADSHEET SECARA AUTOMATIK
         function triggerSpreadsheetSetup() {
             if (!gasUrl) {
                 showToast("Sila masukkan URL Web App dahulu di bahagian atas!", "error");
@@ -1069,7 +1012,6 @@
                 });
         }
 
-        // SIMPAN URL DATABASE
         function saveGasUrl() {
             const val = document.getElementById('setting-gas-url').value.trim();
             gasUrl = val;
@@ -1078,7 +1020,6 @@
             fetchStudentData();
         }
 
-        // NAVIGASI TAB HALAMAN
         function switchTab(tabId) {
             document.getElementById('tab-dashboard').classList.add('hidden');
             document.getElementById('tab-marks').classList.add('hidden');
@@ -1105,56 +1046,40 @@
             }
         }
 
-        // ISIAN DROPDOWN UNIT SECARA DINAMIK
         function populateGroupDropdowns() {
             const groups = [...new Set(students.map(s => s.group))].filter(g => g);
             
-            // Dropdown di halaman pengisian markah
             const selectEl = document.getElementById('filter-group');
             selectEl.innerHTML = '<option value="all">Semua Kumpulan/Unit</option>';
             
-            // Dropdown di dasbor analitis
             const dashSelectEl = document.getElementById('dashboard-filter-group');
             dashSelectEl.innerHTML = '<option value="all">Semua Kumpulan</option>';
 
             groups.forEach(g => {
                 const opt1 = document.createElement('option');
-                opt1.value = g;
-                opt1.innerText = g;
+                opt1.value = g; opt1.innerText = g;
                 selectEl.appendChild(opt1);
 
                 const opt2 = document.createElement('option');
-                opt2.value = g;
-                opt2.innerText = g;
+                opt2.value = g; opt2.innerText = g;
                 dashSelectEl.appendChild(opt2);
             });
         }
 
-        // MAP GRED KEPADA MATA NILAIAN PNGK (GPA)
         const gpaMap = {
             'A+': 4.00, 'A': 4.00, 'A-': 3.67,
             'B+': 3.33, 'B': 3.00, 'B-': 2.67,
             'C+': 2.33, 'C': 2.00, 'D': 1.00, 'F': 0.00
         };
 
-        // STATISTIK DASHBOARD & CHART TABURAN GRED
         function updateDashboardStats() {
             const groupFilter = document.getElementById('dashboard-filter-group').value;
-            
-            // Tapis data pelajar berdasarkan unit tapisan di dasbor
             const filteredStudents = students.filter(s => groupFilter === 'all' || s.group === groupFilter);
 
             const total = filteredStudents.length;
-            let completed = 0;
-            let totalSum = 0;
-            let totalGpaPoints = 0;
-            let totalPassCount = 0;
-
-            let highestMark = -1;
-            let lowestMark = 101;
-            let bestStudent = null;
-            let worstStudent = null;
-
+            let completed = 0, totalSum = 0, totalGpaPoints = 0, totalPassCount = 0;
+            let highestMark = -1, lowestMark = 101;
+            let bestStudent = null, worstStudent = null;
             const gradesMap = { 'A+': 0, 'A': 0, 'A-': 0, 'B+': 0, 'B': 0, 'B-': 0, 'C+': 0, 'C': 0, 'D': 0, 'F': 0 };
 
             filteredStudents.forEach(s => {
@@ -1164,94 +1089,53 @@
                 const currentSum = Math.round((t1_val + t2_sum + t3_sum) * 100) / 100;
                 
                 totalSum += currentSum;
-                
-                if (s.t1 > 0 || t2_sum > 0 || t3_sum > 0) {
-                    completed++;
-                }
+                if (s.t1 > 0 || t2_sum > 0 || t3_sum > 0) completed++;
 
-                // Gred & PNGK
                 const currentGrade = s.grade || calculateGrade(currentSum);
-                if (gradesMap[currentGrade] !== undefined) {
-                    gradesMap[currentGrade]++;
-                }
-
+                if (gradesMap[currentGrade] !== undefined) gradesMap[currentGrade]++;
                 totalGpaPoints += gpaMap[currentGrade] || 0;
 
-                // Lulus jika gred C ke atas (>= 50%)
-                if (currentSum >= 50) {
-                    totalPassCount++;
-                }
+                if (currentSum >= 50) totalPassCount++;
 
-                // Pelajar Terbaik / Tercorot
-                if (currentSum > highestMark) {
-                    highestMark = currentSum;
-                    bestStudent = s;
-                }
-                if (currentSum < lowestMark && currentSum > 0) {
-                    lowestMark = currentSum;
-                    worstStudent = s;
-                }
+                if (currentSum > highestMark) { highestMark = currentSum; bestStudent = s; }
+                if (currentSum < lowestMark && currentSum > 0) { lowestMark = currentSum; worstStudent = s; }
             });
 
-            // Kemas kini paparan nilai angka dengan selamat (Defensive Checking)
-            const elTotal = document.getElementById('stat-total-students');
-            if (elTotal) elTotal.innerText = total;
-
-            const elAverage = document.getElementById('stat-average');
-            if (elAverage) elAverage.innerText = total > 0 ? (totalSum / total).toFixed(1) + "%" : "0.0%";
-
-            const elGpa = document.getElementById('stat-gpa');
-            if (elGpa) elGpa.innerText = total > 0 ? (totalGpaPoints / total).toFixed(2) : "0.00";
-
-            const elPassRate = document.getElementById('stat-pass-rate');
-            if (elPassRate) elPassRate.innerText = total > 0 ? ((totalPassCount / total) * 100).toFixed(1) + "%" : "0.0%";
-
-            const elCompleted = document.getElementById('stat-completed');
-            if (elCompleted) elCompleted.innerText = completed;
-
-            const elPending = document.getElementById('stat-pending');
-            if (elPending) elPending.innerText = total - completed;
+            if (document.getElementById('stat-total-students')) document.getElementById('stat-total-students').innerText = total;
+            if (document.getElementById('stat-average')) document.getElementById('stat-average').innerText = total > 0 ? (totalSum / total).toFixed(1) + "%" : "0.0%";
+            if (document.getElementById('stat-gpa')) document.getElementById('stat-gpa').innerText = total > 0 ? (totalGpaPoints / total).toFixed(2) : "0.00";
+            if (document.getElementById('stat-pass-rate')) document.getElementById('stat-pass-rate').innerText = total > 0 ? ((totalPassCount / total) * 100).toFixed(1) + "%" : "0.0%";
+            if (document.getElementById('stat-completed')) document.getElementById('stat-completed').innerText = completed;
+            if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = total - completed;
 
             const pendingIcon = document.getElementById('stat-pending-icon');
             if (pendingIcon) {
-                if (total - completed === 0) {
-                    pendingIcon.classList.add('hidden');
-                } else {
-                    pendingIcon.classList.remove('hidden');
-                }
+                if (total - completed === 0) pendingIcon.classList.add('hidden');
+                else pendingIcon.classList.remove('hidden');
             }
 
-            // Kemas kini info pelajar terbaik / tercorot
-            const elBestName = document.getElementById('best-student-name');
-            const elBestMeta = document.getElementById('best-student-meta');
-            if (bestStudent && elBestName && elBestMeta) {
-                elBestName.innerText = bestStudent.name;
-                elBestMeta.innerText = `Kumpulan: ${bestStudent.group} • Markah: ${highestMark.toFixed(1)}% (${bestStudent.grade || calculateGrade(highestMark)})`;
-            } else if (elBestName && elBestMeta) {
-                elBestName.innerText = "Tiada Data";
-                elBestMeta.innerText = "Kumpulan: - • Markah: -";
+            if (bestStudent && document.getElementById('best-student-name')) {
+                document.getElementById('best-student-name').innerText = bestStudent.name;
+                document.getElementById('best-student-meta').innerText = `Kumpulan: ${bestStudent.group} • Markah: ${highestMark.toFixed(1)}% (${bestStudent.grade || calculateGrade(highestMark)})`;
+            } else if (document.getElementById('best-student-name')) {
+                document.getElementById('best-student-name').innerText = "Tiada Data";
+                document.getElementById('best-student-meta').innerText = "Kumpulan: - • Markah: -";
             }
 
-            const elWorstName = document.getElementById('worst-student-name');
-            const elWorstMeta = document.getElementById('worst-student-meta');
-            if (worstStudent && elWorstName && elWorstMeta) {
-                elWorstName.innerText = worstStudent.name;
-                elWorstMeta.innerText = `Kumpulan: ${worstStudent.group} • Markah: ${lowestMark.toFixed(1)}% (${worstStudent.grade || calculateGrade(lowestMark)})`;
-            } else if (elWorstName && elWorstMeta) {
-                elWorstName.innerText = "Tiada Data";
-                elWorstMeta.innerText = "Kumpulan: - • Markah: -";
+            if (worstStudent && document.getElementById('worst-student-name')) {
+                document.getElementById('worst-student-name').innerText = worstStudent.name;
+                document.getElementById('worst-student-meta').innerText = `Kumpulan: ${worstStudent.group} • Markah: ${lowestMark.toFixed(1)}% (${worstStudent.grade || calculateGrade(lowestMark)})`;
+            } else if (document.getElementById('worst-student-name')) {
+                document.getElementById('worst-student-name').innerText = "Tiada Data";
+                document.getElementById('worst-student-meta').innerText = "Kumpulan: - • Markah: -";
             }
 
-            // LUKIS KEMBALI INTERACTIVE CHARTS
             renderInteractiveCharts(gradesMap, totalPassCount, total - totalPassCount);
         }
 
-        // FUNGSI JANA CHART.JS SECARA DINAMIK
         function renderInteractiveCharts(gradesMap, passCount, failCount) {
-            // 1. Bar Chart - Taburan Gred
             const ctxBar = document.getElementById('gradeBarChart').getContext('2d');
-            if (gradeChartInstance) gradeChartInstance.destroy(); // Hancurkan graf lama sebelum bina yang baharu
-
+            if (gradeChartInstance) gradeChartInstance.destroy();
             gradeChartInstance = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
@@ -1266,24 +1150,14 @@
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { precision: 0 }
-                        }
-                    }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
                 }
             });
 
-            // 2. Pie/Doughnut Chart - Kelulusan (Lulus vs Gagal)
             const ctxPie = document.getElementById('passPieChart').getContext('2d');
             if (passChartInstance) passChartInstance.destroy();
-
             passChartInstance = new Chart(ctxPie, {
                 type: 'doughnut',
                 data: {
@@ -1291,33 +1165,25 @@
                     datasets: [{
                         data: [passCount, failCount],
                         backgroundColor: ['#10b981', '#f43f5e'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        borderWidth: 2, borderColor: '#ffffff'
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { boxWidth: 12, font: { size: 11 } }
-                        }
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
                     cutout: '70%'
                 }
             });
         }
 
-        // RENDERING JADUAL PELAJAR
         function renderStudentTable() {
             const tbody = document.getElementById('students-tbody');
             const searchVal = document.getElementById('search-student').value.toLowerCase();
             const groupVal = document.getElementById('filter-group').value;
 
             tbody.innerHTML = '';
-
             let counter = 1;
+            
             students.forEach((student) => {
                 const matchesSearch = student.name.toLowerCase().includes(searchVal) || student.kp.includes(searchVal) || student.group.toLowerCase().includes(searchVal);
                 const matchesGroup = groupVal === 'all' || student.group === groupVal;
@@ -1334,7 +1200,7 @@
                     tr.innerHTML = `
                         <td class="p-4 text-center font-bold text-slate-400">${counter++}</td>
                         <td class="p-4 font-bold text-slate-900">${student.name}<p class="text-[10px] text-slate-400 font-normal">${student.kp}</p></td>
-                        <td class="p-4"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-bold">${student.group}</span></td>
+                        <td class="p-4"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-bold border border-slate-200">${student.group}</span></td>
                         <td class="p-4 text-center font-semibold text-blue-600">${t1_final.toFixed(1)}/30</td>
                         <td class="p-4 text-center font-semibold text-amber-600">${t2_final.toFixed(1)}/20</td>
                         <td class="p-4 text-center font-semibold text-emerald-600">${t3_final.toFixed(1)}/50</td>
@@ -1342,13 +1208,11 @@
                         <td class="p-4 text-center"><span class="${getGradeClass(grade)}">${grade}</span></td>
                         <td class="p-4 text-center no-print">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="openGradingModal('${student.id}')" class="bg-ipg-navy hover:bg-ipg-blue text-white px-3 py-1.5 rounded-lg font-bold text-[10px] flex items-center justify-center space-x-1 transition">
-                                    <i class="fa-solid fa-edit"></i>
-                                    <span>Nilai</span>
+                                <button onclick="openGradingModal('${student.id}')" class="bg-ipg-navy hover:bg-ipg-blue text-white px-3 py-1.5 rounded-lg font-bold text-[10px] flex items-center justify-center space-x-1 transition shadow-sm">
+                                    <i class="fa-solid fa-edit"></i><span>Nilai</span>
                                 </button>
-                                <button onclick="printSingleStudent('${student.id}')" title="Cetak laporan markah pelajar ini" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-[10px] flex items-center justify-center space-x-1 transition">
-                                    <i class="fa-solid fa-print"></i>
-                                    <span>Cetak</span>
+                                <button onclick="printSingleStudent('${student.id}')" title="Cetak laporan markah" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-[10px] flex items-center justify-center space-x-1 transition border border-slate-200">
+                                    <i class="fa-solid fa-print"></i><span>Cetak</span>
                                 </button>
                             </div>
                         </td>
@@ -1358,7 +1222,7 @@
             });
 
             if (tbody.innerHTML === '') {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 text-xs">Tiada data dijumpai. Sila sambungkan pautan Web App dengan betul.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-400 text-xs">Tiada data dijumpai.</td></tr>`;
             }
         }
 
@@ -1369,16 +1233,9 @@
             return "bg-rose-50 text-rose-800 font-bold px-2 py-1 rounded text-[10px] border border-rose-200";
         }
 
-        // EKSPORT DATA JADUAL KEPADA FAIL EXCEL (CSV)
         function exportToExcel() {
-            if (students.length === 0) {
-                showToast("Tiada data pelajar untuk dieksport!", "error");
-                return;
-            }
-
+            if (students.length === 0) { showToast("Tiada data pelajar untuk dieksport!", "error"); return; }
             let csvContent = "data:text/csv;charset=utf-8,";
-            
-            // Header baris CSV
             csvContent += "Bil,Nama Pelajar,No Kad Pengenalan,Kumpulan,T1: Ujian (30%),T2: Persembahan (20%),T3: Penulisan (50%),Jumlah Markah (100%),Gred\n";
 
             students.forEach((s, idx) => {
@@ -1386,8 +1243,6 @@
                 const t3_sum = Object.values(s.t3).reduce((a, b) => a + b, 0);
                 const finalScore = s.t1 + t2_sum + t3_sum;
                 const grade = s.grade || calculateGrade(finalScore);
-
-                // Tambah data ke baris CSV
                 csvContent += `"${idx + 1}","${s.name}","${s.kp}","${s.group}","${s.t1.toFixed(1)}","${t2_sum.toFixed(1)}","${t3_sum.toFixed(1)}","${finalScore.toFixed(1)}","${grade}"\n`;
             });
 
@@ -1395,26 +1250,38 @@
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
             link.setAttribute("download", "Laporan_Markah_GKKO1062.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
             showToast("Fail CSV berjaya dieksport!", "success");
         }
 
-        // KAWALAN SLIDERS DAN DIALOG BOX
+        // FUNGSI ANIMASI TOGOL UI
+        function toggleSyncText(isChecked) {
+            const txt = document.getElementById('sync-status-text');
+            if(isChecked) {
+                txt.innerText = 'ON';
+                txt.className = "text-[10px] font-bold text-ipg-blue";
+            } else {
+                txt.innerText = 'OFF';
+                txt.className = "text-[10px] font-bold text-slate-400";
+            }
+        }
+
         function openGradingModal(studentId) {
             const student = students.find(s => s.id === studentId);
             if (!student) return;
 
             activeStudentId = studentId;
             document.getElementById('grading-student-meta').innerText = `${student.name} • ${student.group} • KP: ${student.kp} • Baris Sheet: ${student.rowNum}`;
+            document.getElementById('sync-group-name').innerText = student.group;
             
+            // Reset togol
+            const syncToggle = document.getElementById('sync-group-t2');
+            syncToggle.checked = false;
+            toggleSyncText(false);
+
             document.getElementById('input-t1').value = student.t1;
             calculateT1(student.t1);
 
-            // Bina semula UI sub-kriteria T2 & T3, prefill dgn markah sedia ada (subMarks)
-            // drpd lajur T-AE dalam sheet supaya setiap kotak raw boleh terus diedit.
             const sm = student.subMarks || {};
             ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
                 const config = RUBRIK_T2_T3[critId];
@@ -1425,9 +1292,6 @@
                 renderRubricCriterion(critId, presetForCrit);
             });
 
-            // FAILSAFE: rekod LAMA (sebelum lajur pecahan T-AE wujud) tiada data subMarks,
-            // jadi jumlah terkira drpd sub-kriteria akan jadi 0. Dalam kes itu, kekalkan
-            // sahaja jumlah agregat asal drpd lajur F-K supaya markah lama tidak hilang.
             [['t2-k1', student.t2.k1], ['t2-k2', student.t2.k2], ['t2-k3', student.t2.k3],
              ['t3-k1', student.t3.k1], ['t3-k2', student.t3.k2], ['t3-k3', student.t3.k3]].forEach(([critId, legacyVal]) => {
                 const currentHidden = parseFloat(document.getElementById(critId).value) || 0;
@@ -1439,7 +1303,6 @@
                 }
             });
 
-            // Papar komen sedia ada (jika ada) bagi setiap kriteria
             const c = student.comments || {};
             document.getElementById('comment-t2-k1').value = c.t2k1 || "";
             document.getElementById('comment-t2-k2').value = c.t2k2 || "";
@@ -1460,19 +1323,10 @@
         function calculateT1(val) {
             const rawVal = parseFloat(val) || 0;
             const badge = document.getElementById('t1-band-badge');
-            if (rawVal >= 27) {
-                badge.innerText = "Amat Cemerlang";
-                badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-emerald-100 text-emerald-800";
-            } else if (rawVal >= 22.5) {
-                badge.innerText = "Cemerlang";
-                badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-blue-100 text-blue-800";
-            } else if (rawVal >= 18) {
-                badge.innerText = "Kepujian";
-                badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-amber-100 text-amber-800";
-            } else {
-                badge.innerText = "Sederhana/Lemah";
-                badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-rose-100 text-rose-800";
-            }
+            if (rawVal >= 27) { badge.innerText = "Amat Cemerlang"; badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-emerald-100 text-emerald-800"; }
+            else if (rawVal >= 22.5) { badge.innerText = "Cemerlang"; badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-blue-100 text-blue-800"; }
+            else if (rawVal >= 18) { badge.innerText = "Kepujian"; badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-amber-100 text-amber-800"; }
+            else { badge.innerText = "Sederhana/Lemah"; badge.className = "text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-rose-100 text-rose-800"; }
             calculateModalTotal();
         }
 
@@ -1481,49 +1335,34 @@
             calculateModalTotal();
         }
 
-        // Pembetulan ralat: memetakan id v-t3-k5 dengan betul
         function updateT3Slider(key, val) {
             const label = document.getElementById(`v-t3-${key}`);
-            if (label) {
-                label.innerText = parseFloat(val).toFixed(1);
-            }
+            if (label) label.innerText = parseFloat(val).toFixed(1);
             calculateModalTotal();
         }
 
         function calculateModalTotal() {
             const t1 = parseFloat(document.getElementById('input-t1').value) || 0;
-            
-            const t2_k1 = parseFloat(document.getElementById('t2-k1').value) || 0;
-            const t2_k2 = parseFloat(document.getElementById('t2-k2').value) || 0;
-            const t2_k3 = parseFloat(document.getElementById('t2-k3').value) || 0;
-            const t2_sum = t2_k1 + t2_k2 + t2_k3;
-
-            const t3_k1 = parseFloat(document.getElementById('t3-k1').value) || 0;
-            const t3_k2 = parseFloat(document.getElementById('t3-k2').value) || 0;
-            const t3_k3 = parseFloat(document.getElementById('t3-k3').value) || 0;
-            const t3_sum = t3_k1 + t3_k2 + t3_k3;
+            const t2_sum = (parseFloat(document.getElementById('t2-k1').value) || 0) + (parseFloat(document.getElementById('t2-k2').value) || 0) + (parseFloat(document.getElementById('t2-k3').value) || 0);
+            const t3_sum = (parseFloat(document.getElementById('t3-k1').value) || 0) + (parseFloat(document.getElementById('t3-k2').value) || 0) + (parseFloat(document.getElementById('t3-k3').value) || 0);
 
             document.getElementById('t2-total-badge').innerText = `${t2_sum.toFixed(1)} / 20.0 Markah`;
             document.getElementById('t3-total-badge').innerText = `${t3_sum.toFixed(1)} / 50.0 Markah`;
 
             const grantTotal = Math.round((t1 + t2_sum + t3_sum) * 100) / 100;
             const grade = calculateGrade(grantTotal);
-            document.getElementById('grading-modal-total').innerHTML = `${grantTotal.toFixed(1)}% <span class="text-xs font-bold text-slate-400">(Gred: -)</span>`;
+            document.getElementById('grading-modal-total').innerHTML = `${grantTotal.toFixed(1)}% <span class="text-xs font-bold text-slate-400">(Gred: ${grade})</span>`;
         }
 
-        // HANTAR DATA UPDATE KE SHEETS
         function saveStudentScores() {
             if (!activeStudentId) return;
-
             const student = students.find(s => s.id === activeStudentId);
             if (!student) return;
 
             const saveBtn = document.getElementById('save-btn');
             saveBtn.disabled = true;
-            saveBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menghantar...</span>`;
+            saveBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan...</span>`;
 
-            // Kumpulkan SETIAP markah sub-kriteria individu (lajur T-AE) supaya
-            // ia boleh dimuat semula & diedit bila modal dibuka semula pada masa hadapan.
             const subMarksPayload = {};
             ['t2-k1', 't2-k2', 't2-k3', 't3-k1', 't3-k2', 't3-k3'].forEach(critId => {
                 const config = RUBRIK_T2_T3[critId];
@@ -1532,6 +1371,17 @@
                     subMarksPayload[`${critId}-${sub.id}`] = parseFloat(el ? el.value : 0) || 0;
                 });
             });
+
+            const syncGroupT2 = document.getElementById('sync-group-t2').checked;
+            const groupRowNums = [];
+            
+            if (syncGroupT2 && student.group && student.group !== "TIADA UNIT" && student.group !== "TIADA DATA") {
+                students.forEach(s => {
+                    if (s.group === student.group && s.id !== student.id) {
+                        groupRowNums.push(s.rowNum);
+                    }
+                });
+            }
 
             const payload = {
                 rowNum: student.rowNum,
@@ -1554,7 +1404,9 @@
                     t3k2: document.getElementById('comment-t3-k2').value.trim(),
                     t3k3: document.getElementById('comment-t3-k3').value.trim()
                 },
-                subMarks: subMarksPayload
+                subMarks: subMarksPayload,
+                syncGroupT2: syncGroupT2,
+                groupRowNums: groupRowNums
             };
 
             if (!gasUrl) {
@@ -1564,32 +1416,32 @@
                 return;
             }
 
+            // PERUBAHAN UTAMA: Guna 'text/plain' supaya tidak disekat CORS & boleh baca response
             fetch(gasUrl, {
                 method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                showToast("Markah & komen dikemas kini & dihantar ke Google Sheets secara langsung!", "success");
-                
-                student.t1 = payload.t1;
-                student.t2 = payload.t2;
-                student.t3 = payload.t3;
-                student.comments = payload.comments;
-                student.subMarks = payload.subMarks;
-                
-                renderStudentTable();
-                updateDashboardStats();
-                closeGradingModal();
-                
-                setTimeout(fetchStudentData, 1500);
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.status === "success") {
+                    let msg = "Markah & komen individu dikemas kini!";
+                    if (resData.groupSyncCount > 0) {
+                        msg = `Berjaya: Markah T2 turut disalin ke ${resData.groupSyncCount} rakan kumpulan.`;
+                    }
+                    showToast(msg, "success");
+                    
+                    closeGradingModal();
+                    
+                    // Tarik data baharu dari server supaya semua baris kumpulan turut dikemaskini
+                    setTimeout(fetchStudentData, 800);
+                } else {
+                    throw new Error(resData.error || "Ralat pelayan");
+                }
             })
             .catch(error => {
                 console.error("Ralat menyimpan markah:", error);
-                showToast("Gagal menghantar markah ke Google Sheets. Sila periksa semula sambungan anda.", "error");
+                showToast("Gagal menghantar markah. Sila periksa semula sambungan anda.", "error");
             })
             .finally(() => {
                 saveBtn.disabled = false;
@@ -1597,7 +1449,6 @@
             });
         }
 
-        // PANDUAN RUJUKAN RUBRIK GKKO1062
         function toggleRubricInfo(rubricCode) {
             const btn1 = document.getElementById('btn-r1');
             const btn2 = document.getElementById('btn-r2');
@@ -1693,7 +1544,6 @@
             }
         }
 
-        // Fungsi pembantu penentuan gred
         function calculateGrade(score) {
             if (score >= 90) return 'A+';
             if (score >= 80) return 'A';
@@ -1707,7 +1557,6 @@
             return 'F';
         }
 
-        // Label tahap pencapaian T1 (dikongsi antara modal & laporan cetakan)
         function getT1BandLabel(rawVal) {
             const v = parseFloat(rawVal) || 0;
             if (v >= 27) return "Amat Cemerlang";
@@ -1717,35 +1566,22 @@
             return "Lemah";
         }
 
-        // ================================================================
-        // CETAK LAPORAN MARKAH SEORANG PELAJAR (seorang demi seorang)
-        // ================================================================
         function printSingleStudent(studentId) {
             const student = students.find(s => s.id === studentId);
-            if (!student) {
-                showToast("Data pelajar tidak dijumpai!", "error");
-                return;
-            }
+            if (!student) { showToast("Data pelajar tidak dijumpai!", "error"); return; }
 
             const t1 = student.t1 || 0;
-            const t2k1 = student.t2.k1 || 0;
-            const t2k2 = student.t2.k2 || 0;
-            const t2k3 = student.t2.k3 || 0;
-            const t2Total = Math.round((t2k1 + t2k2 + t2k3) * 100) / 100;
-
-            const t3k1 = student.t3.k1 || 0;
-            const t3k2 = student.t3.k2 || 0;
-            const t3k3 = student.t3.k3 || 0;
-            const t3Total = Math.round((t3k1 + t3k2 + t3k3) * 100) / 100;
-
+            const t2Total = Math.round(((student.t2.k1 || 0) + (student.t2.k2 || 0) + (student.t2.k3 || 0)) * 100) / 100;
+            const t3Total = Math.round(((student.t3.k1 || 0) + (student.t3.k2 || 0) + (student.t3.k3 || 0)) * 100) / 100;
             const grandTotal = Math.round((t1 + t2Total + t3Total) * 100) / 100;
+            
             const grade = student.grade || calculateGrade(grandTotal);
             const today = new Date().toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
+            
             const cm = student.comments || {};
             const sm = student.subMarks || {};
             const escapeHtml = (str) => (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-            // Jana baris pecahan sub-kriteria + baris jumlah kriteria (data-driven drpd RUBRIK_T2_T3)
             function printCriterionRows(critId, headerLabel, aggregateVal, commentVal) {
                 const config = RUBRIK_T2_T3[critId];
                 let rows = '';
@@ -1808,9 +1644,9 @@
                             <tr style="border-bottom:1px solid #e2e8f0;background:#f8fafc;">
                                 <td colspan="3" style="padding:6px 10px;font-weight:700;color:#134074;">Tugasan 2: Persembahan OPD (20%)</td>
                             </tr>
-                            ${printCriterionRows('t2-k1', 'Perancangan', t2k1, cm.t2k1)}
-                            ${printCriterionRows('t2-k2', 'Pembinaan Produk', t2k2, cm.t2k2)}
-                            ${printCriterionRows('t2-k3', 'Pembentangan', t2k3, cm.t2k3)}
+                            ${printCriterionRows('t2-k1', 'Perancangan', student.t2.k1, cm.t2k1)}
+                            ${printCriterionRows('t2-k2', 'Pembinaan Produk', student.t2.k2, cm.t2k2)}
+                            ${printCriterionRows('t2-k3', 'Pembentangan', student.t2.k3, cm.t2k3)}
                             <tr style="border-bottom:1px solid #e2e8f0;">
                                 <td style="padding:8px 10px;font-weight:700;">Jumlah Tugasan 2</td>
                                 <td style="padding:8px 10px;text-align:center;font-weight:700;">${t2Total.toFixed(1)} / 20.0</td>
@@ -1819,9 +1655,9 @@
                             <tr style="border-bottom:1px solid #e2e8f0;background:#f8fafc;">
                                 <td colspan="3" style="padding:6px 10px;font-weight:700;color:#134074;">Tugasan 3: Penulisan (50%)</td>
                             </tr>
-                            ${printCriterionRows('t3-k1', 'Pengenalan', t3k1, cm.t3k1)}
-                            ${printCriterionRows('t3-k2', 'Kandungan', t3k2, cm.t3k2)}
-                            ${printCriterionRows('t3-k3', 'Kesimpulan', t3k3, cm.t3k3)}
+                            ${printCriterionRows('t3-k1', 'Pengenalan', student.t3.k1, cm.t3k1)}
+                            ${printCriterionRows('t3-k2', 'Kandungan', student.t3.k2, cm.t3k2)}
+                            ${printCriterionRows('t3-k3', 'Kesimpulan', student.t3.k3, cm.t3k3)}
                             <tr style="border-bottom:1px solid #e2e8f0;">
                                 <td style="padding:8px 10px;font-weight:700;">Jumlah Tugasan 3</td>
                                 <td style="padding:8px 10px;text-align:center;font-weight:700;">${t3Total.toFixed(1)} / 50.0</td>
@@ -1847,18 +1683,12 @@
                     </div>
                 </div>
             `;
-
-            const reportEl = document.getElementById('print-student-report');
-            reportEl.innerHTML = reportHtml;
-
+            document.getElementById('print-student-report').innerHTML = reportHtml;
             document.body.classList.add('printing-single');
             window.print();
         }
 
-        // Bersihkan mod cetak-seorang selepas dialog cetak ditutup (sokongan pelbagai pelayar)
-        window.addEventListener('afterprint', () => {
-            document.body.classList.remove('printing-single');
-        });
+        window.addEventListener('afterprint', () => { document.body.classList.remove('printing-single'); });
     </script>
 </body>
 </html>
